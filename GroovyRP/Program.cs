@@ -20,7 +20,7 @@ namespace GroovyRP
         //The Lumineers (the lumineers)
         private static readonly string[] albums = new[] { "myheadisananimal", "feverdream", "babel", "thelumineers", "delta", "sighnomore", "wildermind" };
         private static string pressenceDetails = string.Empty;
-        private static string[] validPlayers = new[] { "music.ui", "chrome", "spotify" };
+        private static string[] validPlayers = new[] { "music.ui", "chrome", "spotify", "brave", "new_chrome", "firefox" };
         //For use in settings
         private static readonly Dictionary<string, string> aliases = new Dictionary<string, string>
         {
@@ -35,14 +35,18 @@ namespace GroovyRP
         {
             {"music.ui", "groove" },
             {"chrome", "chrome" },
-            {"spotify", "spotify" }
+            {"new_chrome", "brave" },
+            {"brave", "brave" },
+            {"spotify", "spotify" },
         };
         //might just combine these later
         private static readonly Dictionary<string, string> little_assets = new Dictionary<string, string>
         {
             {"music.ui", "groove_small" },
             {"chrome", "chrome_small" },
-            {"spotify", "spotify_small" }
+            {"new_chrome", "brave_small" },
+            {"brave", "brave" },
+            {"spotify", "spotify_small" },
         };
         private static readonly string defaultPlayer = "groove";
         private static int timeout_seconds = 60;
@@ -59,8 +63,17 @@ namespace GroovyRP
             _client.OnError += _client_OnError;
             _client.OnPresenceUpdate += _client_OnPresenceUpdate;
 
-            GlobalSystemMediaTransportControlsSessionMediaProperties currentTrack = GetStuff();
-            GlobalSystemMediaTransportControlsSessionMediaProperties oldTrack = GetStuff();
+            GlobalSystemMediaTransportControlsSessionMediaProperties currentTrack = null;
+            GlobalSystemMediaTransportControlsSessionMediaProperties oldTrack = null;
+
+            try
+            {
+                currentTrack = GetStuff();
+                oldTrack = GetStuff();
+            }catch (Exception)
+            {
+            
+            }
 
             bool isPlaying = IsUsingAudio();
             bool wasPlaying = false;
