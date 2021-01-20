@@ -6,41 +6,80 @@ using System.Diagnostics;
 using CSCore.CoreAudioAPI;
 using System.Linq;
 using System.IO;
+using System.Diagnostics;
+using System.Collections.Generic;
 
 namespace GroovyRP
 {
     class Program
     {
-        private const string appDetails = "GroovyRP\nOrignal Creator: https://github.com/dsdude123/GroovyRP \nModified: https://github.com/jojo2357/GroovyRP";
+        private const string appDetails = "GroovyRP\nOrignal Creator: https://github.com/dsdude123/GroovyRP \nModified: https://github.com/jojo2357/Music-Discord-Presence";
         private static readonly DiscordRpcClient _client = new DiscordRpcClient("801209905020272681", autoEvents: false);
         //My head is an animal, Fever Dream (of monsters and men)
         //Sigh no more, wilder mind, babel, delta (Mumford + sons)
         //The Lumineers (the lumineers)
         private static readonly string[] albums = new[] { "myheadisananimal", "feverdream", "babel", "thelumineers", "delta", "sighnomore", "wildermind" };
         private static string pressenceDetails = string.Empty;
-        private static bool wasPlaying = false;
-        private static string[] validPlayers = new[] { "" };
+        private static string[] validPlayers = new[] { "music.ui", "chrome", "spotify" };
+        //For use in settings
+        private static readonly Dictionary<string, string> aliases = new Dictionary<string, string>
+        {
+            {"googlechrome", "chrome" },
+            {"google", "chrome" },
+            {"chrome", "chrome" },
+            {"spotify", "spotify" },
+            {"groove", "music.ui" },
+            {"music.ui", "music.ui" },
+        };
+        private static readonly Dictionary<string, string> big_assets = new Dictionary<string, string>
+        {
+            {"music.ui", "groove" },
+            {"chrome", "chrome" },
+            {"spotify", "spotify" }
+        };
+        //might just combine these later
+        private static readonly Dictionary<string, string> little_assets = new Dictionary<string, string>
+        {
+            {"music.ui", "groove_small" },
+            {"chrome", "chrome_small" },
+            {"spotify", "spotify_small" }
+        };
+        private static readonly string defaultPlayer = "groove";
+        private static int timeout_seconds = 60;
+        private static Stopwatch timer = new Stopwatch();
+        private static Stopwatch metaTimer = new Stopwatch();
+        private static string playerName = string.Empty;
+        private static bool justcleared = false;
 
         private static void Main()
         {
+            metaTimer.Start();
+            timer.Start();
             _client.Initialize();
             _client.OnError += _client_OnError;
             _client.OnPresenceUpdate += _client_OnPresenceUpdate;
 
-            GlobalSystemMediaTransportControlsSessionMediaProperties currentTrack = null;
-            GlobalSystemMediaTransportControlsSessionMediaProperties oldTrack = null;
+            GlobalSystemMediaTransportControlsSessionMediaProperties currentTrack = GetStuff();
+            GlobalSystemMediaTransportControlsSessionMediaProperties oldTrack = GetStuff();
+
+            bool isPlaying = IsUsingAudio();
+            bool wasPlaying = false;
 
             while (_client.IsInitialized)
             {
                 //limit performace impact
                 System.Threading.Thread.Sleep(500);
-                if (IsUsingAudio())
+                wasPlaying = isPlaying;
+                isPlaying = IsUsingAudio();
+                if (wasPlaying && !isPlaying)
+                    timer.Restart();
+                if (isPlaying || timer.ElapsedMilliseconds < timeout_seconds * 1000)
                 {
                     try
                     {
-                        wasPlaying = true;
+                        oldTrack = currentTrack;
                         currentTrack = GetStuff();
-                        if (oldTrack == null || oldTrack.Title != currentTrack.Title)
+                        if (_client.CurrentPresence == null || _client.CurrentPresence.Details != ("Title: " + currentTrack.Title) || wasPlaying != isPlaying)
                         {
                             var details = $"Title: {currentTrack.Title}";
                             var state = $"Artist: {currentTrack.Artist}";
@@ -58,15 +97,20 @@ namespace GroovyRP
                                 State = state,
                                 Assets = new Assets
                                 {
-                                    LargeImageKey = (hasAlbum ? album :"groove"),
+                                    LargeImageKey = (albums.Contains(album) ? album : (big_assets.ContainsKey(playerName) ? big_assets[playerName] : defaultPlayer)),
                                     LargeImageText = currentTrack.AlbumTitle.Length > 0 ? currentTrack.AlbumTitle : "Unknown Album",
-                                    SmallImageKey = "groove_small",
-                                    SmallImageText = "using trash"
+                                    SmallImageKey = isPlaying ? (little_assets.ContainsKey(playerName) ? little_assets[playerName] : defaultPlayer) : "paused",
+                                    SmallImageText = isPlaying ? ("using " + big_assets[playerName]) : "paused"
                                 }
                             });
 
                             _client.Invoke();
+
+                            setConsole(currentTrack.Title, currentTrack.AlbumTitle);
                         }
+                        #if DEBUG
+                        Console.Write("" + (metaTimer.ElapsedMilliseconds) + "(" + (timer.ElapsedMilliseconds/* < timeout_seconds * 1000*/) + ") in " + playerName + '\r');
+                        #endif
                     }
                     catch (Exception)
                     {
@@ -79,14 +123,33 @@ namespace GroovyRP
                 }
                 else
                 {
-                    if (wasPlaying)
+                    setClear();
+                    #if DEBUG
+                    Console.Write("Cleared " + (metaTimer.ElapsedMilliseconds) + "\r");
+                    #endif
+                    if (_client.CurrentPresence != null)
                     {
                         _client.ClearPresence();
-                        oldTrack = null;
                         _client.Invoke();
                     }
-                    wasPlaying = false;
                 }
+            }
+        }
+
+        private static void setConsole(string Title, string Artist)
+        {
+            Console.Clear();
+            Console.WriteLine(appDetails);
+            Console.WriteLine($"Title: {Title}, Artist: {Artist}");
+            justcleared = false;
+        }
+
+        private static void setClear()
+        {
+            if (!justcleared) {
+                justcleared = true;
+                Console.Clear();
+                Console.WriteLine("Nothing Playing\r");
             }
         }
 
@@ -97,15 +160,10 @@ namespace GroovyRP
                 if (pressenceDetails != args.Presence.Details)
                 {
                     pressenceDetails = _client.CurrentPresence?.Details;
-                    Console.Clear();
-                    Console.WriteLine(appDetails);
-                    Console.WriteLine($"{args.Presence.Details}, {args.Presence.State}");
                 }
             }
             else
             {
-                Console.Clear();
-                Console.WriteLine("Nothing Playing");
                 pressenceDetails = string.Empty;
             }
         }
@@ -125,8 +183,11 @@ namespace GroovyRP
         private static bool IsUsingAudio()
         {
             //Music.UI is Groove. Additional options include chrome, spotify, etc
-            var grooveMusics = Process.GetProcessesByName("Music.UI");
-            if (grooveMusics.Any())
+            List<Process> candidates = new List<Process>();
+            foreach (string program in validPlayers)
+                foreach (Process process in Process.GetProcessesByName(program))
+                    candidates.Add(process);
+            if (candidates.Any())
             {
                 AudioSessionManager2 sessionManager;
                 using (var enumerator = new MMDeviceEnumerator())
@@ -141,21 +202,11 @@ namespace GroovyRP
                 {
                     foreach (var session in sessionEnumerator)
                     {
-                        bool targetProcess = false;
-                        using (var sessionControl = session.QueryInterface<AudioSessionControl2>())
+                        var process = session.QueryInterface<AudioSessionControl2>().Process;
+                        if (validPlayers.Contains(process.ProcessName.ToLower()) && session.QueryInterface<AudioMeterInformation>().GetPeakValue() > 0)
                         {
-                            var process = sessionControl.Process;
-                            if (process.ProcessName.Equals("Music.UI"))
-                            {
-                                targetProcess = true;
-                            }
-                        }
-                        using (var audioMeter = session.QueryInterface<AudioMeterInformation>())
-                        {
-                            if (audioMeter.GetPeakValue() > 0 && targetProcess)
-                            {
-                                return true;
-                            }
+                            playerName = process.ProcessName.ToLower();
+                            return true;
                         }
                     }
                 }

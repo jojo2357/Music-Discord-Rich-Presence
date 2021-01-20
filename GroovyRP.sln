@@ -7,6 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GroovyRP", "GroovyRP\Groovy
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7CEE00F7-E2BB-4A97-9C6A-B9AD04933D1A}"
 	ProjectSection(SolutionItems) = preProject
+		discordapp.ico = discordapp.ico
 		RunHidden.bat = RunHidden.bat
 	EndProjectSection
 EndProject
