@@ -5,6 +5,7 @@ using Windows.Media.Control;
 using System.Diagnostics;
 using CSCore.CoreAudioAPI;
 using System.Linq;
+using System.IO;
 
 namespace GroovyRP
 {
@@ -18,6 +19,7 @@ namespace GroovyRP
         private static readonly string[] albums = new[] { "myheadisananimal", "feverdream", "babel", "thelumineers", "delta", "sighnomore", "wildermind" };
         private static string pressenceDetails = string.Empty;
         private static bool wasPlaying = false;
+        private static string[] validPlayers = new[] { "" };
 
         private static void Main()
         {
@@ -159,6 +161,11 @@ namespace GroovyRP
                 }
             }
             return false;
+        }
+
+        private static void LoadSettings()
+        {
+
         }
     }
 }

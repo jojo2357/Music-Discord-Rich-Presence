@@ -2,4 +2,4 @@
 
 taskkill /im GroovyRP.exe
 
-START /MIN "Rich Presence for Discord" GroovyRP/bin/Debug/GroovyRP.exe
+START /MIN "Rich Presence for Discord" bin/Debug/GroovyRP.exe

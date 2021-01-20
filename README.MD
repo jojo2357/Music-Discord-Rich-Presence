@@ -8,6 +8,8 @@ To end, kill the terminal thru clicking the x or `KillHidden.bat`
 
 ## Instructions
 Uh, download and unzip (of course), then run `RunHidden.bat` and ggwp.
+Don't run the exe standalone, for future settings wont work with this
+Don't move the exe or the bat file. Instead move the provided shortcut to the desktop, or any other location
 
 ## Future fatures
 * Make settings to allow showing music from a plethora of apps.
