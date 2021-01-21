@@ -18,7 +18,7 @@ namespace GroovyRP
         //The Lumineers (the lumineers)
         private static readonly string[] albums = new[] { "myheadisananimal", "feverdream", "babel", "thelumineers", "delta", "sighnomore", "wildermind" };
         private static string pressenceDetails = string.Empty;
-        private static string[] validPlayers = new[] { "music.ui", "chrome", "spotify", "brave", "new_chrome", "firefox" };
+        private static readonly string[] validPlayers = new[] { "music.ui", "chrome", "spotify", "brave", "new_chrome", "firefox" };
         //For use in settings
         private static readonly Dictionary<string, string> aliases = new Dictionary<string, string>
         {
@@ -47,9 +47,9 @@ namespace GroovyRP
             {"spotify", "spotify_small" },
         };
         private static readonly string defaultPlayer = "groove";
-        private static int timeout_seconds = 60;
-        private static Stopwatch timer = new Stopwatch();
-        private static Stopwatch metaTimer = new Stopwatch();
+        private static readonly int timeout_seconds = 60;
+        private static readonly Stopwatch timer = new Stopwatch();
+        private static readonly Stopwatch metaTimer = new Stopwatch();
         private static string playerName = string.Empty;
         private static bool justcleared = false;
 
@@ -81,7 +81,14 @@ namespace GroovyRP
                 //limit performace impact
                 System.Threading.Thread.Sleep(500);
                 wasPlaying = isPlaying;
-                isPlaying = IsUsingAudio();
+                try
+                {
+                    isPlaying = IsUsingAudio();
+                }
+                catch (Exception)
+                {
+                    isPlaying = false;
+                }
                 if (wasPlaying && !isPlaying)
                     timer.Restart();
                 if (isPlaying || timer.ElapsedMilliseconds < timeout_seconds * 1000)
@@ -117,7 +124,7 @@ namespace GroovyRP
 
                             _client.Invoke();
 
-                            setConsole(currentTrack.Title, currentTrack.AlbumTitle);
+                            SetConsole(currentTrack.Title, currentTrack.AlbumTitle);
                         }
                         #if DEBUG
                         Console.Write("" + (metaTimer.ElapsedMilliseconds) + "(" + (timer.ElapsedMilliseconds/* < timeout_seconds * 1000*/) + ") in " + playerName + '\r');
@@ -134,7 +141,7 @@ namespace GroovyRP
                 }
                 else
                 {
-                    setClear();
+                    SetClear();
                     #if DEBUG
                     Console.Write("Cleared " + (metaTimer.ElapsedMilliseconds) + "\r");
                     #endif
@@ -147,7 +154,7 @@ namespace GroovyRP
             }
         }
 
-        private static void setConsole(string Title, string Artist)
+        private static void SetConsole(string Title, string Artist)
         {
             Console.Clear();
             Console.WriteLine(appDetails);
@@ -155,7 +162,7 @@ namespace GroovyRP
             justcleared = false;
         }
 
-        private static void setClear()
+        private static void SetClear()
         {
             if (!justcleared) {
                 justcleared = true;

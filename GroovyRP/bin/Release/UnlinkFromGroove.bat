@@ -1,5 +1,6 @@
 @echo off
 
-schtasks /delete /tn GrooveRichPresence
+schtasks /delete /tn GrooveRichPresenceOpen
+schtasks /delete /tn GrooveRichPresenceClose
 
 pause 
