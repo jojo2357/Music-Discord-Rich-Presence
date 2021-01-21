@@ -18,7 +18,6 @@ Don't move the exe or the bat file. Instead move the provided shortcut to the de
 ## Future fatures
 * Make settings to allow showing music from a plethora of apps.
 
-### Credits
-https://github.com/dsdude123/GroovyRP
+### [Credits](https://github.com/dsdude123/GroovyRP)
 
-I really like the ingenious solution @dsdude123 came up with, but it was so very expensive. It took about 20% of my CPU to run idly. With my tweaks and improvements, it takes less than 2% and half (15 MB less) as much memory. I'm not knocking their way, as it is too big brain for me, I just took what they did and built on it to make something better.
+I really like the ingenious solution [@dsdude123](https://github.com/dsdude123) came up with, but it was so very expensive. It took about 20% of my CPU to run idly. With my tweaks and improvements, it takes less than 2% and half (15 MB less) as much memory. I'm not knocking their way, as it is too big brain for me, I just took what they did and built on it to make something better.
