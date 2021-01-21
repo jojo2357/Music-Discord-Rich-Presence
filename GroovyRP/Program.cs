@@ -5,8 +5,6 @@ using Windows.Media.Control;
 using System.Diagnostics;
 using CSCore.CoreAudioAPI;
 using System.Linq;
-using System.IO;
-using System.Diagnostics;
 using System.Collections.Generic;
 
 namespace GroovyRP
@@ -35,8 +33,8 @@ namespace GroovyRP
         {
             {"music.ui", "groove" },
             {"chrome", "chrome" },
-            {"new_chrome", "brave" },
-            {"brave", "brave" },
+            {"new_chrome", "brave_small" },
+            {"brave", "brave_small" },
             {"spotify", "spotify" },
         };
         //might just combine these later

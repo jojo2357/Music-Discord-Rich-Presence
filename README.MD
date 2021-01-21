@@ -5,6 +5,10 @@ To end, kill the terminal thru clicking the x or `KillHidden.bat`
 ## Features
 * For 7 select albums, displays the cover art in the DRP for any songs being played by Groovy (built in windows music player).
 * Shows song title, artist, and album on any song.
+* Includes batch scripts to make rich presence launch when groove is opened
+
+## About linking Groove and DRP
+In order to have rich presence every time you open groovy, run the shortcut `Link Rich Presence With Groove`. If at any time you wish to disable this feature, simply run `Unlink Rich Presence With Groove`.
 
 ## Instructions
 Uh, download and unzip (of course), then run `RunHidden.bat` and ggwp.
