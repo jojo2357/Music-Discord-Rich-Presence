@@ -11,7 +11,7 @@ namespace GroovyRP
 {
     class Program
     {
-        private const string appDetails = "GroovyRP\nOrignal Creator: https://github.com/dsdude123/GroovyRP \nModified: https://github.com/jojo2357/Music-Discord-Presence";
+        private const string appDetails = "Discord Rich Presence For Groovy\nGithub: https://github.com/jojo2357/Music-Discord-Presence";
         private static readonly DiscordRpcClient _client = new DiscordRpcClient("801209905020272681", autoEvents: false);
         //My head is an animal, Fever Dream (of monsters and men)
         //Sigh no more, wilder mind, babel, delta (Mumford + sons)
@@ -22,12 +22,12 @@ namespace GroovyRP
         //For use in settings
         private static readonly Dictionary<string, string> aliases = new Dictionary<string, string>
         {
-            {"googlechrome", "chrome" },
-            {"google", "chrome" },
-            {"chrome", "chrome" },
-            {"spotify", "spotify" },
-            {"groove", "music.ui" },
-            {"music.ui", "music.ui" },
+            {"chrome", "Something in Google Chrome" },
+            {"spotify", "Spotify Music" },
+            {"groove", "Groove Music Player" },
+            {"new_chrome", "Something in Brave" },
+            {"music.ui", "Groove Music Player" },
+            {"brave", "Something in Brave" },
         };
         private static readonly Dictionary<string, string> big_assets = new Dictionary<string, string>
         {
@@ -118,13 +118,13 @@ namespace GroovyRP
                                     LargeImageKey = (albums.Contains(album) ? album : (big_assets.ContainsKey(playerName) ? big_assets[playerName] : defaultPlayer)),
                                     LargeImageText = currentTrack.AlbumTitle.Length > 0 ? currentTrack.AlbumTitle : "Unknown Album",
                                     SmallImageKey = isPlaying ? (little_assets.ContainsKey(playerName) ? little_assets[playerName] : defaultPlayer) : "paused",
-                                    SmallImageText = isPlaying ? ("using " + big_assets[playerName]) : "paused"
+                                    SmallImageText = isPlaying ? ("using " + aliases[playerName]) : "paused"
                                 }
                             });
 
                             _client.Invoke();
 
-                            SetConsole(currentTrack.Title, currentTrack.AlbumTitle);
+                            SetConsole(currentTrack.Title, currentTrack.Artist, currentTrack.AlbumTitle, album);
                         }
                         #if DEBUG
                         Console.Write("" + (metaTimer.ElapsedMilliseconds) + "(" + (timer.ElapsedMilliseconds/* < timeout_seconds * 1000*/) + ") in " + playerName + '\r');
@@ -136,7 +136,7 @@ namespace GroovyRP
                         {
                             Details = "Failed to get track info"
                         });
-                        Console.WriteLine("Failed to get track info");
+                        Console.Write("Failed to get track info\r");
                     }
                 }
                 else
@@ -154,11 +154,11 @@ namespace GroovyRP
             }
         }
 
-        private static void SetConsole(string Title, string Artist)
+        private static void SetConsole(string Title, string Artist, string Album, string album)
         {
             Console.Clear();
             Console.WriteLine(appDetails);
-            Console.WriteLine($"Title: {Title}, Album: {Artist}");
+            Console.WriteLine($"Title: {Title}, Artist: {Artist}, Album: {Album} {(albums.Contains(album) ? "\nThis is a good one, check ur DRP ;)" : "")}");
             justcleared = false;
         }
 
@@ -167,7 +167,7 @@ namespace GroovyRP
             if (!justcleared) {
                 justcleared = true;
                 Console.Clear();
-                Console.WriteLine("Nothing Playing\r");
+                Console.Write("Nothing Playing\r");
             }
         }
 

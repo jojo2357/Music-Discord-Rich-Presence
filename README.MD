@@ -1,5 +1,5 @@
 # KNOWN ERRORS
-The tasks created only work on my machine. Working on a fix but may take a day or two. If youre adventurous, locate where Music.UI.exe is on your machine (somewhere in C:\System Files\WindowsApps) and replace it in the xml files
+The setup files dont have very good error handling yet. If you have any questions, open an issue. I'm working on improving it, but if you follow [the instructions](https://github.com/jojo2357/Music-Discord-Presence#instructions) it should all work.
 
 # Discord Rich Presence For Windows
 To run, simply run `RunHidden.bat`
@@ -17,6 +17,14 @@ In order to have rich presence every time you open groovy, run the shortcut `Lin
 Uh, download and unzip (of course), then run `RunHidden.bat` and ggwp.
 Don't run the exe standalone, for future settings wont work with this
 Don't move the exe or the bat file. Instead move the provided shortcut to the desktop, or any other location
+
+If you want to link Groove and the DRP: 
+close Groove
+run `Locate Groove`
+run `Link Rich Presence With Groove`
+restart groove (it should have been opened by `Locate groove`)
+if the DRP doesnt show up within 5 seconds, run `Unlink Rich Presence With Groove` and try steps 1-4 again.
+If it still doesn't work, open up an issue and let me know whats going on.
 
 ## Future fatures
 * Make settings to allow showing music from a plethora of apps.

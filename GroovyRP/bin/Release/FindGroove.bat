@@ -2,14 +2,12 @@
 
 echo I need to find the location of groove music on your computer, and the easiest way to do that is to open it and see where it came from
 
-pause
-
 auditpol /set /category:{6997984C-797A-11D9-BED3-505054503030} /success:enable>nul
 
 taskkill /im Music.UI.exe>nul
 
-echo waiting for groove to close
-timeout 2
+echo Please ensure Groove is closed
+timeout 10
 
 cmd /c start mswindowsmusic:
 
