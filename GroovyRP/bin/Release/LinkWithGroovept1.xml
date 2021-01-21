@@ -13,20 +13,4 @@ This sample schedules a task to start notepad.exe at a specific time.
         <EventTrigger>
             <Enabled>true</Enabled>
             <Subscription>
-                &lt;QueryList&gt;&lt;Query Id="0" Path="Security"&gt;&lt;Select Path="Security"&gt;*[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] and Task = 13312 and (band(Keywords,9007199254740992)) and (EventID=4688)]] and *[EventData[(Data='C:\Program Files\WindowsApps\Microsoft.ZuneMusic_10.20112.10111.0_x64__8wekyb3d8bbwe\Music.UI.exe')]]&lt;/Select&gt;&lt;/Query&gt;&lt;/QueryList&gt;
-            </Subscription>
-        </EventTrigger>
-    </Triggers>
-    <Principals>
-        <Principal id="Author">
-            <RunLevel>LeastPrivilege</RunLevel>
-        </Principal>
-    </Principals>
-    <Settings>
-        <Enabled>true</Enabled>
-        <AllowStartOnDemand>true</AllowStartOnDemand>
-        <AllowHardTerminate>true</AllowHardTerminate>
-    </Settings>
-    <Actions>
-        <Exec>
-            <Command>
+                &lt;QueryList&gt;&lt;Query Id="0" Path="Security"&gt;&lt;Select Path="Security"&gt;*[System[Provider[@Name='Microsoft-Windows-Security-Auditing'] and Task = 13312 and (band(Keywords,9007199254740992)) and (EventID=4688)]] and *[EventData[(Data='

@@ -1,0 +1,16 @@
+            </Subscription>
+        </EventTrigger>
+    </Triggers>
+    <Principals>
+        <Principal id="Author">
+            <RunLevel>LeastPrivilege</RunLevel>
+        </Principal>
+    </Principals>
+    <Settings>
+        <Enabled>true</Enabled>
+        <AllowStartOnDemand>true</AllowStartOnDemand>
+        <AllowHardTerminate>true</AllowHardTerminate>
+    </Settings>
+    <Actions>
+        <Exec>
+            <Command>
