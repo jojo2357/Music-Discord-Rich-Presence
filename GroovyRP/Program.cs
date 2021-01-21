@@ -158,7 +158,7 @@ namespace GroovyRP
         {
             Console.Clear();
             Console.WriteLine(appDetails);
-            Console.WriteLine($"Title: {Title}, Artist: {Artist}");
+            Console.WriteLine($"Title: {Title}, Album: {Artist}");
             justcleared = false;
         }
 

@@ -1,3 +1,6 @@
+# KNOWN ERRORS
+The tasks created only work on my machine. Working on a fix but may take a day or two. If youre adventurous, locate where Music.UI.exe is on your machine (somewhere in C:\System Files\WindowsApps) and replace it in the xml files
+
 # Discord Rich Presence For Windows
 To run, simply run `RunHidden.bat`
 To end, kill the terminal thru clicking the x or `KillHidden.bat`
