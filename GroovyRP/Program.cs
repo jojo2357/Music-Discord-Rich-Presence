@@ -43,7 +43,7 @@ namespace GroovyRP
         //The Lumineers (the lumineers)
         private static readonly string[] albums = new[] { "myheadisananimal", "feverdream", "babel", "thelumineers", "delta", "sighnomore", "wildermind" };
         private static string pressenceDetails = string.Empty;
-        private static readonly string[] validPlayers = new[] { "music.ui", "chrome", "spotify", "brave", "new_chrome", "firefox" };
+        private static readonly string[] validPlayers = new[] { "music.ui", "chrome", "spotify", /*"brave", */"new_chrome"/*, "firefox" */};
         //For use in settings
         private static readonly Dictionary<string, string> aliases = new Dictionary<string, string>
         {
@@ -88,6 +88,8 @@ namespace GroovyRP
 
         private static void Main()
         {
+            Console.Title = "Discord Rich Presence for Groove";
+
             LoadSettings();
 
             metaTimer.Start();
@@ -192,6 +194,16 @@ namespace GroovyRP
                         Console.Write("Failed to get track info\r");
                     }
                 }
+                else if (!enabled_clients.ContainsKey(playerName))
+                {
+                    SetUnknown();
+                    foreach (DiscordRpcClient client in clients.Values)
+                        if (client.CurrentPresence != null)
+                        {
+                            client.ClearPresence();
+                            client.Invoke();
+                        }
+                }
                 else
                 {
                     SetClear();
@@ -288,6 +300,12 @@ namespace GroovyRP
                 Console.Clear();
                 Console.Write("Nothing Playing\r");
             }
+        }
+
+        private static void SetUnknown()
+        {
+            Console.Clear();
+            Console.Write("Detected volume in " + playerName + " but not showing as it is not currently supported");
         }
 
         private static void _client_OnPresenceUpdate(object sender, PresenceMessage args)

@@ -1,24 +1,22 @@
-# KNOWN ERRORS
-The setup files dont have very good error handling yet. If you have any questions, open an issue. I'm working on improving it, but if you follow [the instructions](https://github.com/jojo2357/Music-Discord-Presence#instructions) it should all work.
-
 # Discord Rich Presence For Groove (windows only)
-To run, simply run `RunHidden.bat` (this just makes it minimized in the taskbar)
-To end, kill the terminal thru clicking the x or `KillHidden.bat`
+To run, simply run `Launch DRP` from the shortcuts folder.
+Works with Groove, Spotify, and Chrome
 
 ## Features
 * For 7 select albums, displays the cover art in the DRP for any songs being played by Groovy (built in windows music player).
 * Shows song title, artist, and album on any song.
-* Includes batch scripts to make rich presence launch when groove is opened
+* Includes batch scripts to enable rich presence to launch when groove is opened
+* Ability to toggle media players showing up in rich presence.
 
 ## About linking Groove and DRP
-In order to have rich presence every time you open groovy, run the shortcut `Link Rich Presence With Groove`. If at any time you wish to disable this feature, simply run `Unlink Rich Presence With Groove`.
+In order to have rich presence every time you open groovy, run the shortcut `Link Rich Presence With Groove`. If at any time you wish to disable this feature, simply run `Unlink Rich Presence With Groove`. See [Linking Groove](https://github.com/jojo2357/Music-Discord-Presence#linking-groove) for more 
 
 ## Instructions
-Uh, download and unzip (of course), then run `RunHidden.bat` and ggwp.
-Don't run the exe standalone, for future settings wont work with this
-Don't move the exe or the bat file. Instead move the provided shortcut to the desktop, or any other location
+Uh, download and unzip (of course), then run the `Launch DRP` shortcut from the shortcuts folder
+Do **NOT** move the exe. Instead, move the provided shortcut
+To prevent a player from showing up in the rich presence, open `DiscordPresenceConfig.ini` and change true to false or false to true as you desire.
 
-If you want to link Groove and the DRP: 
+## Linking Groove 
 close Groove
 run `Locate Groove`
 run `Link Rich Presence With Groove`
@@ -27,8 +25,7 @@ if the DRP doesnt show up within 5 seconds, run `Unlink Rich Presence With Groov
 If it still doesn't work, open up an issue and let me know whats going on.
 
 ## Future fatures
-* Make settings to allow showing music from a plethora of apps.
+* None planned rn!
 
 ### [Credits](https://github.com/dsdude123/GroovyRP)
-
 I really like the ingenious solution [@dsdude123](https://github.com/dsdude123) came up with, but it was so very expensive. It took about 20% of my CPU to run idly. With my tweaks and improvements, it takes less than 2% and half (15 MB less) as much memory. I'm not knocking their way, as it is too big brain for me, I just took what they did and built on it to make something better.
