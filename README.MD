@@ -1,8 +1,8 @@
 # KNOWN ERRORS
 The setup files dont have very good error handling yet. If you have any questions, open an issue. I'm working on improving it, but if you follow [the instructions](https://github.com/jojo2357/Music-Discord-Presence#instructions) it should all work.
 
-# Discord Rich Presence For Windows
-To run, simply run `RunHidden.bat`
+# Discord Rich Presence For Groove (windows only)
+To run, simply run `RunHidden.bat` (this just makes it minimized in the taskbar)
 To end, kill the terminal thru clicking the x or `KillHidden.bat`
 
 ## Features
