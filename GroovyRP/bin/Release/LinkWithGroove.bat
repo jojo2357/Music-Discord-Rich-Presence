@@ -15,10 +15,8 @@ pause
 EXIT /B
 )
 
-if not exist filelocation.dat (
-echo Locating groove...
-FindGroove.bat
-)
+if not exist filelocation.dat call FindGroove.bat
+
 rem if not exist %loc% set /a "loc=%%loc:~0,%result%%%"
 
 echo Setting security logger
