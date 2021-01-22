@@ -12,8 +12,9 @@ namespace GroovyRP
 {
     class Program
     {
-        private const string Version = "1.1.0";
-        private const string appDetails = "Discord Rich Presence For Groovy\nVersion: " + Version + "\nGithub: https://github.com/jojo2357/Music-Discord-Presence";
+        private const string version = "1.1.0";
+        private const string github = "https://github.com/jojo2357/Music-Discord-Presence";
+        private const string title = "Discord Rich Presence For Groove";
         private static readonly Dictionary<string, DiscordRpcClient> clients = new Dictionary<string, DiscordRpcClient>{
             {"music.ui", new DiscordRpcClient("801209905020272681", autoEvents: false) },
             {"chrome", new DiscordRpcClient("802213652974272513", autoEvents: false) },
@@ -29,6 +30,12 @@ namespace GroovyRP
             {"music.ui", true },
             {"chrome", false },
             {"spotify", false }
+        };
+        private static readonly Dictionary<string, ConsoleColor> PlayerColors = new Dictionary<string, ConsoleColor>
+        {
+            {"music.ui", ConsoleColor.Blue },
+            {"chrome", ConsoleColor.Yellow },
+            {"spotify", ConsoleColor.DarkGreen }
         };
         //private static readonly DiscordRpcClient chrome_client = new DiscordRpcClient("802213652974272513", autoEvents: false);
         //My head is an animal, Fever Dream (of monsters and men)
@@ -124,7 +131,7 @@ namespace GroovyRP
                 }
                 if (wasPlaying && !isPlaying)
                     timer.Restart();
-                if (enabled_clients.ContainsKey(playerName) && enabled_clients[playerName] && (isPlaying || timer.ElapsedMilliseconds < timeout_seconds * 1000) )
+                if (enabled_clients.ContainsKey(playerName) && enabled_clients[playerName] && (isPlaying || timer.ElapsedMilliseconds < timeout_seconds * 1000))
                 {
                     DiscordRpcClient activeClient;
                     if (clients.ContainsKey(playerName))
@@ -214,11 +221,62 @@ namespace GroovyRP
         private static void SetConsole(string Title, string Artist, string Album, string album)
         {
             Console.Clear();
-            Console.WriteLine(appDetails);
+
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.WriteLine(title);
+
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write("Version: ");
+
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.WriteLine(version);
+
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write("Github: ");
+
+            Console.ForegroundColor = ConsoleColor.Cyan;
+            Console.WriteLine(github);
+
             Console.WriteLine();
+
+            Console.ForegroundColor = ConsoleColor.White;
             Console.WriteLine("Music details:");
-            Console.WriteLine($"Title: {Title}, Artist: {Artist}, Album: {Album} {(albums.Contains(album) ? "\nThis is a good one, check ur DRP ;)" : "")}");
-            Console.WriteLine("Playing in " + whatpeoplecallthisplayer[playerName]);
+
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write("  Title: ");
+
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.WriteLine(Title);
+
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write(" Artist: ");
+
+            Console.ForegroundColor = ConsoleColor.Gray;
+            Console.WriteLine(Artist);
+
+            if (!Album.Equals(String.Empty))
+            {
+                Console.ForegroundColor = ConsoleColor.White;
+                Console.Write("  Album: ");
+
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.WriteLine(Album);
+            }
+
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.Write(" Player: ");
+
+            Console.ForegroundColor = PlayerColors[playerName];
+            Console.WriteLine(whatpeoplecallthisplayer[playerName]);
+
+            if (albums.Contains(album))
+            {
+                Console.ForegroundColor = ConsoleColor.Magenta;
+                Console.WriteLine("\nThis is a good one, check ur DRP ;)");
+                Console.ForegroundColor = ConsoleColor.White;
+            }
+
+            Console.ForegroundColor = ConsoleColor.White;
             justcleared = false;
         }
 
@@ -305,7 +363,8 @@ namespace GroovyRP
                         enabled_clients[line.Split('=')[0]] = line.Split('=')[1].Trim().ToLower() == "true";
                     }
                 }
-            }catch (Exception)
+            }
+            catch (Exception)
             {
                 Console.Error.WriteLine("DiscordPresenceConfig.ini not found! this is the settings file to enable or disable certain features");
                 System.Threading.Thread.Sleep(5000);
