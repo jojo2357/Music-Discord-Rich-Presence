@@ -12,7 +12,7 @@ namespace GroovyRP
 {
     class Program
     {
-        private const string version = "1.1.0";
+        private const string version = "1.1.1";
         private const string github = "https://github.com/jojo2357/Music-Discord-Presence";
         private const string title = "Discord Rich Presence For Groove";
         private static readonly Dictionary<string, DiscordRpcClient> clients = new Dictionary<string, DiscordRpcClient>{
@@ -28,8 +28,6 @@ namespace GroovyRP
         private static Dictionary<string, bool> enabled_clients = new Dictionary<string, bool>
         {
             {"music.ui", true },
-            {"chrome", false },
-            {"spotify", false }
         };
         private static readonly Dictionary<string, ConsoleColor> PlayerColors = new Dictionary<string, ConsoleColor>
         {
@@ -78,6 +76,13 @@ namespace GroovyRP
             {"new_chrome", "Brave" },
             {"brave", "Brave" },
             {"spotify", "Spotify" },
+        };
+        private static readonly Dictionary<string, string> inverseWhatpeoplecallthisplayer = new Dictionary<string, string>
+        {
+            {"groove", "music.ui" },
+            {"chrome", "chrome" },
+            {"brave", "new_chroome" },
+            {"spotify", "spotify" },
         };
         private static readonly string defaultPlayer = "groove";
         private static readonly int timeout_seconds = 60;
@@ -278,7 +283,7 @@ namespace GroovyRP
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write(" Player: ");
 
-            Console.ForegroundColor = PlayerColors[playerName];
+            Console.ForegroundColor = PlayerColors.ContainsKey(playerName) ? PlayerColors[playerName] : ConsoleColor.White;
             Console.WriteLine(whatpeoplecallthisplayer[playerName]);
 
             if (albums.Contains(album))
@@ -340,8 +345,9 @@ namespace GroovyRP
             //Music.UI is Groove. Additional options include chrome, spotify, etc
             List<Process> candidates = new List<Process>();
             foreach (string program in validPlayers)
-                foreach (Process process in Process.GetProcessesByName(program))
-                    candidates.Add(process);
+                if (enabled_clients.ContainsKey(program) && enabled_clients[program])
+                    foreach (Process process in Process.GetProcessesByName(program))
+                        candidates.Add(process);
             if (candidates.Any())
             {
                 AudioSessionManager2 sessionManager;
@@ -373,13 +379,17 @@ namespace GroovyRP
         {
             try
             {
-                string[] lines = System.IO.File.ReadAllLines("../../../DiscordPresenceConfig.ini");
+                string[] lines = File.ReadAllLines("../../../DiscordPresenceConfig.ini");
                 foreach (string line in lines)
                 {
-                    if (enabled_clients.Keys.Contains(line.Split('=')[0].Trim().ToLower()))
+                    if (validPlayers.Contains(line.Split('=')[0].Trim().ToLower()))
+                    //if (enabled_clients.Keys.Contains(line.Split('=')[0].Trim().ToLower()))
                     {
                         enabled_clients[line.Split('=')[0]] = line.Split('=')[1].Trim().ToLower() == "true";
+                    }else if ((inverseWhatpeoplecallthisplayer.ContainsKey(line.Split('=')[0].Trim().ToLower()) && validPlayers.Contains(inverseWhatpeoplecallthisplayer[line.Split('=')[0].Trim().ToLower()]))){
+                        enabled_clients.Add(line.Split('=')[0], line.Split('=')[1].Trim().ToLower() == "true");
                     }
+
                 }
             }
             catch (Exception)

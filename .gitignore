@@ -4,7 +4,9 @@
 **/LinkWithGroove.xml
 **/LinkWithGrooveOpen.xml
 **/LinkWithGrooveClose.xml
-/ArchivedReleases/
+ArchivedReleases/[0-9].[0-9].[0-9]_Release/
+ArchivedReleases/[0-9].[0-9].[0-9]_Release.zip
+# ArchivedReleases/1.0.0_Release/
 
 # User-specific files
 *.suo
