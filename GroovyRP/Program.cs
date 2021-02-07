@@ -7,6 +7,7 @@ using CSCore.CoreAudioAPI;
 using System.Linq;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
 
 namespace GroovyRP
 {
@@ -152,8 +153,11 @@ namespace GroovyRP
                     {
                         oldTrack = currentTrack;
                         currentTrack = GetStuff();
-                        if (albums.ContainsKey(currentTrack.AlbumTitle.Replace(" ", "").Replace(":", "").ToLower()))
-                            activeClient = allClients[albums[currentTrack.AlbumTitle.Replace(" ", "").Replace(":", "").ToLower()]];
+                        var album = currentTrack.AlbumTitle;
+                        album = album.ToLower();
+                        album = Regex.Replace(album, @"[^0-9a-z\-_]+", "");
+                        if (albums.ContainsKey(album))
+                            activeClient = allClients[albums[album]];
                         else if (defaultClients.ContainsKey(playerName))
                             activeClient = defaultClients[playerName];
                         else
@@ -162,9 +166,7 @@ namespace GroovyRP
                         {
                             var details = $"Title: {currentTrack.Title}";
                             var state = $"Artist: {currentTrack.Artist}";
-                            var album = currentTrack.AlbumTitle;
-                            album = album.Replace(" ", "").Replace(":", "");
-                            album = album.ToLower();
+
 
                             bool hasAlbum = false;
                             foreach (string str in albums.Keys)
@@ -434,11 +436,13 @@ Console.WriteLine("Caught isUsingAudioException");
                         if (!validPlayers.Contains(lines[0].Split('=')[0]))
                         {
                             Console.Error.WriteLine("Error in file " + file.Name + " not a valid player name");
+                            System.Threading.Thread.Sleep(5000);
                             continue;
                         }
                         if (!lines[1].ToLower().Contains("id="))
                         {
                             Console.Error.WriteLine("Error in file " + file.Name + " no id found on the second line");
+                            System.Threading.Thread.Sleep(5000);
                             continue;
                         }
                         id = lines[1].Split('=')[1].Trim();
@@ -454,7 +458,7 @@ Console.WriteLine("Caught isUsingAudioException");
                
             }
             catch (Exception) { }
-            System.Threading.Thread.Sleep(5000);
+            
         }
     }
 }
