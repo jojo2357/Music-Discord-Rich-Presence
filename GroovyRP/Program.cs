@@ -13,7 +13,7 @@ namespace GroovyRP
 {
     class Program
     {
-        private const string version = "1.2.0";
+        private const string version = "1.2.1";
         private const string github = "https://github.com/jojo2357/Music-Discord-Presence";
         private const string title = "Discord Rich Presence For Groove";
         //ID, client
@@ -47,6 +47,7 @@ namespace GroovyRP
         //The Lumineers (the lumineers)
         //normalized album name, ID
         private static Dictionary<string, string> albums = new Dictionary<string, string>() /*{ "myheadisananimal", "feverdream", "babel", "thelumineers", "delta", "sighnomore", "wildermind" }*/;
+        private static Dictionary<string, string> albumAliases = new Dictionary<string, string>();
         private static string pressenceDetails = string.Empty;
         private static readonly string[] validPlayers = new[] { "music.ui", "chrome", "spotify", /*"brave", */"new_chrome"/*, "firefox" */};
         //For use in settings
@@ -158,6 +159,11 @@ namespace GroovyRP
                         album = Regex.Replace(album, @"[^0-9a-z\-_]+", "");
                         if (albums.ContainsKey(album))
                             activeClient = allClients[albums[album]];
+                        else if (albumAliases.ContainsKey(currentTrack.AlbumTitle) && albums.ContainsKey(albumAliases[currentTrack.AlbumTitle]))
+                        {
+                            album = albumAliases[currentTrack.AlbumTitle];
+                            activeClient = allClients[albums[album]];
+                        }
                         else if (defaultClients.ContainsKey(playerName))
                             activeClient = defaultClients[playerName];
                         else
@@ -451,7 +457,14 @@ Console.WriteLine("Caught isUsingAudioException");
                             defaultClients.Add(lines[0].Split('=')[0], allClients[id]);
                         clientIDs.Add(id, lines[0].Split('=')[0]);
                         for (int i = 2; i < lines.Length; i++)
-                            albums.Add(lines[i], id);
+                        {
+                            if (lines[i].Contains('='))
+                            {
+                                albums.Add(lines[i].Split('=')[1], id);
+                                albumAliases.Add(lines[i].Split('=')[0], lines[i].Split('=')[1]);
+                            }else
+                                albums.Add(lines[i], id);
+                        }
                     }
                     catch (Exception) { }
                 }

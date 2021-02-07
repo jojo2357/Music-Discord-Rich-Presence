@@ -25,7 +25,7 @@ if the DRP doesnt show up within 5 seconds, run `Unlink Rich Presence With Groov
 If it still doesn't work, open up an issue and let me know whats going on.
 
 ## Custom Album Art
-* In the `clientdata` folder you will find 5 text files by default. `chrome.dat` `groove.dat` and `spotify.dat` are required only to provide a default if there is no provided album art.
+* In the `clientdata` folder you will find 6 text files by default. `chrome.dat` `groove.dat` and `spotify.dat` are required only to provide a default if there is no provided album art.
 * Since the provided files correlate to my own applications, you may create your own instead in order to upload art.
 * [Create a discord application](https://discord.com/developers/applications) and set the name to be what you want displayed under your avatar (as in `playing <name>`)
 * Grab the client ID. We will use this later.
@@ -38,10 +38,13 @@ If it still doesn't work, open up an issue and let me know whats going on.
 ```
 <executeable playing music name>=<player name>
 id=<client ID from earlier>
-song1
-song2
+album1
+album2
+Album Name $3=albumname3
 ```
+* For non latin albums, latinize it however you want and put a line in the format `<Album In Japanese/Emoji/Cyrillic/Chinese/non latin alphabet>=albumkey`
 * For now, the executeable playing music must be a [supported player](https://github.com/jojo2357/Music-Discord-Presence#supported-players) and the part after the = is ignored. In the future I do think it will have a use tho.
+* Nonlatin example owned and maintained by Smaltin
 
 ### Supported Players
 - Groove Music (music.ui)
