@@ -1,0 +1,13 @@
+#This is a demo file! Heres a little blurb before the actual example
+#Line 1 goes <name of exe>=<name of player> which is usually the same for both, (like <chrome=chrome> would work for chrome
+#Line 2 goes "id=<application id>" and I have included my own application here as an example
+#Line 3...n is the name of the album, normalized to pass discord's regex which bars you from using characters such as spaces, colons, etc. Just put an album name per line going on and on and add the album art to your application in discord. see the readme for more info.
+music.ui=groove
+id=801209905020272681
+babel
+feverdream
+myheadisananimal
+delta
+sighnomore
+thelumineers
+wildermind

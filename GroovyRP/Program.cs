@@ -15,17 +15,21 @@ namespace GroovyRP
         private const string version = "1.2.0";
         private const string github = "https://github.com/jojo2357/Music-Discord-Presence";
         private const string title = "Discord Rich Presence For Groove";
+        //ID, client
         private static Dictionary<string, DiscordRpcClient> defaultClients = new Dictionary<string, DiscordRpcClient>{
             /*{"music.ui", new DiscordRpcClient("801209905020272681", autoEvents: false) },
             {"chrome", new DiscordRpcClient("802213652974272513", autoEvents: false) },
             {"spotify", new DiscordRpcClient("802222525110812725", autoEvents: false) }*/
         };
+        //ID, client
         private static Dictionary<string, DiscordRpcClient> allClients = new Dictionary<string, DiscordRpcClient>();
+        //ID, process name
         private static Dictionary<string, string> clientIDs = new Dictionary<string, string>{
             /*{"801209905020272681", "music.ui" },
             {"802213652974272513", "chrome" },
             {"802222525110812725", "spotify" }*/
         };
+        //process name, enabled y/n
         private static Dictionary<string, bool> enabled_clients = new Dictionary<string, bool>
         {
             {"music.ui", true },
@@ -40,6 +44,7 @@ namespace GroovyRP
         //My head is an animal, Fever Dream (of monsters and men)
         //Sigh no more, wilder mind, babel, delta (Mumford + sons)
         //The Lumineers (the lumineers)
+        //normalized album name, ID
         private static Dictionary<string, string> albums = new Dictionary<string, string>() /*{ "myheadisananimal", "feverdream", "babel", "thelumineers", "delta", "sighnomore", "wildermind" }*/;
         private static string pressenceDetails = string.Empty;
         private static readonly string[] validPlayers = new[] { "music.ui", "chrome", "spotify", /*"brave", */"new_chrome"/*, "firefox" */};
@@ -91,6 +96,7 @@ namespace GroovyRP
         private static readonly Stopwatch metaTimer = new Stopwatch();
         private static string playerName = string.Empty;
         private static bool justcleared = false;
+        private static bool justUnknowned = false;
 
         private static void Main()
         {
@@ -195,6 +201,7 @@ namespace GroovyRP
                     }
                     catch (Exception e)
                     {
+                        Console.WriteLine(e.StackTrace);
                         if (activeClient != null) 
                             activeClient.SetPresence(new RichPresence()
                             {
@@ -299,6 +306,7 @@ namespace GroovyRP
 
             Console.ForegroundColor = ConsoleColor.White;
             justcleared = false;
+            justUnknowned = false;
         }
 
         private static void SetClear()
@@ -313,8 +321,12 @@ namespace GroovyRP
 
         private static void SetUnknown()
         {
-            Console.Clear();
-            Console.Write("Detected volume in " + playerName + " but not showing as it is not currently supported");
+            if (!justUnknowned)
+            {
+                justUnknowned = true;
+                Console.Clear();
+                Console.Write("Detected volume in " + playerName + " but not showing as it is not currently supported");
+            }
         }
 
         private static void _client_OnPresenceUpdate(object sender, PresenceMessage args)
@@ -323,7 +335,7 @@ namespace GroovyRP
             {
                 if (pressenceDetails != args.Presence.Details)
                 {
-                    pressenceDetails = allClients[clientIDs[args.ApplicationID]].CurrentPresence?.Details;
+                    pressenceDetails = allClients[args.ApplicationID].CurrentPresence?.Details;
                 }
             }
             else
@@ -413,10 +425,11 @@ Console.WriteLine("Caught isUsingAudioException");
             {
                 foreach (var file in new DirectoryInfo("../../../clientdata").GetFiles())
                 {
+                    if (file.Name == "demo.dat")
+                        continue;
                     try
                     {
                         string[] lines = File.ReadAllLines(file.FullName);
-                        string name = "";
                         string id = "";
                         if (!validPlayers.Contains(lines[0].Split('=')[0]))
                         {
@@ -441,7 +454,7 @@ Console.WriteLine("Caught isUsingAudioException");
                
             }
             catch (Exception) { }
-            Console.WriteLine();
+            System.Threading.Thread.Sleep(5000);
         }
     }
 }
