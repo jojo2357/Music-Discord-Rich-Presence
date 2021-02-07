@@ -12,24 +12,23 @@ namespace GroovyRP
 {
     class Program
     {
-        private const string version = "1.1.0";
+        private const string version = "1.2.0";
         private const string github = "https://github.com/jojo2357/Music-Discord-Presence";
         private const string title = "Discord Rich Presence For Groove";
-        private static readonly Dictionary<string, DiscordRpcClient> clients = new Dictionary<string, DiscordRpcClient>{
-            {"music.ui", new DiscordRpcClient("801209905020272681", autoEvents: false) },
+        private static Dictionary<string, DiscordRpcClient> defaultClients = new Dictionary<string, DiscordRpcClient>{
+            /*{"music.ui", new DiscordRpcClient("801209905020272681", autoEvents: false) },
             {"chrome", new DiscordRpcClient("802213652974272513", autoEvents: false) },
-            {"spotify", new DiscordRpcClient("802222525110812725", autoEvents: false) }
+            {"spotify", new DiscordRpcClient("802222525110812725", autoEvents: false) }*/
         };
-        private static readonly Dictionary<string, string> clientIDs = new Dictionary<string, string>{
-            {"801209905020272681", "music.ui" },
+        private static Dictionary<string, DiscordRpcClient> allClients = new Dictionary<string, DiscordRpcClient>();
+        private static Dictionary<string, string> clientIDs = new Dictionary<string, string>{
+            /*{"801209905020272681", "music.ui" },
             {"802213652974272513", "chrome" },
-            {"802222525110812725", "spotify" }
+            {"802222525110812725", "spotify" }*/
         };
         private static Dictionary<string, bool> enabled_clients = new Dictionary<string, bool>
         {
             {"music.ui", true },
-            {"chrome", false },
-            {"spotify", false }
         };
         private static readonly Dictionary<string, ConsoleColor> PlayerColors = new Dictionary<string, ConsoleColor>
         {
@@ -41,7 +40,7 @@ namespace GroovyRP
         //My head is an animal, Fever Dream (of monsters and men)
         //Sigh no more, wilder mind, babel, delta (Mumford + sons)
         //The Lumineers (the lumineers)
-        private static readonly string[] albums = new[] { "myheadisananimal", "feverdream", "babel", "thelumineers", "delta", "sighnomore", "wildermind" };
+        private static Dictionary<string, string> albums = new Dictionary<string, string>() /*{ "myheadisananimal", "feverdream", "babel", "thelumineers", "delta", "sighnomore", "wildermind" }*/;
         private static string pressenceDetails = string.Empty;
         private static readonly string[] validPlayers = new[] { "music.ui", "chrome", "spotify", /*"brave", */"new_chrome"/*, "firefox" */};
         //For use in settings
@@ -79,6 +78,13 @@ namespace GroovyRP
             {"brave", "Brave" },
             {"spotify", "Spotify" },
         };
+        private static readonly Dictionary<string, string> inverseWhatpeoplecallthisplayer = new Dictionary<string, string>
+        {
+            {"groove", "music.ui" },
+            {"chrome", "chrome" },
+            {"brave", "new_chroome" },
+            {"spotify", "spotify" },
+        };
         private static readonly string defaultPlayer = "groove";
         private static readonly int timeout_seconds = 60;
         private static readonly Stopwatch timer = new Stopwatch();
@@ -95,7 +101,7 @@ namespace GroovyRP
             metaTimer.Start();
             timer.Start();
 
-            foreach (DiscordRpcClient client in clients.Values)
+            foreach (DiscordRpcClient client in allClients.Values)
             {
                 client.Initialize();
                 client.OnError += _client_OnError;
@@ -121,7 +127,7 @@ namespace GroovyRP
             while (IsInitialized())
             {
                 //limit performace impact
-                System.Threading.Thread.Sleep(500);
+                System.Threading.Thread.Sleep(1000);
                 wasPlaying = isPlaying;
                 try
                 {
@@ -135,25 +141,27 @@ namespace GroovyRP
                     timer.Restart();
                 if (enabled_clients.ContainsKey(playerName) && enabled_clients[playerName] && (isPlaying || timer.ElapsedMilliseconds < timeout_seconds * 1000))
                 {
-                    DiscordRpcClient activeClient;
-                    if (clients.ContainsKey(playerName))
-                        activeClient = clients[playerName];
-                    else
-                        activeClient = clients["music.ui"];
+                    DiscordRpcClient activeClient = null;
                     try
                     {
                         oldTrack = currentTrack;
                         currentTrack = GetStuff();
+                        if (albums.ContainsKey(currentTrack.AlbumTitle.Replace(" ", "").Replace(":", "").ToLower()))
+                            activeClient = allClients[albums[currentTrack.AlbumTitle.Replace(" ", "").Replace(":", "").ToLower()]];
+                        else if (defaultClients.ContainsKey(playerName))
+                            activeClient = defaultClients[playerName];
+                        else
+                            activeClient = defaultClients["music.ui"];
                         if (activeClient.CurrentPresence == null || activeClient.CurrentPresence.Details != ("Title: " + currentTrack.Title) || wasPlaying != isPlaying)
                         {
                             var details = $"Title: {currentTrack.Title}";
                             var state = $"Artist: {currentTrack.Artist}";
                             var album = currentTrack.AlbumTitle;
-                            album = album.Replace(" ", "");
+                            album = album.Replace(" ", "").Replace(":", "");
                             album = album.ToLower();
 
                             bool hasAlbum = false;
-                            foreach (string str in albums)
+                            foreach (string str in albums.Keys)
                                 hasAlbum |= str.Equals(album);
 
                             activeClient.SetPresence(new RichPresence
@@ -162,7 +170,7 @@ namespace GroovyRP
                                 State = state,
                                 Assets = new Assets
                                 {
-                                    LargeImageKey = (albums.Contains(album) ? album : (big_assets.ContainsKey(playerName) ? big_assets[playerName] : defaultPlayer)),
+                                    LargeImageKey = (albums.ContainsKey(album) ? album : (big_assets.ContainsKey(playerName) ? big_assets[playerName] : defaultPlayer)),
                                     LargeImageText = currentTrack.AlbumTitle.Length > 0 ? currentTrack.AlbumTitle : "Unknown Album",
                                     SmallImageKey = isPlaying ? (little_assets.ContainsKey(playerName) ? little_assets[playerName] : defaultPlayer) : "paused",
                                     SmallImageText = isPlaying ? ("using " + aliases[playerName]) : "paused"
@@ -171,7 +179,7 @@ namespace GroovyRP
                             SetConsole(currentTrack.Title, currentTrack.Artist, currentTrack.AlbumTitle, album);
                             activeClient.Invoke();
 
-                            foreach (DiscordRpcClient client in clients.Values)
+                            foreach (DiscordRpcClient client in allClients.Values)
                                 if (client.CurrentPresence != null && client.ApplicationID != activeClient.ApplicationID)
                                 {
 #if DEBUG
@@ -185,19 +193,20 @@ namespace GroovyRP
                         Console.Write("" + (metaTimer.ElapsedMilliseconds) + "(" + (timer.ElapsedMilliseconds/* < timeout_seconds * 1000*/) + ") in " + playerName + '\r');
 #endif
                     }
-                    catch (Exception)
+                    catch (Exception e)
                     {
-                        activeClient.SetPresence(new RichPresence()
-                        {
-                            Details = "Failed to get track info"
-                        });
+                        if (activeClient != null) 
+                            activeClient.SetPresence(new RichPresence()
+                            {
+                                Details = "Failed to get track info"
+                            });
                         Console.Write("Failed to get track info\r");
                     }
                 }
                 else if (!enabled_clients.ContainsKey(playerName))
                 {
                     SetUnknown();
-                    foreach (DiscordRpcClient client in clients.Values)
+                    foreach (DiscordRpcClient client in allClients.Values)
                         if (client.CurrentPresence != null)
                         {
                             client.ClearPresence();
@@ -210,7 +219,7 @@ namespace GroovyRP
 #if DEBUG
                     Console.Write("Cleared " + (metaTimer.ElapsedMilliseconds) + "\r");
 #endif
-                    foreach (DiscordRpcClient client in clients.Values)
+                    foreach (DiscordRpcClient client in allClients.Values)
                         if (client.CurrentPresence != null)
                         {
                             client.ClearPresence();
@@ -222,7 +231,7 @@ namespace GroovyRP
 
         private static bool IsInitialized()
         {
-            foreach (DiscordRpcClient client in clients.Values)
+            foreach (DiscordRpcClient client in allClients.Values)
             {
                 if (!client.IsInitialized)
                     return false;
@@ -278,10 +287,10 @@ namespace GroovyRP
             Console.ForegroundColor = ConsoleColor.White;
             Console.Write(" Player: ");
 
-            Console.ForegroundColor = PlayerColors[playerName];
+            Console.ForegroundColor = PlayerColors.ContainsKey(playerName) ? PlayerColors[playerName] : ConsoleColor.White;
             Console.WriteLine(whatpeoplecallthisplayer[playerName]);
 
-            if (albums.Contains(album))
+            if (albums.ContainsKey(album))
             {
                 Console.ForegroundColor = ConsoleColor.Magenta;
                 Console.WriteLine("\nThis is a good one, check ur DRP ;)");
@@ -314,7 +323,7 @@ namespace GroovyRP
             {
                 if (pressenceDetails != args.Presence.Details)
                 {
-                    pressenceDetails = clients[clientIDs[args.ApplicationID]].CurrentPresence?.Details;
+                    pressenceDetails = allClients[clientIDs[args.ApplicationID]].CurrentPresence?.Details;
                 }
             }
             else
@@ -340,8 +349,9 @@ namespace GroovyRP
             //Music.UI is Groove. Additional options include chrome, spotify, etc
             List<Process> candidates = new List<Process>();
             foreach (string program in validPlayers)
-                foreach (Process process in Process.GetProcessesByName(program))
-                    candidates.Add(process);
+                if (enabled_clients.ContainsKey(program) && enabled_clients[program])
+                    foreach (Process process in Process.GetProcessesByName(program))
+                        candidates.Add(process);
             if (candidates.Any())
             {
                 AudioSessionManager2 sessionManager;
@@ -358,10 +368,18 @@ namespace GroovyRP
                     foreach (var session in sessionEnumerator)
                     {
                         var process = session.QueryInterface<AudioSessionControl2>().Process;
-                        if (validPlayers.Contains(process.ProcessName.ToLower()) && session.QueryInterface<AudioMeterInformation>().GetPeakValue() > 0)
+                        try
                         {
-                            playerName = process.ProcessName.ToLower();
-                            return true;
+                            if (validPlayers.Contains(process.ProcessName.ToLower()) && session.QueryInterface<AudioMeterInformation>().GetPeakValue() > 0)
+                            {
+                                playerName = process.ProcessName.ToLower();
+                                return true;
+                            }
+                        }
+                        catch (Exception) {
+#if DEBUG
+Console.WriteLine("Caught isUsingAudioException");
+#endif
                         }
                     }
                 }
@@ -373,13 +391,17 @@ namespace GroovyRP
         {
             try
             {
-                string[] lines = System.IO.File.ReadAllLines("../../../DiscordPresenceConfig.ini");
+                string[] lines = File.ReadAllLines("../../../DiscordPresenceConfig.ini");
                 foreach (string line in lines)
                 {
-                    if (enabled_clients.Keys.Contains(line.Split('=')[0].Trim().ToLower()))
+                    if (validPlayers.Contains(line.Split('=')[0].Trim().ToLower()))
+                    //if (enabled_clients.Keys.Contains(line.Split('=')[0].Trim().ToLower()))
                     {
                         enabled_clients[line.Split('=')[0]] = line.Split('=')[1].Trim().ToLower() == "true";
+                    }else if ((inverseWhatpeoplecallthisplayer.ContainsKey(line.Split('=')[0].Trim().ToLower()) && validPlayers.Contains(inverseWhatpeoplecallthisplayer[line.Split('=')[0].Trim().ToLower()]))){
+                        enabled_clients.Add(line.Split('=')[0], line.Split('=')[1].Trim().ToLower() == "true");
                     }
+
                 }
             }
             catch (Exception)
@@ -387,6 +409,39 @@ namespace GroovyRP
                 Console.Error.WriteLine("DiscordPresenceConfig.ini not found! this is the settings file to enable or disable certain features");
                 System.Threading.Thread.Sleep(5000);
             }
+            try
+            {
+                foreach (var file in new DirectoryInfo("../../../clientdata").GetFiles())
+                {
+                    try
+                    {
+                        string[] lines = File.ReadAllLines(file.FullName);
+                        string name = "";
+                        string id = "";
+                        if (!validPlayers.Contains(lines[0].Split('=')[0]))
+                        {
+                            Console.Error.WriteLine("Error in file " + file.Name + " not a valid player name");
+                            continue;
+                        }
+                        if (!lines[1].ToLower().Contains("id="))
+                        {
+                            Console.Error.WriteLine("Error in file " + file.Name + " no id found on the second line");
+                            continue;
+                        }
+                        id = lines[1].Split('=')[1].Trim();
+                        allClients.Add(id, new DiscordRpcClient(id, autoEvents: false));
+                        if (!defaultClients.ContainsKey(lines[0].Split('=')[0]))
+                            defaultClients.Add(lines[0].Split('=')[0], allClients[id]);
+                        clientIDs.Add(id, lines[0].Split('=')[0]);
+                        for (int i = 2; i < lines.Length; i++)
+                            albums.Add(lines[i], id);
+                    }
+                    catch (Exception) { }
+                }
+               
+            }
+            catch (Exception) { }
+            Console.WriteLine();
         }
     }
 }
