@@ -58,5 +58,7 @@ Album Name $3=albumname3
 ### [Credits](https://github.com/dsdude123/GroovyRP)
 I really like the ingenious solution [@dsdude123](https://github.com/dsdude123) came up with, but it was so very expensive. It took about 20% of my CPU to run idly. With my tweaks and improvements, it takes less than 2% and half (15 MB less) as much memory. I'm not knocking their way, as it is too big brain for me, I just took what they did and built on it to make something better.
 
+The new icon is thanks to [Ghoelian](https://github.com/Ghoelian) so thanks for that!
+
 ### Licence
 Since I have added more features that allow the user to do more and more, I must add that while licenced under an MIT licence, I am not responsible for any damages caused by the use or abuse of the tools that I have provided. Use for good, not evil.
