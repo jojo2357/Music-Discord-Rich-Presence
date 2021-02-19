@@ -1,5 +1,5 @@
 # Discord Rich Presence For Groove (windows only)
-To run, simply run `Launch DRP` from the shortcuts folder.
+To run, simply run `Launch DRP` from the shortcuts folder or, if you want it to run in the background, run `Launch DRP Hidden`
 Works with Groove, Spotify, and Chrome
 
 ## Features
@@ -7,13 +7,14 @@ Works with Groove, Spotify, and Chrome
 * Shows song title, artist, and album on any song.
 * Includes batch scripts to enable rich presence to launch when groove is opened
 * Ability to toggle media players showing up in rich presence.
+* Can run in the background or with a pretty terminal
 
 ## About linking Groove and DRP
 In order to have rich presence every time you open groovy, run the shortcut `Link Rich Presence With Groove`. If at any time you wish to disable this feature, simply run `Unlink Rich Presence With Groove`. See [Linking Groove](https://github.com/jojo2357/Music-Discord-Presence#linking-groove) for more 
 
 ## Instructions
 Uh, download and unzip (of course), then run the `Launch DRP` shortcut from the shortcuts folder
-Do **NOT** move the exe. Instead, move the provided shortcut
+Do **NOT** move the exe. Instead, move the provided shortcut(s)
 To prevent a player from showing up in the rich presence, open `DiscordPresenceConfig.ini` and change true to false or false to true as you desire.
 
 ## Linking Groove 
