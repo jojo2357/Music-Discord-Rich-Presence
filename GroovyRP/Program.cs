@@ -13,15 +13,11 @@ namespace GroovyRP
 {
     class Program
     {
-        private const string version = "1.2.1";
+        private const string version = "1.3.0";
         private const string github = "https://github.com/jojo2357/Music-Discord-Presence";
         private const string title = "Discord Rich Presence For Groove";
         //ID, client
-        private static Dictionary<string, DiscordRpcClient> defaultClients = new Dictionary<string, DiscordRpcClient>{
-            /*{"music.ui", new DiscordRpcClient("801209905020272681", autoEvents: false) },
-            {"chrome", new DiscordRpcClient("802213652974272513", autoEvents: false) },
-            {"spotify", new DiscordRpcClient("802222525110812725", autoEvents: false) }*/
-        };
+        private static Dictionary<string, DiscordRpcClient> defaultClients = new Dictionary<string, DiscordRpcClient>();
         //ID, client
         private static Dictionary<string, DiscordRpcClient> allClients = new Dictionary<string, DiscordRpcClient>();
         //ID, process name
@@ -103,6 +99,9 @@ namespace GroovyRP
         private static void Main()
         {
             Console.Title = "Discord Rich Presence for Groove";
+            
+            Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
+            Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
             LoadSettings();
 

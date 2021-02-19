@@ -6,8 +6,8 @@ This sample schedules a task to start notepad.exe at a specific time.
     <RegistrationInfo>
         <Date>2021-10-11T13:21:17-08:00</Date>
         <Author>jojo2357</Author>
-        <Version>1.0.0</Version>
-        <Description>Runs DRP for Groove when groove is opened</Description>
+        <Version>1.1.0</Version>
+        <Description>Runs DRP for Groove in the background when groove is opened</Description>
     </RegistrationInfo>
     <Triggers>
         <EventTrigger>
