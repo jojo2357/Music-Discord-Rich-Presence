@@ -159,9 +159,9 @@ namespace GroovyRP
 						album = Regex.Replace(album, @"[^0-9a-z\-_]+", "");
 						if (albums.ContainsKey(album))
 							activeClient = allClients[albums[album]];
-						else if (albumAliases.ContainsKey(currentTrack.AlbumTitle.Remove('=')) && albums.ContainsKey(albumAliases[currentTrack.AlbumTitle.Remove('=')]))
+						else if (albumAliases.ContainsKey(currentTrack.AlbumTitle.Contains('=') ? currentTrack.AlbumTitle.Remove('=') : currentTrack.AlbumTitle) && albums.ContainsKey(albumAliases[currentTrack.AlbumTitle.Contains('=') ? currentTrack.AlbumTitle.Remove('=') : currentTrack.AlbumTitle]))
 						{
-							album = albumAliases[currentTrack.AlbumTitle.Remove('=')];
+							album = albumAliases[currentTrack.AlbumTitle.Contains('=') ? currentTrack.AlbumTitle.Remove('=') : currentTrack.AlbumTitle];
 							activeClient = allClients[albums[album]];
 						}
 						else if (defaultClients.ContainsKey(playerName))
