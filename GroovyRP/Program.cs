@@ -13,89 +13,101 @@ namespace GroovyRP
 {
 	class Program
 	{
-		private const string version = "1.3.1";
-		private const string github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
-		private const string title = "Discord Rich Presence For Groove";
+		private const string Version = "1.3.1";
+		private const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
+
+		private const string Title = "Discord Rich Presence For Groove";
+
 		//ID, client
 		private static Dictionary<string, DiscordRpcClient> defaultClients = new Dictionary<string, DiscordRpcClient>();
+
 		//ID, client
 		private static Dictionary<string, DiscordRpcClient> allClients = new Dictionary<string, DiscordRpcClient>();
+
 		//ID, process name
-		private static Dictionary<string, string> clientIDs = new Dictionary<string, string>
-		{
-			/*{"801209905020272681", "music.ui" },
-			{"802213652974272513", "chrome" },
-			{"802222525110812725", "spotify" }*/
-		};
 		//process name, enabled y/n
 		private static Dictionary<string, bool> enabled_clients = new Dictionary<string, bool>
 		{
-			{"music.ui", true },
+			{"music.ui", true},
 		};
+
 		private static readonly Dictionary<string, ConsoleColor> PlayerColors = new Dictionary<string, ConsoleColor>
 		{
-			{"music.ui", ConsoleColor.Blue },
-			{"chrome", ConsoleColor.Yellow },
-			{"spotify", ConsoleColor.DarkGreen }
+			{"music.ui", ConsoleColor.Blue},
+			{"chrome", ConsoleColor.Yellow},
+			{"spotify", ConsoleColor.DarkGreen}
 		};
+
 		//private static readonly DiscordRpcClient chrome_client = new DiscordRpcClient("802213652974272513", autoEvents: false);
 		//My head is an animal, Fever Dream (of monsters and men)
 		//Sigh no more, wilder mind, babel, delta (Mumford + sons)
 		//The Lumineers (the lumineers)
 		//normalized album name, ID
-		private static Dictionary<string, string> albums = new Dictionary<string, string>() /*{ "myheadisananimal", "feverdream", "babel", "thelumineers", "delta", "sighnomore", "wildermind" }*/;
+		private static Dictionary<string, string>
+			albums =
+				new Dictionary<string, string>() /*{ "myheadisananimal", "feverdream", "babel", "thelumineers", "delta", "sighnomore", "wildermind" }*/;
+
 		private static Dictionary<string, string> albumAliases = new Dictionary<string, string>();
 		private static string pressenceDetails = string.Empty;
-		private static readonly string[] validPlayers = new[] { "music.ui", "chrome", "spotify", /*"brave", */"new_chrome"/*, "firefox" */};
+
+		private static readonly string[] ValidPlayers = new[]
+			{"music.ui", "chrome", "spotify", /*"brave", */"new_chrome" /*, "firefox" */};
+
 		//For use in settings
-		private static readonly Dictionary<string, string> aliases = new Dictionary<string, string>
+		private static readonly Dictionary<string, string> Aliases = new Dictionary<string, string>
 		{
-			{"chrome", "Something in Google Chrome" },
-			{"spotify", "Spotify Music" },
-			{"groove", "Groove Music Player" },
-			{"new_chrome", "Something in Brave" },
-			{"music.ui", "Groove Music Player" },
-			{"brave", "Something in Brave" },
+			{"chrome", "Something in Google Chrome"},
+			{"spotify", "Spotify Music"},
+			{"groove", "Groove Music Player"},
+			{"new_chrome", "Something in Brave"},
+			{"music.ui", "Groove Music Player"},
+			{"brave", "Something in Brave"},
 		};
-		private static readonly Dictionary<string, string> big_assets = new Dictionary<string, string>
+
+		private static readonly Dictionary<string, string> BigAssets = new Dictionary<string, string>
 		{
-			{"music.ui", "groove" },
-			{"chrome", "chrome" },
-			{"new_chrome", "brave_small" },
-			{"brave", "brave_small" },
-			{"spotify", "spotify" },
+			{"music.ui", "groove"},
+			{"chrome", "chrome"},
+			{"new_chrome", "brave_small"},
+			{"brave", "brave_small"},
+			{"spotify", "spotify"},
 		};
+
 		//might just combine these later
-		private static readonly Dictionary<string, string> little_assets = new Dictionary<string, string>
+		private static readonly Dictionary<string, string> LittleAssets = new Dictionary<string, string>
 		{
-			{"music.ui", "groove_small" },
-			{"chrome", "chrome_small" },
-			{"new_chrome", "brave_small" },
-			{"brave", "brave" },
-			{"spotify", "spotify_small" },
+			{"music.ui", "groove_small"},
+			{"chrome", "chrome_small"},
+			{"new_chrome", "brave_small"},
+			{"brave", "brave"},
+			{"spotify", "spotify_small"},
 		};
-		private static readonly Dictionary<string, string> whatpeoplecallthisplayer = new Dictionary<string, string>
+
+		private static readonly Dictionary<string, string> Whatpeoplecallthisplayer = new Dictionary<string, string>
 		{
-			{"music.ui", "Groove Music" },
-			{"chrome", "Google Chrome" },
-			{"new_chrome", "Brave" },
-			{"brave", "Brave" },
-			{"spotify", "Spotify" },
+			{"music.ui", "Groove Music"},
+			{"chrome", "Google Chrome"},
+			{"new_chrome", "Brave"},
+			{"brave", "Brave"},
+			{"spotify", "Spotify"},
 		};
-		private static readonly Dictionary<string, string> inverseWhatpeoplecallthisplayer = new Dictionary<string, string>
-		{
-			{"groove", "music.ui" },
-			{"chrome", "chrome" },
-			{"brave", "new_chroome" },
-			{"spotify", "spotify" },
-		};
+
+		private static readonly Dictionary<string, string> InverseWhatpeoplecallthisplayer =
+			new Dictionary<string, string>
+			{
+				{"groove", "music.ui"},
+				{"chrome", "chrome"},
+				{"brave", "new_chroome"},
+				{"spotify", "spotify"},
+			};
+
 		private static readonly string defaultPlayer = "groove";
 		private static readonly int timeout_seconds = 60;
-		private static readonly Stopwatch timer = new Stopwatch();
-		private static readonly Stopwatch metaTimer = new Stopwatch();
+		private static readonly Stopwatch Timer = new Stopwatch();
+		private static readonly Stopwatch MetaTimer = new Stopwatch();
 		private static string playerName = string.Empty;
-		private static bool justcleared = false;
-		private static bool justUnknowned = false;
+		private static bool justcleared;
+		private static bool justUnknowned;
 
 		private static void Main()
 		{
@@ -106,8 +118,8 @@ namespace GroovyRP
 
 			LoadSettings();
 
-			metaTimer.Start();
-			timer.Start();
+			MetaTimer.Start();
+			Timer.Start();
 
 			foreach (DiscordRpcClient client in allClients.Values)
 			{
@@ -117,16 +129,14 @@ namespace GroovyRP
 			}
 
 			GlobalSystemMediaTransportControlsSessionMediaProperties currentTrack = null;
-			GlobalSystemMediaTransportControlsSessionMediaProperties oldTrack = null;
 
 			try
 			{
 				currentTrack = GetStuff();
-				oldTrack = GetStuff();
+				GetStuff();
 			}
 			catch (Exception)
 			{
-
 			}
 
 			bool isPlaying = IsUsingAudio();
@@ -145,56 +155,71 @@ namespace GroovyRP
 				{
 					isPlaying = false;
 				}
+
 				if (wasPlaying && !isPlaying)
-					timer.Restart();
-				if (enabled_clients.ContainsKey(playerName) && enabled_clients[playerName] && (isPlaying || timer.ElapsedMilliseconds < timeout_seconds * 1000))
+					Timer.Restart();
+				if (enabled_clients.ContainsKey(playerName) && enabled_clients[playerName] &&
+					(isPlaying || Timer.ElapsedMilliseconds < timeout_seconds * 1000))
 				{
 					DiscordRpcClient activeClient = null;
 					try
 					{
-						oldTrack = currentTrack;
 						currentTrack = GetStuff();
 						var album = currentTrack.AlbumTitle;
 						album = album.ToLower();
 						album = Regex.Replace(album, @"[^0-9a-z\-_]+", "");
 						if (albums.ContainsKey(album))
 							activeClient = allClients[albums[album]];
-						else if (albumAliases.ContainsKey(currentTrack.AlbumTitle.Contains('=') ? currentTrack.AlbumTitle.Remove('=') : currentTrack.AlbumTitle) && albums.ContainsKey(albumAliases[currentTrack.AlbumTitle.Contains('=') ? currentTrack.AlbumTitle.Remove('=') : currentTrack.AlbumTitle]))
+						else if (albumAliases.ContainsKey(currentTrack.AlbumTitle.Contains('=')
+							? currentTrack.AlbumTitle.Remove('=')
+							: currentTrack.AlbumTitle) && albums.ContainsKey(albumAliases[
+							currentTrack.AlbumTitle.Contains('=')
+								? currentTrack.AlbumTitle.Remove('=')
+								: currentTrack.AlbumTitle]))
 						{
-							album = albumAliases[currentTrack.AlbumTitle.Contains('=') ? currentTrack.AlbumTitle.Remove('=') : currentTrack.AlbumTitle];
+							album = albumAliases[
+								currentTrack.AlbumTitle.Contains('=')
+									? currentTrack.AlbumTitle.Remove('=')
+									: currentTrack.AlbumTitle];
 							activeClient = allClients[albums[album]];
 						}
 						else if (defaultClients.ContainsKey(playerName))
 							activeClient = defaultClients[playerName];
 						else
 							activeClient = defaultClients["music.ui"];
-						if (activeClient.CurrentPresence == null || activeClient.CurrentPresence.Details != ("Title: " + currentTrack.Title) || wasPlaying != isPlaying)
+
+						if (activeClient.CurrentPresence == null ||
+							activeClient.CurrentPresence.Details != ("Title: " + currentTrack.Title) ||
+							wasPlaying != isPlaying)
 						{
 							var details = $"Title: {currentTrack.Title}";
 							var state = $"Artist: {currentTrack.Artist}";
-
-
-							bool hasAlbum = false;
-							foreach (string str in albums.Keys)
-								hasAlbum |= str.Equals(album);
-
 							activeClient.SetPresence(new RichPresence
 							{
 								Details = details,
 								State = state,
 								Assets = new Assets
 								{
-									LargeImageKey = (albums.ContainsKey(album) ? album : (big_assets.ContainsKey(playerName) ? big_assets[playerName] : defaultPlayer)),
-									LargeImageText = currentTrack.AlbumTitle.Length > 0 ? currentTrack.AlbumTitle : "Unknown Album",
-									SmallImageKey = isPlaying ? (little_assets.ContainsKey(playerName) ? little_assets[playerName] : defaultPlayer) : "paused",
-									SmallImageText = isPlaying ? ("using " + aliases[playerName]) : "paused"
+									LargeImageKey = (albums.ContainsKey(album)
+										? album
+										: (BigAssets.ContainsKey(playerName) ? BigAssets[playerName] : defaultPlayer)),
+									LargeImageText = currentTrack.AlbumTitle.Length > 0
+										? currentTrack.AlbumTitle
+										: "Unknown Album",
+									SmallImageKey = isPlaying
+										? (LittleAssets.ContainsKey(playerName)
+											? LittleAssets[playerName]
+											: defaultPlayer)
+										: "paused",
+									SmallImageText = isPlaying ? ("using " + Aliases[playerName]) : "paused"
 								}
 							});
 							SetConsole(currentTrack.Title, currentTrack.Artist, currentTrack.AlbumTitle, album);
 							activeClient.Invoke();
 
 							foreach (DiscordRpcClient client in allClients.Values)
-								if (client.CurrentPresence != null && client.ApplicationID != activeClient.ApplicationID)
+								if (client.CurrentPresence != null &&
+									client.ApplicationID != activeClient.ApplicationID)
 								{
 #if DEBUG
 									Console.WriteLine("Cleared " + client.ApplicationID);
@@ -251,27 +276,28 @@ namespace GroovyRP
 				if (!client.IsInitialized)
 					return false;
 			}
+
 			return true;
 		}
 
-		private static void SetConsole(string Title, string Artist, string Album, string album)
+		private static void SetConsole(string title, string artist, string albumName, string album)
 		{
 			Console.Clear();
 
 			Console.ForegroundColor = ConsoleColor.White;
-			Console.WriteLine(title);
+			Console.WriteLine(Program.Title);
 
 			Console.ForegroundColor = ConsoleColor.White;
 			Console.Write("Version: ");
 
 			Console.ForegroundColor = ConsoleColor.Gray;
-			Console.WriteLine(version);
+			Console.WriteLine(Version);
 
 			Console.ForegroundColor = ConsoleColor.White;
 			Console.Write("Github: ");
 
 			Console.ForegroundColor = ConsoleColor.Cyan;
-			Console.WriteLine(github);
+			Console.WriteLine(Github);
 
 			Console.WriteLine();
 
@@ -282,28 +308,29 @@ namespace GroovyRP
 			Console.Write("  Title: ");
 
 			Console.ForegroundColor = ConsoleColor.Gray;
-			Console.WriteLine(Title);
+			Console.WriteLine(title);
 
 			Console.ForegroundColor = ConsoleColor.White;
 			Console.Write(" Artist: ");
 
 			Console.ForegroundColor = ConsoleColor.Gray;
-			Console.WriteLine(Artist);
+			Console.WriteLine(artist);
 
-			if (!Album.Equals(String.Empty))
+			if (!albumName.Equals(String.Empty))
 			{
 				Console.ForegroundColor = ConsoleColor.White;
 				Console.Write("  Album: ");
 
 				Console.ForegroundColor = ConsoleColor.Gray;
-				Console.WriteLine(Album);
+				Console.WriteLine(albumName);
 			}
 
 			Console.ForegroundColor = ConsoleColor.White;
 			Console.Write(" Player: ");
 
-			Console.ForegroundColor = PlayerColors.ContainsKey(playerName) ? PlayerColors[playerName] : ConsoleColor.White;
-			Console.WriteLine(whatpeoplecallthisplayer[playerName]);
+			Console.ForegroundColor =
+				PlayerColors.ContainsKey(playerName) ? PlayerColors[playerName] : ConsoleColor.White;
+			Console.WriteLine(Whatpeoplecallthisplayer[playerName]);
 
 			if (albums.ContainsKey(album))
 			{
@@ -360,7 +387,8 @@ namespace GroovyRP
 		//Get palying details
 		private static GlobalSystemMediaTransportControlsSessionMediaProperties GetStuff()
 		{
-			var gsmtcsm = GlobalSystemMediaTransportControlsSessionManager.RequestAsync().GetAwaiter().GetResult().GetCurrentSession();
+			var gsmtcsm = GlobalSystemMediaTransportControlsSessionManager.RequestAsync().GetAwaiter().GetResult()
+				.GetCurrentSession();
 			return gsmtcsm.TryGetMediaPropertiesAsync().GetAwaiter().GetResult();
 		}
 
@@ -368,7 +396,7 @@ namespace GroovyRP
 		{
 			//Music.UI is Groove. Additional options include chrome, spotify, etc
 			List<Process> candidates = new List<Process>();
-			foreach (string program in validPlayers)
+			foreach (string program in ValidPlayers)
 				if (enabled_clients.ContainsKey(program) && enabled_clients[program])
 					foreach (Process process in Process.GetProcessesByName(program))
 						candidates.Add(process);
@@ -390,7 +418,8 @@ namespace GroovyRP
 						var process = session.QueryInterface<AudioSessionControl2>().Process;
 						try
 						{
-							if (validPlayers.Contains(process.ProcessName.ToLower()) && session.QueryInterface<AudioMeterInformation>().GetPeakValue() > 0)
+							if (ValidPlayers.Contains(process.ProcessName.ToLower()) &&
+								session.QueryInterface<AudioMeterInformation>().GetPeakValue() > 0)
 							{
 								playerName = process.ProcessName.ToLower();
 								return true;
@@ -405,6 +434,7 @@ Console.WriteLine("Caught isUsingAudioException");
 					}
 				}
 			}
+
 			return false;
 		}
 
@@ -415,23 +445,26 @@ Console.WriteLine("Caught isUsingAudioException");
 				string[] lines = File.ReadAllLines("../../../DiscordPresenceConfig.ini");
 				foreach (string line in lines)
 				{
-					if (validPlayers.Contains(line.Split('=')[0].Trim().ToLower()))
-					//if (enabled_clients.Keys.Contains(line.Split('=')[0].Trim().ToLower()))
+					if (ValidPlayers.Contains(line.Split('=')[0].Trim().ToLower()))
+						//if (enabled_clients.Keys.Contains(line.Split('=')[0].Trim().ToLower()))
 					{
 						enabled_clients[line.Split('=')[0]] = line.Split('=')[1].Trim().ToLower() == "true";
 					}
-					else if ((inverseWhatpeoplecallthisplayer.ContainsKey(line.Split('=')[0].Trim().ToLower()) && validPlayers.Contains(inverseWhatpeoplecallthisplayer[line.Split('=')[0].Trim().ToLower()])))
+					else if ((InverseWhatpeoplecallthisplayer.ContainsKey(line.Split('=')[0].Trim().ToLower()) &&
+							  ValidPlayers.Contains(
+								  InverseWhatpeoplecallthisplayer[line.Split('=')[0].Trim().ToLower()])))
 					{
 						enabled_clients.Add(line.Split('=')[0], line.Split('=')[1].Trim().ToLower() == "true");
 					}
-
 				}
 			}
 			catch (Exception)
 			{
-				Console.Error.WriteLine("DiscordPresenceConfig.ini not found! this is the settings file to enable or disable certain features");
+				Console.Error.WriteLine(
+					"DiscordPresenceConfig.ini not found! this is the settings file to enable or disable certain features");
 				System.Threading.Thread.Sleep(5000);
 			}
+
 			try
 			{
 				foreach (var file in new DirectoryInfo("../../../clientdata").GetFiles())
@@ -442,23 +475,24 @@ Console.WriteLine("Caught isUsingAudioException");
 					{
 						string[] lines = File.ReadAllLines(file.FullName);
 						string id = "";
-						if (!validPlayers.Contains(lines[0].Split('=')[0]))
+						if (!ValidPlayers.Contains(lines[0].Split('=')[0]))
 						{
 							Console.Error.WriteLine("Error in file " + file.Name + " not a valid player name");
 							System.Threading.Thread.Sleep(5000);
 							continue;
 						}
+
 						if (!lines[1].ToLower().Contains("id="))
 						{
 							Console.Error.WriteLine("Error in file " + file.Name + " no id found on the second line");
 							System.Threading.Thread.Sleep(5000);
 							continue;
 						}
+
 						id = lines[1].Split('=')[1].Trim();
 						allClients.Add(id, new DiscordRpcClient(id, autoEvents: false));
 						if (!defaultClients.ContainsKey(lines[0].Split('=')[0]))
 							defaultClients.Add(lines[0].Split('=')[0], allClients[id]);
-						clientIDs.Add(id, lines[0].Split('=')[0]);
 						for (int i = 2; i < lines.Length; i++)
 						{
 							if (lines[i].Contains('='))
@@ -471,12 +505,14 @@ Console.WriteLine("Caught isUsingAudioException");
 								albums.Add(lines[i], id);
 						}
 					}
-					catch (Exception) { }
+					catch (Exception)
+					{
+					}
 				}
-
 			}
-			catch (Exception) { }
-
+			catch (Exception)
+			{
+			}
 		}
 	}
 }
