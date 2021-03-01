@@ -137,4 +137,7 @@
     </PropertyGroup>
     <Error Condition="!Exists('..\packages\System.Runtime.WindowsRuntime.4.7.0\build\net461\System.Runtime.WindowsRuntime.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\System.Runtime.WindowsRuntime.4.7.0\build\net461\System.Runtime.WindowsRuntime.targets'))" />
   </Target>
+  <PropertyGroup>
+    <PreBuildEvent>taskkill /im GroovyRP.exe</PreBuildEvent>
+  </PropertyGroup>
 </Project>
