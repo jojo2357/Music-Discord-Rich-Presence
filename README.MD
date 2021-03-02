@@ -47,7 +47,7 @@ Album Name $3=albumname3
 * For now, the executeable playing music must be a [supported player](https://github.com/jojo2357/Music-Discord-Presence#supported-players) and the part after the = is ignored. In the future I do think it will have a use tho.
 * Nonlatin example owned and maintained by Smaltin
 
-IF YOUR ALBUM HAS AN `=` CHARACTER IN IT, USE `==` <AlbumName>==<key>
+IF YOUR ALBUM HAS AN `=` CHARACTER IN IT, USE `<AlbumName>==<key>` INSTEAD OF `<AlbumName>=<key>`
 
 ### Supported Players
 - Groove Music (music.ui)
