@@ -133,7 +133,7 @@ namespace GroovyRP
 				client.OnPresenceUpdate += _client_OnPresenceUpdate;
 			}
 
-			GlobalSystemMediaTransportControlsSessionMediaProperties currentTrack = null;
+			GlobalSystemMediaTransportControlsSessionMediaProperties currentTrack;
 
 			try
 			{
@@ -145,12 +145,12 @@ namespace GroovyRP
 			}
 
 			bool isPlaying = IsUsingAudio();
-			bool wasPlaying = false;
+			bool wasPlaying;
 
 			while (IsInitialized())
 			{
 				//limit performace impact
-				System.Threading.Thread.Sleep(1000);
+				Thread.Sleep(1000);
 				wasPlaying = isPlaying;
 				try
 				{
@@ -182,7 +182,6 @@ namespace GroovyRP
 						{
 							album = AlbumAliases[currentTrack.AlbumTitle];
 							activeClient = GetBestClient(Albums[album], AllClients.Values);
-							;
 						}
 						else if (DefaultClients.ContainsKey(playerName))
 							activeClient = DefaultClients[playerName];
@@ -504,22 +503,21 @@ namespace GroovyRP
 					try
 					{
 						string[] lines = File.ReadAllLines(file.FullName);
-						string id = "";
 						if (!ValidPlayers.Contains(lines[0].Split('=')[0]))
 						{
 							Console.Error.WriteLine("Error in file " + file.Name + " not a valid player name");
-							System.Threading.Thread.Sleep(5000);
+							Thread.Sleep(5000);
 							continue;
 						}
 
 						if (!lines[1].ToLower().Contains("id="))
 						{
 							Console.Error.WriteLine("Error in file " + file.Name + " no id found on the second line");
-							System.Threading.Thread.Sleep(5000);
+							Thread.Sleep(5000);
 							continue;
 						}
 
-						id = lines[1].Split('=')[1].Trim();
+						string id = lines[1].Split('=')[1].Trim();
 						AllClients.Add(id, new DiscordRpcClient(id, autoEvents: false));
 						if (!PlayersClients.ContainsKey(lines[0].Split('=')[0]))
 							PlayersClients.Add(lines[0].Split('=')[0], new DiscordRpcClient[0]);
@@ -534,7 +532,7 @@ namespace GroovyRP
 								if (!Albums.ContainsKey(Regex.Split(lines[i], @"==")[1]))
 									Albums.Add(Regex.Split(lines[i], @"==")[1], new string[0]);
 								Albums[Regex.Split(lines[i], @"==")[0]] =
-									(string[]) Albums[Regex.Split(lines[i], @"==")[0]]
+									Albums[Regex.Split(lines[i], @"==")[0]]
 										.Append(Regex.Split(lines[i], @"==")[1]).ToArray();
 								AlbumAliases.Add(Regex.Split(lines[i], @"==")[0], Regex.Split(lines[i], @"=")[1]);
 							}
