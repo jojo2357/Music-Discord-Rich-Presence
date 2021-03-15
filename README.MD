@@ -53,7 +53,11 @@ IF YOUR ALBUM HAS AN `=` CHARACTER IN IT, USE `<AlbumName>==<key>` INSTEAD OF `<
 - Groove Music (music.ui)
 - Spotify
 - Chrome
+- MusicBee
 (More can be added, I just dunno if it's needed)
+
+## Music Bee
+- In order to be compatible with music bee, you have to add [this plugin](https://getmusicbee.com/forum/index.php?topic=21240.0).
 
 ## Future fatures
 * Maybe an image resizer but that sounds hard so only if asked for.
