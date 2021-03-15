@@ -56,7 +56,7 @@ namespace GroovyRP
 		//For use in settings
 		private static readonly Dictionary<string, string> Aliases = new Dictionary<string, string>
 		{
-			{"musicbee", "Something in Music Bee"},
+			{"musicbee", "Music Bee"},
 			{"chrome", "Something in Google Chrome"},
 			{"spotify", "Spotify Music"},
 			{"groove", "Groove Music Player"},
@@ -207,8 +207,10 @@ namespace GroovyRP
 								Assets = new Assets
 								{
 									LargeImageKey = (Albums.ContainsKey(album)
-										? album
-										: (BigAssets.ContainsKey(playerName) ? BigAssets[playerName] : defaultPlayer)),
+										? album.Length > 32 ? defaultPlayer : album
+										: (BigAssets.ContainsKey(playerName)
+											? BigAssets[playerName].Length > 32 ? defaultPlayer : BigAssets[playerName]
+											: defaultPlayer)),
 									LargeImageText = currentTrack.AlbumTitle.Length > 0
 										? currentTrack.AlbumTitle
 										: "Unknown Album",
@@ -228,22 +230,22 @@ namespace GroovyRP
 								    client.ApplicationID != activeClient.ApplicationID)
 								{
 #if DEBUG
-                                    Console.WriteLine("Cleared " + client.ApplicationID);
+									Console.WriteLine("Cleared " + client.ApplicationID);
 #endif
 									client.ClearPresence();
 									client.Invoke();
 								}
 						}
 #if DEBUG
-                        Console.Write("" + (MetaTimer.ElapsedMilliseconds) + "(" +
-                                      (Timer.ElapsedMilliseconds /* < timeout_seconds * 1000*/) + ") in " + playerName +
-                                      '\r');
+						Console.Write("" + (MetaTimer.ElapsedMilliseconds) + "(" +
+						              (Timer.ElapsedMilliseconds /* < timeout_seconds * 1000*/) + ") in " + playerName +
+						              '\r');
 #endif
 					}
 					catch (Exception e)
 					{
 #if DEBUG
-                        Console.WriteLine(e.StackTrace);
+						Console.WriteLine(e.StackTrace);
 #else
 						Console.WriteLine(e.Message);
 #endif
@@ -269,7 +271,7 @@ namespace GroovyRP
 				{
 					SetClear();
 #if DEBUG
-                    Console.Write("Cleared " + (MetaTimer.ElapsedMilliseconds) + "\r");
+					Console.Write("Cleared " + (MetaTimer.ElapsedMilliseconds) + "\r");
 #endif
 					foreach (DiscordRpcClient client in AllClients.Values)
 						if (client.CurrentPresence != null)
@@ -353,6 +355,15 @@ namespace GroovyRP
 
 				Console.ForegroundColor = ConsoleColor.Gray;
 				Console.WriteLine(albumName);
+
+				if ((Albums.ContainsKey(album)
+						? album
+						: (BigAssets.ContainsKey(playerName) ? BigAssets[playerName] : defaultPlayer))
+					.Length > 32)
+				{
+					Console.ForegroundColor = ConsoleColor.Red;
+					Console.WriteLine("The key for this album is too long. It must be 32 characters or less");
+				}
 			}
 
 			Console.ForegroundColor = ConsoleColor.White;
@@ -455,10 +466,12 @@ namespace GroovyRP
 								return true;
 							}
 						}
-						catch (Exception)
+						catch (Exception e)
 						{
 #if DEBUG
-                            Console.WriteLine("Caught isUsingAudioException");
+							Console.WriteLine(e.StackTrace);
+#else
+							Console.WriteLine(e.Message);
 #endif
 						}
 					}
