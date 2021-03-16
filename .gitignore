@@ -14,6 +14,9 @@
 **/filelocation.dat
 ArchivedReleases/[0-9].[0-9].[0-9]_Release/
 ArchivedReleases/[0-9].[0-9].[0-9]_Release.zip
+
+clientdata/*
+!clientdata/demo.dat
 # ArchivedReleases/1.0.0_Release/
 
 # User-specific files

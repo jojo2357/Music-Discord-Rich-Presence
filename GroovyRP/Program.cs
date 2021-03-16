@@ -14,13 +14,20 @@ namespace GroovyRP
 {
 	class Program
 	{
-		private const string Version = "1.3.4";
+		private const string Version = "1.4.0";
 		private const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
 		private const string Title = "Discord Rich Presence For Groove";
 
-		//ID, client
+		//Player Name, client
 		private static readonly Dictionary<string, DiscordRpcClient> DefaultClients =
-			new Dictionary<string, DiscordRpcClient>();
+			new Dictionary<string, DiscordRpcClient>
+			{
+				{"music.ui", new DiscordRpcClient("807774172574253056", autoEvents: false)},
+				{"musicbee", new DiscordRpcClient("820837854385012766", autoEvents: false)},
+				{"spotify", new DiscordRpcClient("802222525110812725", autoEvents: false)},
+				{"chrome", new DiscordRpcClient("802213652974272513", autoEvents: false)},
+				{"", new DiscordRpcClient("821398156905283585", autoEvents: false)},
+			};
 
 		//ID, client
 		private static readonly Dictionary<string, DiscordRpcClient> AllClients =
@@ -121,6 +128,11 @@ namespace GroovyRP
 			Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
 			Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
+			foreach (DiscordRpcClient client in DefaultClients.Values)
+			{
+				AllClients.Add(client.ApplicationID, client);
+			}
+
 			LoadSettings();
 
 			MetaTimer.Start();
@@ -175,24 +187,28 @@ namespace GroovyRP
 						album = Regex.Replace(album, @"[^0-9a-z\-_]+", "");
 						if (Albums.ContainsKey(album))
 						{
-							activeClient = GetBestClient(Albums[album], AllClients.Values);
+							activeClient = GetBestClient(Albums[album]);
 						}
 						else if (AlbumAliases.ContainsKey(currentTrack.AlbumTitle) &&
 						         Albums.ContainsKey(AlbumAliases[currentTrack.AlbumTitle]))
 						{
 							album = AlbumAliases[currentTrack.AlbumTitle];
-							activeClient = GetBestClient(Albums[album], AllClients.Values);
+							activeClient = GetBestClient(Albums[album]);
 						}
 						else if (DefaultClients.ContainsKey(playerName))
 							activeClient = DefaultClients[playerName];
 						else
-							activeClient = DefaultClients["music.ui"];
+							activeClient = DefaultClients[""];
 
 						if (activeClient == null)
 						{
-							activeClient = DefaultClients["music.ui"];
+							activeClient = DefaultClients[playerName];
 							Console.WriteLine("Uh oh!!!");
 						}
+
+#if DEBUG
+						Console.WriteLine("Using " + activeClient.ApplicationID);
+#endif
 
 						if (activeClient.CurrentPresence == null ||
 						    activeClient.CurrentPresence.Details != ("Title: " + currentTrack.Title) ||
@@ -283,8 +299,7 @@ namespace GroovyRP
 			}
 		}
 
-		private static DiscordRpcClient GetBestClient(string[] album,
-			Dictionary<String, DiscordRpcClient>.ValueCollection clients)
+		private static DiscordRpcClient GetBestClient(string[] album)
 		{
 			foreach (DiscordRpcClient klient in PlayersClients[playerName])
 			{
@@ -292,13 +307,7 @@ namespace GroovyRP
 					return klient;
 			}
 
-			foreach (DiscordRpcClient klient in clients)
-			{
-				if (album.Contains(klient.ApplicationID))
-					return klient;
-			}
-
-			return null;
+			return DefaultClients[playerName];
 		}
 
 		private static bool IsInitialized()
@@ -504,7 +513,7 @@ namespace GroovyRP
 			{
 				Console.Error.WriteLine(
 					"DiscordPresenceConfig.ini not found! this is the settings file to enable or disable certain features");
-				System.Threading.Thread.Sleep(5000);
+				Thread.Sleep(5000);
 			}
 
 			try
@@ -531,13 +540,17 @@ namespace GroovyRP
 						}
 
 						string id = lines[1].Split('=')[1].Trim();
-						AllClients.Add(id, new DiscordRpcClient(id, autoEvents: false));
-						if (!PlayersClients.ContainsKey(lines[0].Split('=')[0]))
-							PlayersClients.Add(lines[0].Split('=')[0], new DiscordRpcClient[0]);
-						PlayersClients[lines[0].Split('=')[0]] =
-							PlayersClients[lines[0].Split('=')[0]].Append(AllClients[id]).ToArray();
-						if (!DefaultClients.ContainsKey(lines[0].Split('=')[0]))
-							DefaultClients.Add(lines[0].Split('=')[0], AllClients[id]);
+						if (!AllClients.ContainsKey(id))
+						{
+							AllClients.Add(id, new DiscordRpcClient(id, autoEvents: false));
+							if (!PlayersClients.ContainsKey(lines[0].Split('=')[0]))
+								PlayersClients.Add(lines[0].Split('=')[0], new DiscordRpcClient[0]);
+							PlayersClients[lines[0].Split('=')[0]] =
+								PlayersClients[lines[0].Split('=')[0]].Append(AllClients[id]).ToArray();
+							if (!DefaultClients.ContainsKey(lines[0].Split('=')[0]))
+								DefaultClients.Add(lines[0].Split('=')[0], AllClients[id]);
+						}
+
 						for (int i = 2; i < lines.Length; i++)
 						{
 							if (lines[i].Contains("=="))
