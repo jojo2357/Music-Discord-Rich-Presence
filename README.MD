@@ -3,14 +3,17 @@ To run, simply run `Launch DRP` from the shortcuts folder or, if you want it to 
 Works with Groove, Spotify, and Chrome
 
 ## Features
-* Allows uploading album art to custom applications to display and exceed the 150 asset maximum (see [uploading custom album art](https://github.com/jojo2357/Music-Discord-Presence#custom-album-art) for instructions) 
+* Allows uploading album art to custom applications to display and exceed the 150 asset maximum (see [uploading custom album art](https://github.com/jojo2357/Music-Discord-Rich-Presence#custom-album-art) for instructions) 
 * Shows song title, artist, and album on any song.
 * Includes batch scripts to enable rich presence to launch when groove is opened
 * Ability to toggle media players showing up in rich presence.
 * Can run in the background or with a pretty terminal
 
+## Coming soon
+@Smaltin and I will be creating a [library repo](https://github.com/jojo2357/Music-Discord-Rich-Presence-Library) soon that will contain user generated clientdata in order to rival spotify rp as mentioned in #23
+
 ## About linking Groove and DRP
-In order to have rich presence every time you open groovy, run the shortcut `Link Rich Presence With Groove`. If at any time you wish to disable this feature, simply run `Unlink Rich Presence With Groove`. See [Linking Groove](https://github.com/jojo2357/Music-Discord-Presence#linking-groove) for more 
+In order to have rich presence every time you open groovy, run the shortcut `Link Rich Presence With Groove`. If at any time you wish to disable this feature, simply run `Unlink Rich Presence With Groove`. See [Linking Groove](https://github.com/jojo2357/Music-Discord-Rich-Presence#linking-groove) for more 
 
 ## Instructions
 Uh, download and unzip (of course), then run the `Launch DRP` shortcut from the shortcuts folder
@@ -44,7 +47,7 @@ album2
 Album Name $3=albumname3
 ```
 * For non latin albums, latinize it however you want and put a line in the format `<Album In Japanese/Emoji/Cyrillic/Chinese/non latin alphabet>=albumkey`
-* For now, the executeable playing music must be a [supported player](https://github.com/jojo2357/Music-Discord-Presence#supported-players) and the part after the = is ignored. In the future I do think it will have a use tho.
+* For now, the executeable playing music must be a [supported player](https://github.com/jojo2357/Music-Discord-Rich-Presence#supported-players) and the part after the = is ignored. In the future I do think it will have a use tho.
 * Nonlatin example owned and maintained by Smaltin
 
 IF YOUR ALBUM HAS AN `=` CHARACTER IN IT, USE `<AlbumName>==<key>` INSTEAD OF `<AlbumName>=<key>`

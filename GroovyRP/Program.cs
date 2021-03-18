@@ -14,7 +14,7 @@ namespace GroovyRP
 {
 	class Program
 	{
-		private const string Version = "1.4.0";
+		private const string Version = "1.4.1";
 		private const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
 		private const string Title = "Discord Rich Presence For Groove";
 
@@ -37,6 +37,10 @@ namespace GroovyRP
 		private static readonly Dictionary<string, DiscordRpcClient[]> PlayersClients =
 			new Dictionary<string, DiscordRpcClient[]>();
 
+		//Album, (id, key)
+		private static readonly Dictionary<string, Dictionary<string, string>> AlbumKeyMapping =
+			new Dictionary<string, Dictionary<string, string>>();
+
 		//ID, process name
 		//process name, enabled y/n
 		private static readonly Dictionary<string, bool> EnabledClients = new Dictionary<string, bool>
@@ -52,9 +56,6 @@ namespace GroovyRP
 			{"musicbee", ConsoleColor.Yellow}
 		};
 
-		private static readonly Dictionary<string, string[]> Albums = new Dictionary<string, string[]>();
-
-		private static readonly Dictionary<string, string> AlbumAliases = new Dictionary<string, string>();
 		private static string _presenceDetails = string.Empty;
 
 		private static readonly string[] ValidPlayers = new[]
@@ -118,8 +119,8 @@ namespace GroovyRP
 		private static readonly Stopwatch Timer = new Stopwatch();
 		private static readonly Stopwatch MetaTimer = new Stopwatch();
 		private static string playerName = string.Empty;
-		private static bool justcleared;
-		private static bool justUnknowned;
+		private static bool justcleared, justUnknowned, presenceIsRich = false;
+		private static DiscordRpcClient activeClient;
 
 		private static void Main()
 		{
@@ -156,8 +157,7 @@ namespace GroovyRP
 			{
 			}
 
-			bool isPlaying = IsUsingAudio();
-			bool wasPlaying;
+			bool isPlaying = IsUsingAudio(), wasPlaying;
 
 			while (IsInitialized())
 			{
@@ -178,22 +178,19 @@ namespace GroovyRP
 				if (EnabledClients.ContainsKey(playerName) && EnabledClients[playerName] &&
 				    (isPlaying || Timer.ElapsedMilliseconds < timeout_seconds * 1000))
 				{
-					DiscordRpcClient activeClient = null;
+					activeClient = null;
 					try
 					{
 						currentTrack = GetStuff();
 						var album = currentTrack.AlbumTitle;
-						album = album.ToLower();
-						album = Regex.Replace(album, @"[^0-9a-z\-_]+", "");
-						if (Albums.ContainsKey(album))
+						if (AlbumKeyMapping.ContainsKey(album))
 						{
-							activeClient = GetBestClient(Albums[album]);
+							activeClient = GetBestClient(AlbumKeyMapping[album]);
 						}
-						else if (AlbumAliases.ContainsKey(currentTrack.AlbumTitle) &&
-						         Albums.ContainsKey(AlbumAliases[currentTrack.AlbumTitle]))
+						else if (AlbumKeyMapping.ContainsKey(Regex.Replace(album.ToLower(), @"[^0-9a-z\-_]+", "")))
 						{
-							album = AlbumAliases[currentTrack.AlbumTitle];
-							activeClient = GetBestClient(Albums[album]);
+							activeClient =
+								GetBestClient(AlbumKeyMapping[Regex.Replace(album.ToLower(), @"[^0-9a-z\-_]+", "")]);
 						}
 						else if (DefaultClients.ContainsKey(playerName))
 							activeClient = DefaultClients[playerName];
@@ -207,7 +204,12 @@ namespace GroovyRP
 						}
 
 #if DEBUG
-						Console.WriteLine("Using " + activeClient.ApplicationID);
+						Console.WriteLine("Using " + activeClient.ApplicationID + " (" +
+						                  (AlbumKeyMapping.ContainsKey(album) && AlbumKeyMapping[album]
+							                   .ContainsKey(activeClient.ApplicationID) &&
+						                   AlbumKeyMapping[album][activeClient.ApplicationID].Length <= 32
+							                  ? AlbumKeyMapping[album][activeClient.ApplicationID]
+							                  : BigAssets[playerName]) + ")");
 #endif
 
 						if (activeClient.CurrentPresence == null ||
@@ -216,17 +218,20 @@ namespace GroovyRP
 						{
 							var details = $"Title: {currentTrack.Title}";
 							var state = $"Artist: {currentTrack.Artist}";
+							presenceIsRich = AlbumKeyMapping.ContainsKey(album) &&
+							                 AlbumKeyMapping[album].ContainsKey(activeClient.ApplicationID);
 							activeClient.SetPresence(new RichPresence
 							{
 								Details = details,
 								State = state,
 								Assets = new Assets
 								{
-									LargeImageKey = (Albums.ContainsKey(album)
-										? album.Length > 32 ? defaultPlayer : album
-										: (BigAssets.ContainsKey(playerName)
-											? BigAssets[playerName].Length > 32 ? defaultPlayer : BigAssets[playerName]
-											: defaultPlayer)),
+									LargeImageKey =
+										AlbumKeyMapping.ContainsKey(album) && AlbumKeyMapping[album]
+											.ContainsKey(activeClient.ApplicationID) &&
+										AlbumKeyMapping[album][activeClient.ApplicationID].Length <= 32
+											? AlbumKeyMapping[album][activeClient.ApplicationID]
+											: BigAssets[playerName],
 									LargeImageText = currentTrack.AlbumTitle.Length > 0
 										? currentTrack.AlbumTitle
 										: "Unknown Album",
@@ -299,12 +304,22 @@ namespace GroovyRP
 			}
 		}
 
-		private static DiscordRpcClient GetBestClient(string[] album)
+		private static DiscordRpcClient GetBestClient(Dictionary<string, string> album)
 		{
-			foreach (DiscordRpcClient klient in PlayersClients[playerName])
+			try
 			{
-				if (album.Contains(klient.ApplicationID))
-					return klient;
+				if (PlayersClients.ContainsKey(playerName))
+					foreach (DiscordRpcClient klient in PlayersClients[playerName])
+					{
+						if (album.ContainsKey(klient.ApplicationID))
+							return klient;
+					}
+			}
+			catch (Exception e)
+			{
+#if DEBUG
+				Console.WriteLine(e);
+#endif
 			}
 
 			return DefaultClients[playerName];
@@ -364,10 +379,10 @@ namespace GroovyRP
 
 				Console.ForegroundColor = ConsoleColor.Gray;
 				Console.WriteLine(albumName);
-
-				if ((Albums.ContainsKey(album)
-						? album
-						: (BigAssets.ContainsKey(playerName) ? BigAssets[playerName] : defaultPlayer))
+				
+				if ((AlbumKeyMapping.ContainsKey(album) && AlbumKeyMapping[album].ContainsKey(activeClient.ApplicationID)
+						? AlbumKeyMapping[album][activeClient.ApplicationID]
+						: BigAssets[playerName])
 					.Length > 32)
 				{
 					Console.ForegroundColor = ConsoleColor.Red;
@@ -382,7 +397,7 @@ namespace GroovyRP
 				PlayerColors.ContainsKey(playerName) ? PlayerColors[playerName] : ConsoleColor.White;
 			Console.WriteLine(Whatpeoplecallthisplayer[playerName]);
 
-			if (Albums.ContainsKey(album))
+			if (presenceIsRich)
 			{
 				Console.ForegroundColor = ConsoleColor.Magenta;
 				Console.WriteLine("\nThis is a good one, check ur DRP ;)");
@@ -410,7 +425,8 @@ namespace GroovyRP
 			{
 				justUnknowned = true;
 				Console.Clear();
-				Console.Write("Detected volume in " + playerName + " but not showing as it is not currently supported");
+				Console.Write(
+					"Detected volume in something but not showing as it is not currently supported or is disabled");
 			}
 		}
 
@@ -469,6 +485,8 @@ namespace GroovyRP
 						try
 						{
 							if (ValidPlayers.Contains(process.ProcessName.ToLower()) &&
+							    EnabledClients.ContainsKey(process.ProcessName.ToLower()) &&
+							    EnabledClients[process.ProcessName.ToLower()] &&
 							    session.QueryInterface<AudioMeterInformation>().GetPeakValue() > 0)
 							{
 								playerName = process.ProcessName.ToLower();
@@ -555,25 +573,24 @@ namespace GroovyRP
 						{
 							if (lines[i].Contains("=="))
 							{
-								if (!Albums.ContainsKey(Regex.Split(lines[i], @"==")[1]))
-									Albums.Add(Regex.Split(lines[i], @"==")[1], new string[0]);
-								Albums[Regex.Split(lines[i], @"==")[0]] =
-									Albums[Regex.Split(lines[i], @"==")[0]]
-										.Append(Regex.Split(lines[i], @"==")[1]).ToArray();
-								AlbumAliases.Add(Regex.Split(lines[i], @"==")[0], Regex.Split(lines[i], @"=")[1]);
+								if (!AlbumKeyMapping.ContainsKey(Regex.Split(lines[i], @"==")[0]))
+									AlbumKeyMapping.Add(Regex.Split(lines[i], @"==")[0],
+										new Dictionary<string, string>());
+								AlbumKeyMapping[Regex.Split(lines[i], @"==")[0]]
+									.Add(id, Regex.Split(lines[i], @"==")[1]);
 							}
 							else if (lines[i].Contains('='))
 							{
-								if (!Albums.ContainsKey(lines[i].Split('=')[1]))
-									Albums.Add(lines[i].Split('=')[1], new string[0]);
-								Albums[lines[i].Split('=')[1]] = Albums[lines[i].Split('=')[1]].Append(id).ToArray();
-								AlbumAliases.Add(Regex.Split(lines[i], @"=")[0], Regex.Split(lines[i], @"=")[1]);
+								if (!AlbumKeyMapping.ContainsKey(Regex.Split(lines[i], "=")[0]))
+									AlbumKeyMapping.Add(Regex.Split(lines[i], "=")[0],
+										new Dictionary<string, string>());
+								AlbumKeyMapping[Regex.Split(lines[i], "=")[0]].Add(id, Regex.Split(lines[i], "=")[1]);
 							}
 							else
 							{
-								if (!Albums.ContainsKey(lines[i]))
-									Albums.Add(lines[i], new string[0]);
-								Albums[lines[i]] = Albums[lines[i]].Append(id).ToArray();
+								if (!AlbumKeyMapping.ContainsKey(lines[i]))
+									AlbumKeyMapping.Add(lines[i], new Dictionary<string, string>());
+								AlbumKeyMapping[lines[i]].Add(id, lines[i]);
 							}
 						}
 					}
