@@ -14,7 +14,7 @@ namespace GroovyRP
 {
 	class Program
 	{
-		private const string Version = "1.4.1";
+		private const string Version = "1.4.2";
 		private const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
 		private const string Title = "Discord Rich Presence For Groove";
 
@@ -119,7 +119,7 @@ namespace GroovyRP
 		private static readonly Stopwatch Timer = new Stopwatch();
 		private static readonly Stopwatch MetaTimer = new Stopwatch();
 		private static string playerName = string.Empty;
-		private static bool justcleared, justUnknowned, presenceIsRich = false;
+		private static bool justcleared, justUnknowned, ScreamAtUser = false, presenceIsRich = false;
 		private static DiscordRpcClient activeClient;
 
 		private static void Main()
@@ -220,6 +220,13 @@ namespace GroovyRP
 							var state = $"Artist: {currentTrack.Artist}";
 							presenceIsRich = AlbumKeyMapping.ContainsKey(album) &&
 							                 AlbumKeyMapping[album].ContainsKey(activeClient.ApplicationID);
+							if (ScreamAtUser && !presenceIsRich)
+							{
+								SendNotification("Album not keyed",
+									album +
+									" is not keyed. To disable these notifications, set verbose to false in DiscordPresenceConfig.ini");
+							}
+
 							activeClient.SetPresence(new RichPresence
 							{
 								Details = details,
@@ -379,8 +386,9 @@ namespace GroovyRP
 
 				Console.ForegroundColor = ConsoleColor.Gray;
 				Console.WriteLine(albumName);
-				
-				if ((AlbumKeyMapping.ContainsKey(album) && AlbumKeyMapping[album].ContainsKey(activeClient.ApplicationID)
+
+				if ((AlbumKeyMapping.ContainsKey(album) &&
+				     AlbumKeyMapping[album].ContainsKey(activeClient.ApplicationID)
 						? AlbumKeyMapping[album][activeClient.ApplicationID]
 						: BigAssets[playerName])
 					.Length > 32)
@@ -401,6 +409,12 @@ namespace GroovyRP
 			{
 				Console.ForegroundColor = ConsoleColor.Magenta;
 				Console.WriteLine("\nThis is a good one, check ur DRP ;)");
+				Console.ForegroundColor = ConsoleColor.White;
+			}
+			else
+			{
+				Console.ForegroundColor = ConsoleColor.Red;
+				Console.WriteLine("\nAlbum not keyed :(");
 				Console.ForegroundColor = ConsoleColor.White;
 			}
 
@@ -508,6 +522,19 @@ namespace GroovyRP
 			return false;
 		}
 
+		private static void SendNotification(string message)
+		{
+			SendNotification("MDRP message", message);
+		}
+
+		private static void SendNotification(string messageTitle, string message)
+		{
+			ProcessStartInfo errornotif =
+				new ProcessStartInfo("sendNotification.bat", "\"" + messageTitle + "\" \"" + message + "\"");
+			errornotif.WindowStyle = ProcessWindowStyle.Hidden;
+			Process.Start(errornotif);
+		}
+
 		private static void LoadSettings()
 		{
 			try
@@ -524,6 +551,10 @@ namespace GroovyRP
 					)
 					{
 						EnabledClients.Add(line.Split('=')[0], line.Split('=')[1].Trim().ToLower() == "true");
+					}
+					else if (line.Split('=')[0].Trim().ToLower() == "verbose" && line.Split('=').Length > 1)
+					{
+						ScreamAtUser = line.Split('=')[1].Trim().ToLower() == "true";
 					}
 				}
 			}
@@ -546,6 +577,9 @@ namespace GroovyRP
 						if (!ValidPlayers.Contains(lines[0].Split('=')[0]))
 						{
 							Console.Error.WriteLine("Error in file " + file.Name + " not a valid player name");
+							SendNotification("Error in clientdata",
+								"Error in file " + file.Name + ": " + lines[0].Split('=')[0] +
+								" is not a valid player name");
 							Thread.Sleep(5000);
 							continue;
 						}
@@ -553,6 +587,8 @@ namespace GroovyRP
 						if (!lines[1].ToLower().Contains("id="))
 						{
 							Console.Error.WriteLine("Error in file " + file.Name + " no id found on the second line");
+							SendNotification("\"MDRP settings issue\"",
+								"\"Error in file " + file.Name + " no id found on the second line\"");
 							Thread.Sleep(5000);
 							continue;
 						}
