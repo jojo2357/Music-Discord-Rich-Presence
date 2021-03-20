@@ -9,12 +9,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
+using Microsoft.Toolkit.Uwp.Notifications;
 
 namespace GroovyRP
 {
 	class Program
 	{
-		private const string Version = "1.4.2";
+		private const string Version = "1.4.3";
 		private const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
 		private const string Title = "Discord Rich Presence For Groove";
 
@@ -28,6 +29,8 @@ namespace GroovyRP
 				{"chrome", new DiscordRpcClient("802213652974272513", autoEvents: false)},
 				{"", new DiscordRpcClient("821398156905283585", autoEvents: false)},
 			};
+
+		private static readonly List<string> NotifiedAlbums = new List<string>();
 
 		//ID, client
 		private static readonly Dictionary<string, DiscordRpcClient> AllClients =
@@ -119,7 +122,7 @@ namespace GroovyRP
 		private static readonly Stopwatch Timer = new Stopwatch();
 		private static readonly Stopwatch MetaTimer = new Stopwatch();
 		private static string playerName = string.Empty;
-		private static bool justcleared, justUnknowned, ScreamAtUser = false, presenceIsRich = false;
+		private static bool justcleared, justUnknowned, ScreamAtUser, presenceIsRich;
 		private static DiscordRpcClient activeClient;
 
 		private static void Main()
@@ -135,7 +138,7 @@ namespace GroovyRP
 			}
 
 			LoadSettings();
-
+			
 			MetaTimer.Start();
 			Timer.Start();
 
@@ -220,8 +223,9 @@ namespace GroovyRP
 							var state = $"Artist: {currentTrack.Artist}";
 							presenceIsRich = AlbumKeyMapping.ContainsKey(album) &&
 							                 AlbumKeyMapping[album].ContainsKey(activeClient.ApplicationID);
-							if (ScreamAtUser && !presenceIsRich)
+							if (ScreamAtUser && !presenceIsRich && !NotifiedAlbums.Contains(currentTrack.AlbumTitle))
 							{
+								NotifiedAlbums.Add(currentTrack.AlbumTitle);
 								SendNotification("Album not keyed",
 									album +
 									" is not keyed. To disable these notifications, set verbose to false in DiscordPresenceConfig.ini");
@@ -529,10 +533,14 @@ namespace GroovyRP
 
 		private static void SendNotification(string messageTitle, string message)
 		{
-			ProcessStartInfo errornotif =
+			new ToastContentBuilder()
+				.AddText(messageTitle)
+				.AddText(message)
+				.Show();
+			/*ProcessStartInfo errornotif =
 				new ProcessStartInfo("sendNotification.bat", "\"" + messageTitle + "\" \"" + message + "\"");
 			errornotif.WindowStyle = ProcessWindowStyle.Hidden;
-			Process.Start(errornotif);
+			Process.Start(errornotif);*/
 		}
 
 		private static void LoadSettings()
@@ -607,11 +615,23 @@ namespace GroovyRP
 
 						for (int i = 2; i < lines.Length; i++)
 						{
+							bool foundDupe = false;
 							if (lines[i].Contains("=="))
 							{
 								if (!AlbumKeyMapping.ContainsKey(Regex.Split(lines[i], @"==")[0]))
 									AlbumKeyMapping.Add(Regex.Split(lines[i], @"==")[0],
 										new Dictionary<string, string>());
+								else
+								{
+									foreach (DiscordRpcClient otherKlient in PlayersClients[lines[0].Split('=')[0]])
+									{
+										if (otherKlient.ApplicationID != id)
+											foundDupe |= AlbumKeyMapping[Regex.Split(lines[i], @"==")[0]]
+												.ContainsKey(otherKlient.ApplicationID);
+									}
+									if (foundDupe)
+										continue;
+								}
 								AlbumKeyMapping[Regex.Split(lines[i], @"==")[0]]
 									.Add(id, Regex.Split(lines[i], @"==")[1]);
 							}
@@ -620,12 +640,34 @@ namespace GroovyRP
 								if (!AlbumKeyMapping.ContainsKey(Regex.Split(lines[i], "=")[0]))
 									AlbumKeyMapping.Add(Regex.Split(lines[i], "=")[0],
 										new Dictionary<string, string>());
+								else
+								{
+									foreach (DiscordRpcClient otherKlient in PlayersClients[lines[0].Split('=')[0]])
+									{
+										if (otherKlient.ApplicationID != id)
+											foundDupe |= AlbumKeyMapping[lines[i].Split('=')[0]]
+												.ContainsKey(otherKlient.ApplicationID);
+									}
+									if (foundDupe)
+										continue;
+								}
 								AlbumKeyMapping[Regex.Split(lines[i], "=")[0]].Add(id, Regex.Split(lines[i], "=")[1]);
 							}
 							else
 							{
 								if (!AlbumKeyMapping.ContainsKey(lines[i]))
 									AlbumKeyMapping.Add(lines[i], new Dictionary<string, string>());
+								else
+								{
+									foreach (DiscordRpcClient otherKlient in PlayersClients[lines[0].Split('=')[0]])
+									{
+										if (otherKlient.ApplicationID != id)
+											foundDupe |= AlbumKeyMapping[lines[i]]
+												.ContainsKey(otherKlient.ApplicationID);
+									}
+									if (foundDupe)
+										continue;
+								}
 								AlbumKeyMapping[lines[i]].Add(id, lines[i]);
 							}
 						}
