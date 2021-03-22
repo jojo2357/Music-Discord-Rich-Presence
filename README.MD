@@ -9,8 +9,8 @@ Works with Groove, Spotify, and Chrome
 * Ability to toggle media players showing up in rich presence.
 * Can run in the background or with a pretty terminal
 
-## Coming soon
-[@Smaltin](https://github.com/Smaltin) and I will be creating a [library repo](https://github.com/jojo2357/Music-Discord-Rich-Presence-Library) soon that will contain user generated clientdata in order to rival spotify rp as mentioned in #23
+## Music Library Repo
+[@Smaltin](https://github.com/Smaltin) and I are maintaining a [library repo](https://github.com/jojo2357/Music-Discord-Rich-Presence-Library) that allows you to find and download album art packs and contribute your own album arts for others to use. You can read more [here.](https://github.com/jojo2357/Music-Discord-Rich-Presence-Library)
 
 ## About linking Groove and DRP
 In order to have rich presence every time you open groovy, run the shortcut `Link Rich Presence With Groove`. If at any time you wish to disable this feature, simply run `Unlink Rich Presence With Groove`. See [Linking Groove](https://github.com/jojo2357/Music-Discord-Rich-Presence#linking-groove) for more 
