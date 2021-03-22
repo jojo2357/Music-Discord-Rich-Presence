@@ -10,7 +10,7 @@ Works with Groove, Spotify, and Chrome
 * Can run in the background or with a pretty terminal
 
 ## Coming soon
-@Smaltin and I will be creating a [library repo](https://github.com/jojo2357/Music-Discord-Rich-Presence-Library) soon that will contain user generated clientdata in order to rival spotify rp as mentioned in #23
+[@Smaltin](https://github.com/Smaltin) and I will be creating a [library repo](https://github.com/jojo2357/Music-Discord-Rich-Presence-Library) soon that will contain user generated clientdata in order to rival spotify rp as mentioned in #23
 
 ## About linking Groove and DRP
 In order to have rich presence every time you open groovy, run the shortcut `Link Rich Presence With Groove`. If at any time you wish to disable this feature, simply run `Unlink Rich Presence With Groove`. See [Linking Groove](https://github.com/jojo2357/Music-Discord-Rich-Presence#linking-groove) for more 
@@ -48,7 +48,6 @@ Album Name $3=albumname3
 ```
 * For non latin albums, latinize it however you want and put a line in the format `<Album In Japanese/Emoji/Cyrillic/Chinese/non latin alphabet>=albumkey`
 * For now, the executeable playing music must be a [supported player](https://github.com/jojo2357/Music-Discord-Rich-Presence#supported-players) and the part after the = is ignored. In the future I do think it will have a use tho.
-* Nonlatin example owned and maintained by Smaltin
 
 IF YOUR ALBUM HAS AN `=` CHARACTER IN IT, USE `<AlbumName>==<key>` INSTEAD OF `<AlbumName>=<key>`
 
