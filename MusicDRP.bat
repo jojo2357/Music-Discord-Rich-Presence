@@ -8,6 +8,7 @@
 ::: | $$ \/  | $$|  $$$$$$/ /$$$$$$$/| $$|  $$$$$$$| $$$$$$$/| $$  | $$| $$      
 ::: |__/     |__/ \______/ |_______/ |__/ \_______/|_______/ |__/  |__/|__/      
 :::
+::: [0] Generate Shortcuts
 ::: [1] Launch DRP Hidden
 ::: [2] Launch DRP
 ::: [3] Kill Hidden DRP
@@ -30,6 +31,7 @@ cls
 for /f "delims=: tokens=*" %%A in ('findstr /b ::: "%~f0"') do @echo(%%A
 SET /P O=Pick an option: 
 echo ------------------------------------------------------------------------------
+IF %O%==0 GOTO GENERATESHORTCUTS
 IF %O%==1 GOTO LAUNCHDRPHIDDEN
 IF %O%==2 GOTO LAUNCHDRP
 IF %O%==3 GOTO KILLHIDDENDRP
@@ -39,6 +41,9 @@ IF %O%==6 GOTO LOCATEGROOVE
 IF %O%==7 GOTO LOCATEMUSICBEE
 IF %O%==8 GOTO UNLINKDRPGROOVE
 IF %O%==9 GOTO UNLINKDRPMUSICBEE
+GOTO MENU
+:GENERATESHORTCUTS
+call "%mypath%\ShortGen.bat"
 GOTO MENU
 :LAUNCHDRPHIDDEN
 call "%mypath%\GroovyRP\bin\Release\RunHidden.vbs"
