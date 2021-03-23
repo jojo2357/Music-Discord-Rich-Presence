@@ -52,7 +52,7 @@ GOTO MENU
 call "%mypath%\GroovyRP\bin\Release\RunHidden.bat"
 GOTO MENU
 :KILLHIDDENDRP
-taskkill /im GroovyRP.exe
+call "%mypath%\KillHidden.bat"
 GOTO MENU
 :LINKDRPGROOVE
 call "%mypath%\GroovyRP\bin\Release\LinkWithGroove.bat"
