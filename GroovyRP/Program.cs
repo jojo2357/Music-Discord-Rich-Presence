@@ -17,7 +17,7 @@ namespace GroovyRP
 {
 	class Program
 	{
-		private const string Version = "1.4.3";
+		private const string Version = "1.4.4";
 		private const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
 		private const string Title = "Discord Rich Presence For Groove";
 
@@ -707,13 +707,13 @@ namespace GroovyRP
 			
 			shortcut = (IWshShortcut) shell.CreateShortcut(rootFolder + "\\Shortcuts\\Run MDRP Windowed.lnk");
 			shortcut.Description = "Run MDRP";
-			shortcut.IconLocation = Directory.GetCurrentDirectory() + "\\discordapp.ico";
+			shortcut.IconLocation = Directory.GetCurrentDirectory() + "\\GroovyRP.exe";
 			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\RunHidden.bat";
 			shortcut.Save();
 
 			shortcut = (IWshShortcut) shell.CreateShortcut(rootFolder + "\\Shortcuts\\Run MDRP Background.lnk");
 			shortcut.Description = "Run MDRP";
-			shortcut.IconLocation = Directory.GetCurrentDirectory() + "\\discordapp.ico";
+			shortcut.IconLocation = Directory.GetCurrentDirectory() + "\\GroovyRP.exe";
 			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\RunHidden.vbs";
 			shortcut.Save();
 
