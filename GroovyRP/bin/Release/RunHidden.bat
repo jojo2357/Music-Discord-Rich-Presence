@@ -8,3 +8,5 @@ Pushd %directory%
 echo %cd%
 
 START /MIN "Rich Presence for Discord" GroovyRP 
+
+exit

@@ -9,7 +9,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
+using IWshRuntimeLibrary;
 using Microsoft.Toolkit.Uwp.Notifications;
+using File = System.IO.File;
 
 namespace GroovyRP
 {
@@ -132,13 +134,15 @@ namespace GroovyRP
 			Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
 			Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
+			GenerateShortcuts();
+
 			foreach (DiscordRpcClient client in DefaultClients.Values)
 			{
 				AllClients.Add(client.ApplicationID, client);
 			}
 
 			LoadSettings();
-			
+
 			MetaTimer.Start();
 			Timer.Start();
 
@@ -629,9 +633,11 @@ namespace GroovyRP
 											foundDupe |= AlbumKeyMapping[Regex.Split(lines[i], @"==")[0]]
 												.ContainsKey(otherKlient.ApplicationID);
 									}
+
 									if (foundDupe)
 										continue;
 								}
+
 								AlbumKeyMapping[Regex.Split(lines[i], @"==")[0]]
 									.Add(id, Regex.Split(lines[i], @"==")[1]);
 							}
@@ -648,9 +654,11 @@ namespace GroovyRP
 											foundDupe |= AlbumKeyMapping[lines[i].Split('=')[0]]
 												.ContainsKey(otherKlient.ApplicationID);
 									}
+
 									if (foundDupe)
 										continue;
 								}
+
 								AlbumKeyMapping[Regex.Split(lines[i], "=")[0]].Add(id, Regex.Split(lines[i], "=")[1]);
 							}
 							else
@@ -665,9 +673,11 @@ namespace GroovyRP
 											foundDupe |= AlbumKeyMapping[lines[i]]
 												.ContainsKey(otherKlient.ApplicationID);
 									}
+
 									if (foundDupe)
 										continue;
 								}
+
 								AlbumKeyMapping[lines[i]].Add(id, lines[i]);
 							}
 						}
@@ -682,6 +692,65 @@ namespace GroovyRP
 			catch (Exception)
 			{
 			}
+		}
+
+		private static void GenerateShortcuts()
+		{
+			WshShell shell;
+			IWshShortcut shortcut;
+			string rootFolder;
+			rootFolder = Directory.GetParent(
+				Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).FullName).FullName).FullName;
+			shell = new WshShell();
+
+			Directory.CreateDirectory(rootFolder + "\\Shortcuts");
+			
+			shortcut = (IWshShortcut) shell.CreateShortcut(rootFolder + "\\Shortcuts\\Run MDRP Windowed.lnk");
+			shortcut.Description = "Run MDRP";
+			shortcut.IconLocation = Directory.GetCurrentDirectory() + "\\discordapp.ico";
+			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\RunHidden.bat";
+			shortcut.Save();
+
+			shortcut = (IWshShortcut) shell.CreateShortcut(rootFolder + "\\Shortcuts\\Run MDRP Background.lnk");
+			shortcut.Description = "Run MDRP";
+			shortcut.IconLocation = Directory.GetCurrentDirectory() + "\\discordapp.ico";
+			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\RunHidden.vbs";
+			shortcut.Save();
+
+			shortcut = (IWshShortcut) shell.CreateShortcut(rootFolder + "\\Shortcuts\\Link With MusicBee.lnk");
+			shortcut.Description = "Link With MusicBee";
+			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\LinkWithMusicBee.bat";
+			shortcut.Save();
+
+			shortcut = (IWshShortcut) shell.CreateShortcut(rootFolder + "\\Shortcuts\\Link With Groove.lnk");
+			shortcut.Description = "Link With Groove";
+			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\LinkWithGroove.bat";
+			shortcut.Save();
+
+			shortcut = (IWshShortcut) shell.CreateShortcut(rootFolder + "\\Shortcuts\\Link With Spotify.lnk");
+			shortcut.Description = "Link With Spotify";
+			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\LinkWithSpotify.bat";
+			shortcut.Save();
+
+			shortcut = (IWshShortcut) shell.CreateShortcut(rootFolder + "\\Shortcuts\\Unlink MusicBee.lnk");
+			shortcut.Description = "Unlink With MusicBee";
+			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\UnlinkFromMusicBee.bat";
+			shortcut.Save();
+
+			shortcut = (IWshShortcut) shell.CreateShortcut(rootFolder + "\\Shortcuts\\Unlink Spotify.lnk");
+			shortcut.Description = "Unlink With Spotify";
+			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\UnlinkFromSpotify.bat";
+			shortcut.Save();
+
+			shortcut = (IWshShortcut) shell.CreateShortcut(rootFolder + "\\Shortcuts\\Unlink Groove.lnk");
+			shortcut.Description = "Unlink With Groove";
+			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\UnlinkFromGroove.bat";
+			shortcut.Save();
+			
+			shortcut = (IWshShortcut) shell.CreateShortcut(rootFolder + "\\Shortcuts\\Kill MDRP.lnk");
+			shortcut.Description = "Murder MDRP";
+			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\KillHidden.vbs";
+			shortcut.Save();
 		}
 	}
 }

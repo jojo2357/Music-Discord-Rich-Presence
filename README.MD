@@ -1,6 +1,6 @@
 # Discord Rich Presence For Groove (windows only)
-To run, simply run `Launch DRP` from the shortcuts folder or, if you want it to run in the background, run `Launch DRP Hidden`
-Works with Groove, Spotify, and Chrome
+To run, use the included launcher. After you run it once, you can rerun it from a shortcut in the generated shortcuts folder.
+Works with Groove, Spotify, and MusicBee
 
 ## Features
 * Allows uploading album art to custom applications to display and exceed the 150 asset maximum (see [uploading custom album art](https://github.com/jojo2357/Music-Discord-Rich-Presence#custom-album-art) for instructions) 
