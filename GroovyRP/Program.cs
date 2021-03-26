@@ -733,13 +733,13 @@ namespace GroovyRP
 
 			shortcut = (IWshShortcut) shell.CreateShortcut(rootFolder + "\\Shortcuts\\Run MDRP Windowed.lnk");
 			shortcut.Description = "Run MDRP";
-			shortcut.IconLocation = Directory.GetCurrentDirectory() + "\\discordapp.ico";
+			shortcut.IconLocation = Directory.GetCurrentDirectory() + "\\GroovyRP.exe";
 			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\RunHidden.bat";
 			shortcut.Save();
 
 			shortcut = (IWshShortcut) shell.CreateShortcut(rootFolder + "\\Shortcuts\\Run MDRP Background.lnk");
 			shortcut.Description = "Run MDRP";
-			shortcut.IconLocation = Directory.GetCurrentDirectory() + "\\discordapp.ico";
+			shortcut.IconLocation = Directory.GetCurrentDirectory() + "\\GroovyRP.exe";
 			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\RunHidden.vbs";
 			shortcut.Save();
 
