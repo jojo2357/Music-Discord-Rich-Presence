@@ -37,7 +37,9 @@ IF %O%==6 GOTO UNLINKDRPGROOVE
 IF %O%==7 GOTO UNLINKDRPMUSICBEE
 GOTO MENU
 :LAUNCHDRPHIDDEN
-run "%mypath%\GroovyRP\bin\Release\RunHidden.vbs"
+"%mypath%\GroovyRP\bin\Release\GroovyRP.exe" Shortcuts_Only
+start "" "%mypath%\Shortcuts\Run MDRP Background.lnk"
+exit
 GOTO MENU
 :LAUNCHDRP
 call "%mypath%\GroovyRP\bin\Release\RunHidden.bat"

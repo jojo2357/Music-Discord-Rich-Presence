@@ -1,13 +1,13 @@
 #This is a demo file! Heres a little blurb before the actual example
 #Line 1 goes <name of exe>=<name of player> which is usually the same for both, (like <chrome=chrome> would work for chrome
 #Line 2 goes "id=<application id>" and I have included my own application here as an example
-#Line 3...n is the name of the album, normalized to pass discord's regex which bars you from using characters such as spaces, colons, etc. Just put an album name per line going on and on and add the album art to your application in discord. see the readme for more info.
+#Line 3...n is the name of the album exactly, then a ==, then the name of the asset you uploaded that corresponds to that album. Optionally you can add artists if you have duplicated albums. see the readme for more info.
 music.ui=groove
 id=801209905020272681
-babel
-feverdream
-myheadisananimal
-delta
-sighnomore
-thelumineers
-wildermind
+Babel==babel==Mumford & Sons==Jerry Douglas
+Fever Dream==feverdream==Of Monsters And Men
+My Head Is An Animal==mhia==Of Monsters And Men
+Delta==delta==Mumford & Sons
+Sigh No More==sighnomore==Mumford & Sons
+The Lumineers==thelumineers==The Lumineers
+Wilder Mind==wildermind==Mumford & Sons
