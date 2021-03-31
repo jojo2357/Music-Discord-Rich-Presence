@@ -17,7 +17,7 @@ namespace GroovyRP
 {
 	class Program
 	{
-		private const string Version = "1.5.0";
+		private const string Version = "1.5.1";
 		private const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
 		private const string Title = "Discord Rich Presence For Groove";
 
@@ -704,7 +704,8 @@ namespace GroovyRP
 									continue;
 							}
 
-							GetAlbum(AlbumKeyMapping, album).Add(id, parsedLine[1]);
+							if (!GetAlbum(AlbumKeyMapping, album).ContainsKey(id))
+								GetAlbum(AlbumKeyMapping, album).Add(id, parsedLine[1]);
 						}
 					}
 					catch (Exception e)
