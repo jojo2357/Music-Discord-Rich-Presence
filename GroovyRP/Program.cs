@@ -8,7 +8,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Threading.Tasks;
 using Windows.Media.Control;
+using Windows.Web.Http;
 using IWshRuntimeLibrary;
 using Microsoft.Toolkit.Uwp.Notifications;
 using File = System.IO.File;
@@ -17,9 +19,12 @@ namespace GroovyRP
 {
 	class Program
 	{
-		private const string Version = "1.5.1";
+		private const string Version = "1.5.2";
 		private const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
 		private const string Title = "Discord Rich Presence For Groove";
+
+		private static readonly Uri uri =
+			new Uri("https://api.github.com/repos/jojo2357/Music-Discord-Rich-Presence/releases/latest");
 
 		//Player Name, client
 		private static readonly Dictionary<string, DiscordRpcClient> DefaultClients =
@@ -121,17 +126,31 @@ namespace GroovyRP
 
 		private static readonly string defaultPlayer = "groove";
 		private static readonly int timeout_seconds = 60;
-		private static readonly Stopwatch Timer = new Stopwatch();
-		private static readonly Stopwatch MetaTimer = new Stopwatch();
+
+		private static readonly Stopwatch Timer = new Stopwatch(),
+			MetaTimer = new Stopwatch(),
+			UpdateTimer = new Stopwatch();
+
 		private static string playerName = string.Empty, lastPlayer = String.Empty;
-		private static bool justcleared, justUnknowned, ScreamAtUser, presenceIsRich, WrongArtistFlag;
+
+		private static bool justcleared,
+			justUnknowned,
+			ScreamAtUser,
+			presenceIsRich,
+			WrongArtistFlag,
+			UpdateAvailibleFlag;
+
 		private static DiscordRpcClient activeClient;
 		private static Album currentAlbum = new Album("");
+		private static readonly HttpClient Client = new HttpClient();
+		private static int updateCheckInterval = 36000000;
+		private static string UpdateVersion;
 
 		private static void Main(string[] args)
 		{
 			Console.Title = "Discord Rich Presence for Groove";
 
+			Client.DefaultRequestHeaders["User-Agent"] = "c#";
 			Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
 			Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
@@ -149,6 +168,9 @@ namespace GroovyRP
 
 			MetaTimer.Start();
 			Timer.Start();
+			UpdateTimer.Start();
+
+			CheckForUpdate();
 
 			foreach (DiscordRpcClient client in AllClients.Values)
 			{
@@ -175,6 +197,8 @@ namespace GroovyRP
 				try
 				{
 					//limit performace impact
+					if (UpdateTimer.ElapsedMilliseconds > updateCheckInterval)
+						CheckForUpdate();
 					Thread.Sleep(2000);
 					wasPlaying = isPlaying;
 					try
@@ -389,22 +413,7 @@ namespace GroovyRP
 		{
 			Console.Clear();
 
-			Console.ForegroundColor = ConsoleColor.White;
-			Console.WriteLine(Title);
-
-			Console.ForegroundColor = ConsoleColor.White;
-			Console.Write("Version: ");
-
-			Console.ForegroundColor = ConsoleColor.Gray;
-			Console.WriteLine(Version);
-
-			Console.ForegroundColor = ConsoleColor.White;
-			Console.Write("Github: ");
-
-			Console.ForegroundColor = ConsoleColor.Cyan;
-			Console.WriteLine(Github);
-
-			Console.WriteLine();
+			DrawPersistentHeader();
 
 			Console.ForegroundColor = ConsoleColor.White;
 			Console.WriteLine("Music details:");
@@ -474,8 +483,38 @@ namespace GroovyRP
 			{
 				justcleared = true;
 				Console.Clear();
+				DrawPersistentHeader();
 				Console.Write("Nothing Playing (probably paused)\r");
 			}
+		}
+
+		private static void DrawPersistentHeader()
+		{
+			Console.ForegroundColor = ConsoleColor.White;
+			Console.WriteLine(Title);
+
+			Console.ForegroundColor = ConsoleColor.White;
+			Console.Write("Version: ");
+
+			Console.ForegroundColor = ConsoleColor.Gray;
+			Console.Write(Version);
+
+			if (UpdateAvailibleFlag)
+			{
+				Console.ForegroundColor = ConsoleColor.Green;
+				Console.Write(" NEW UPDATE " + UpdateVersion + " (goto github to download)");
+			}
+
+			Console.WriteLine();
+
+			Console.ForegroundColor = ConsoleColor.White;
+			Console.Write("Github: ");
+
+			Console.ForegroundColor = ConsoleColor.Cyan;
+			Console.WriteLine(Github);
+
+			Console.WriteLine();
+			Console.ForegroundColor = ConsoleColor.White;
 		}
 
 		private static void SetUnknown()
@@ -484,6 +523,7 @@ namespace GroovyRP
 			{
 				justUnknowned = true;
 				Console.Clear();
+				DrawPersistentHeader();
 				Console.Write(
 					"Detected volume in something but not showing as it is not currently supported or is disabled");
 			}
@@ -674,8 +714,10 @@ namespace GroovyRP
 								if (!warnedFile)
 								{
 									warnedFile = true;
-									SendNotification("Deprecation Notice", $"{file.Name} uses a deprecated keying format. Albums sould go in form Name==key==Artist");
+									SendNotification("Deprecation Notice",
+										$"{file.Name} uses a deprecated keying format. Albums sould go in form Name==key==Artist");
 								}
+
 								continue;
 							}
 
@@ -719,6 +761,27 @@ namespace GroovyRP
 			{
 				Console.WriteLine("Something bad happened");
 			}
+		}
+
+		private static void CheckForUpdate()
+		{
+			UpdateTimer.Restart();
+			Client.GetAsync(uri).AsTask().ContinueWith((Task<HttpResponseMessage> response) =>
+			{
+				IHttpContent responseContent = response.Result.Content;
+				foreach (string str in Regex.Split(responseContent.ToString(), ","))
+				{
+					if (str.Contains("\"tag_name\":"))
+					{
+						UpdateVersion = str.Replace("\"tag_name\":\"", "").Replace("\"", "");
+						if (ScreamAtUser && !UpdateAvailibleFlag)
+							if (str.Replace("\"tag_name\":\"", "").Replace("\"", "") != Version)
+								SendNotification("Update Available",
+									UpdateVersion + " is published on github. Go there for the latest version");
+						UpdateAvailibleFlag = UpdateVersion != Version;
+					}
+				}
+			});
 		}
 
 		private static void GenerateShortcuts()
@@ -773,7 +836,7 @@ namespace GroovyRP
 			shortcut.Description = "Unlink With Groove";
 			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\UnlinkFromGroove.bat";
 			shortcut.Save();
-			
+
 			shortcut = (IWshShortcut) shell.CreateShortcut(rootFolder + "\\Shortcuts\\Kill Hidden.lnk");
 			shortcut.Description = "Kills MDRP";
 			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\KillHidden.vbs";
@@ -825,7 +888,8 @@ namespace GroovyRP
 		{
 			if (obj != null && typeof(Album).IsInstanceOfType(obj) && ((Album) obj).Name == Name)
 			{
-				if (((Album) obj).Artists.Length == 0 || ((Album) obj).Artists[0] == "*" || Artists.Length == 0 || Artists[0] == "*")
+				if (((Album) obj).Artists.Length == 0 || ((Album) obj).Artists[0] == "*" || Artists.Length == 0 ||
+				    Artists[0] == "*")
 					return true;
 				foreach (string arteest in Artists)
 					if (arteest != "")
