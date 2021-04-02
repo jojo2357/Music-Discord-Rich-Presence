@@ -19,7 +19,7 @@ namespace GroovyRP
 {
 	class Program
 	{
-		private const string Version = "1.5.2";
+		private const string Version = "1.5.3";
 		private const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
 		private const string Title = "Discord Rich Presence For Groove";
 
@@ -148,6 +148,7 @@ namespace GroovyRP
 
 		private static void Main(string[] args)
 		{
+			Console.OutputEncoding = System.Text.Encoding.UTF8;
 			Console.Title = "Discord Rich Presence for Groove";
 
 			Client.DefaultRequestHeaders["User-Agent"] = "c#";
@@ -242,8 +243,15 @@ namespace GroovyRP
 									Console.WriteLine("Uh oh!!!");
 								}
 
+								string details = $"Title: {currentTrack.Title}",
+									state =
+										$"Artist: {(currentTrack.Artist == "" ? "Unkown Artist" : currentTrack.Artist)}";
+
 								if (activeClient.CurrentPresence == null ||
-								    activeClient.CurrentPresence.Details != ("Title: " + currentTrack.Title) ||
+								    activeClient.CurrentPresence.Details !=
+								    details.Substring(0, Math.Min(32, details.Length)) ||
+								    activeClient.CurrentPresence.State !=
+								    state.Substring(0, Math.Min(32, state.Length)) ||
 								    wasPlaying != isPlaying)
 								{
 #if DEBUG
@@ -255,13 +263,11 @@ namespace GroovyRP
                                                 ? GetAlbum(AlbumKeyMapping, currentAlbum)[activeClient.ApplicationID]
                                                 : BigAssets[playerName]) + ")");
 #endif
-									var details = $"Title: {currentTrack.Title}";
-									var state =
-										$"Artist: {(currentTrack.Artist == "" ? "Unkown Artist" : currentTrack.Artist)}";
 									presenceIsRich = ContainsAlbum(AlbumKeyMapping.Keys.ToArray(), currentAlbum) &&
 									                 GetAlbum(AlbumKeyMapping, currentAlbum)
 										                 .ContainsKey(activeClient.ApplicationID);
-									if (ScreamAtUser && !presenceIsRich && !NotifiedAlbums.Contains(currentAlbum))
+									if (ScreamAtUser && !presenceIsRich && !NotifiedAlbums.Contains(currentAlbum) &&
+									    currentAlbum.Name != "")
 									{
 										NotifiedAlbums.Add(currentAlbum);
 										SendNotification("Album not keyed",
