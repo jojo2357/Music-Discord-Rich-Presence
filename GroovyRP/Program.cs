@@ -266,16 +266,26 @@ namespace GroovyRP
 									presenceIsRich = ContainsAlbum(AlbumKeyMapping.Keys.ToArray(), currentAlbum) &&
 									                 GetAlbum(AlbumKeyMapping, currentAlbum)
 										                 .ContainsKey(activeClient.ApplicationID);
+
+									WrongArtistFlag = HasNameNotQuite(new Album(currentTrack.AlbumTitle));
+
 									if (ScreamAtUser && !presenceIsRich && !NotifiedAlbums.Contains(currentAlbum) &&
 									    currentAlbum.Name != "")
 									{
 										NotifiedAlbums.Add(currentAlbum);
-										SendNotification("Album not keyed",
-											currentAlbum.Name +
-											" is not keyed. To disable these notifications, set verbose to false in DiscordPresenceConfig.ini");
+										if (WrongArtistFlag)
+										{
+											SendNotification("Album keyed wrong",
+												currentAlbum.Name +
+												" is keyed for a different artist (check caps). To disable these notifications, set verbose to false in DiscordPresenceConfig.ini");
+										}
+										else
+										{
+											SendNotification("Album not keyed",
+												currentAlbum.Name +
+												" is not keyed. To disable these notifications, set verbose to false in DiscordPresenceConfig.ini");
+										}
 									}
-
-									WrongArtistFlag = HasNameNotQuite(new Album(currentTrack.AlbumTitle));
 
 									activeClient.SetPresence(new RichPresence
 									{
@@ -663,109 +673,116 @@ namespace GroovyRP
 
 			try
 			{
-				foreach (var file in new DirectoryInfo("../../../clientdata").GetFiles())
-				{
-					if (file.Name == "demo.dat")
-						continue;
-					try
-					{
-						string[] lines = File.ReadAllLines(file.FullName);
-						if (!ValidPlayers.Contains(lines[0].Split('=')[0]))
-						{
-							Console.Error.WriteLine("Error in file " + file.Name + " not a valid player name");
-							SendNotification("Error in clientdata",
-								"Error in file " + file.Name + ": " + lines[0].Split('=')[0] +
-								" is not a valid player name");
-							Thread.Sleep(5000);
-							continue;
-						}
-
-						if (!lines[1].ToLower().Contains("id="))
-						{
-							Console.Error.WriteLine("Error in file " + file.Name + " no id found on the second line");
-							SendNotification("\"MDRP settings issue\"",
-								"\"Error in file " + file.Name + " no id found on the second line\"");
-							Thread.Sleep(5000);
-							continue;
-						}
-
-						string id = lines[1].Split('=')[1].Trim();
-						if (!AllClients.ContainsKey(id))
-						{
-							AllClients.Add(id, new DiscordRpcClient(id, autoEvents: false));
-							if (!PlayersClients.ContainsKey(lines[0].Split('=')[0]))
-								PlayersClients.Add(lines[0].Split('=')[0], new DiscordRpcClient[0]);
-							PlayersClients[lines[0].Split('=')[0]] =
-								PlayersClients[lines[0].Split('=')[0]].Append(AllClients[id]).ToArray();
-							if (!DefaultClients.ContainsKey(lines[0].Split('=')[0]))
-								DefaultClients.Add(lines[0].Split('=')[0], AllClients[id]);
-						}
-
-						bool warnedFile = false;
-						for (int i = 2; i < lines.Length; i++)
-						{
-							bool foundDupe = false;
-							Album album;
-							string[] parsedLine;
-							if (lines[i].Contains("=="))
-							{
-								parsedLine = Regex.Split(lines[i], @"==");
-							}
-							else if (lines[i].Contains('='))
-							{
-								parsedLine = Regex.Split(lines[i], @"=");
-							}
-							else
-							{
-								if (!warnedFile)
-								{
-									warnedFile = true;
-									SendNotification("Deprecation Notice",
-										$"{file.Name} uses a deprecated keying format. Albums sould go in form Name==key==Artist");
-								}
-
-								continue;
-							}
-
-							if (parsedLine.Length == 2)
-							{
-								album = new Album(parsedLine[0]);
-							}
-							else
-							{
-								album = new Album(parsedLine[0],
-									parsedLine.Skip(2).Take(parsedLine.Length - 2).ToArray());
-							}
-
-							if (!AlbumKeyMapping.ContainsKey(album))
-								AlbumKeyMapping.Add(album, new Dictionary<string, string>());
-							else
-							{
-								foreach (DiscordRpcClient otherKlient in PlayersClients[lines[0].Split('=')[0]])
-								{
-									if (otherKlient.ApplicationID != id)
-										foundDupe |= GetAlbum(AlbumKeyMapping, album)
-											.ContainsKey(otherKlient.ApplicationID);
-								}
-
-								if (foundDupe)
-									continue;
-							}
-
-							if (!GetAlbum(AlbumKeyMapping, album).ContainsKey(id))
-								GetAlbum(AlbumKeyMapping, album).Add(id, parsedLine[1]);
-						}
-					}
-					catch (Exception e)
-					{
-						Console.Error.WriteLine(e);
-						Thread.Sleep(1000);
-					}
-				}
+				ReadKeyingFromFile(new DirectoryInfo("../../../clientdata"));
 			}
 			catch (Exception)
 			{
 				Console.WriteLine("Something bad happened");
+			}
+		}
+
+		private static void ReadKeyingFromFile(DirectoryInfo files)
+		{
+			foreach (var dir in files.GetDirectories())
+				ReadKeyingFromFile(dir);
+			foreach (var file in files.GetFiles())
+			{
+				if (file.Name == "demo.dat")
+					continue;
+				try
+				{
+					string[] lines = File.ReadAllLines(file.FullName);
+					if (!ValidPlayers.Contains(lines[0].Split('=')[0]))
+					{
+						Console.Error.WriteLine("Error in file " + file.Name + " not a valid player name");
+						SendNotification("Error in clientdata",
+							"Error in file " + file.Name + ": " + lines[0].Split('=')[0] +
+							" is not a valid player name");
+						Thread.Sleep(5000);
+						continue;
+					}
+
+					if (!lines[1].ToLower().Contains("id="))
+					{
+						Console.Error.WriteLine("Error in file " + file.Name + " no id found on the second line");
+						SendNotification("\"MDRP settings issue\"",
+							"\"Error in file " + file.Name + " no id found on the second line\"");
+						Thread.Sleep(5000);
+						continue;
+					}
+
+					string id = lines[1].Split('=')[1].Trim();
+					if (!AllClients.ContainsKey(id))
+					{
+						AllClients.Add(id, new DiscordRpcClient(id, autoEvents: false));
+						if (!PlayersClients.ContainsKey(lines[0].Split('=')[0]))
+							PlayersClients.Add(lines[0].Split('=')[0], new DiscordRpcClient[0]);
+						PlayersClients[lines[0].Split('=')[0]] =
+							PlayersClients[lines[0].Split('=')[0]].Append(AllClients[id]).ToArray();
+						if (!DefaultClients.ContainsKey(lines[0].Split('=')[0]))
+							DefaultClients.Add(lines[0].Split('=')[0], AllClients[id]);
+					}
+
+					bool warnedFile = false;
+					for (int i = 2; i < lines.Length; i++)
+					{
+						bool foundDupe = false;
+						Album album;
+						string[] parsedLine;
+						if (lines[i].Contains("=="))
+						{
+							parsedLine = Regex.Split(lines[i], @"==");
+						}
+						else if (lines[i].Contains('='))
+						{
+							parsedLine = Regex.Split(lines[i], @"=");
+						}
+						else
+						{
+							if (!warnedFile)
+							{
+								warnedFile = true;
+								SendNotification("Deprecation Notice",
+									$"{file.Name} uses a deprecated keying format. Albums sould go in form Name==key==Artist");
+							}
+
+							continue;
+						}
+
+						if (parsedLine.Length == 2)
+						{
+							album = new Album(parsedLine[0]);
+						}
+						else
+						{
+							album = new Album(parsedLine[0],
+								parsedLine.Skip(2).Take(parsedLine.Length - 2).ToArray());
+						}
+
+						if (!ContainsAlbum(AlbumKeyMapping.Keys.ToArray(), album))
+							AlbumKeyMapping.Add(album, new Dictionary<string, string>());
+						else
+						{
+							foreach (DiscordRpcClient otherKlient in PlayersClients[lines[0].Split('=')[0]])
+							{
+								if (otherKlient.ApplicationID != id)
+									foundDupe |= GetAlbum(AlbumKeyMapping, album)
+										.ContainsKey(otherKlient.ApplicationID);
+							}
+
+							if (foundDupe)
+								continue;
+						}
+
+						if (!GetAlbum(AlbumKeyMapping, album).ContainsKey(id))
+							GetAlbum(AlbumKeyMapping, album).Add(id, parsedLine[1]);
+					}
+				}
+				catch (Exception e)
+				{
+					Console.Error.WriteLine(e);
+					Thread.Sleep(1000);
+				}
 			}
 		}
 
