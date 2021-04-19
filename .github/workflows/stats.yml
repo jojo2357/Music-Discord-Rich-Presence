@@ -1,0 +1,24 @@
+name: create stats
+
+on: push
+
+jobs:
+  generate-file:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Code_Stats
+        uses: jojo2357/CodeStats@LATEST
+        with:
+          root_dir: 'src/main/java/frc'
+
+      - name: Git Auto Commit
+        uses: stefanzweifel/git-auto-commit-action@v4.10.0
+        with:
+          branch: ${{ github.head_ref }}
+          commit_message: Woooooooooo stats
+          commit_author: github-actions[bot] <41898282+github-actions[bot]@users.noreply.github.com>
+          commit_user_email: 41898282+github-actions[bot]@users.noreply.github.com
+          push_options: --force
