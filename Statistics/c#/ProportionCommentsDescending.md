@@ -1,0 +1,7 @@
+
+|[File](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/development/Statistics%2Fc%23%2FNameAscending.md%2F)|[Lines (% total)](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/development/Statistics%2Fc%23%2FLinesDescending.md%2F)|[Code Lines](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/development/Statistics%2Fc%23%2FCodeDescending.md%2F)|[% Code](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/development/Statistics%2Fc%23%2FProportionCodeDescending.md%2F)|[Comment Lines](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/development/Statistics%2Fc%23%2FCommentsDescending.md%2F)|[% Comment](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/development/Statistics%2Fc%23%2FProportionCommentsAscending.md%2F)|[Blank Lines](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/development/Statistics%2Fc%23%2FBlanksDescending.md%2F)|[% Blank](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/development/Statistics%2Fc%23%2FProportionBlanksDescending.md%2F)|
+| --- | --- | --- | --- | --- | --- | --- | --- |
+|[AssemblyInfo.cs](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/development/GroovyRP%2FProperties%2FAssemblyInfo.cs)|36 (3.7%)|15|41.7%|17|47.2%|4|11.1%|
+|[Program.cs](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/development/GroovyRP%2FProgram.cs)|928 (96.3%)|801|86.3%|17|1.8%|110|11.9%|
+|Average |482.0|408.0|X|17.0|X|57.0|X|
+|Total (2)|964|816|84.6%|34| 3.5%|114|11.8%|
