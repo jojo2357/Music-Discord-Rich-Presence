@@ -330,7 +330,6 @@ namespace GroovyRP
 									});
 									SetConsole(currentTrack.Title, currentTrack.Artist, currentTrack.AlbumTitle,
 										currentAlbum);
-									Console.WriteLine("Using " + activeClient.ApplicationID);
 									activeClient.Invoke();
 								}
 
@@ -685,10 +684,6 @@ namespace GroovyRP
 					{
 						ScreamAtUser = line.Split('=')[1].Trim().ToLower() == "true";
 					}
-				}
-				foreach (var VARIABLE in DefaultClients)
-				{
-					Console.WriteLine(VARIABLE.Key + ": " + VARIABLE.Value.ApplicationID);
 				}
 			}
 			catch (Exception)
