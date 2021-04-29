@@ -49,6 +49,9 @@ Album Name 3==albumname3
 * For non latin albums, latinize it however you want and put a line in the format `<Album In Japanese/Emoji/Cyrillic/Chinese/non latin alphabet>==albumkey`
 * For now, the executeable playing music must be a [supported player](https://github.com/jojo2357/Music-Discord-Rich-Presence#supported-players) and the part after the = is ignored. In the future I do think it will have a use tho.
 
+## Changing default background
+If you really want to, you can go into the ini config and swap the application id's with your own app to get your own defaults. The three images that will be pulled from this default app are `<playername>` `<playername>_small` and `paused` (replace <playername> with groove, spotify, etc.)
+
 ### Supported Players
 - Groove Music (music.ui)
 - Spotify

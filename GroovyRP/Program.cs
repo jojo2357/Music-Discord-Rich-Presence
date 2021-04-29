@@ -19,7 +19,7 @@ namespace GroovyRP
 {
 	class Program
 	{
-		private const string Version = "1.5.3";
+		private const string Version = "1.5.4";
 		private const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
 		private const string Title = "Discord Rich Presence For Groove";
 
@@ -160,12 +160,15 @@ namespace GroovyRP
 			if (args.Length > 0)
 				return;
 
+			LoadSettings();
+			
 			foreach (DiscordRpcClient client in DefaultClients.Values)
 			{
-				AllClients.Add(client.ApplicationID, client);
+				if (!AllClients.ContainsKey(client.ApplicationID))
+					AllClients.Add(client.ApplicationID, client);
+				else 
+					AllClients[client.ApplicationID] = client;
 			}
-
-			LoadSettings();
 
 			MetaTimer.Start();
 			Timer.Start();
@@ -180,7 +183,7 @@ namespace GroovyRP
 				client.OnPresenceUpdate += _client_OnPresenceUpdate;
 			}
 
-			GlobalSystemMediaTransportControlsSessionMediaProperties currentTrack = null, lastTrack;
+			GlobalSystemMediaTransportControlsSessionMediaProperties currentTrack = null, lastTrack = null;
 
 			try
 			{
@@ -216,15 +219,25 @@ namespace GroovyRP
 					if (EnabledClients.ContainsKey(playerName) && EnabledClients[playerName] &&
 					    (isPlaying || Timer.ElapsedMilliseconds < timeout_seconds * 1000))
 					{
-						activeClient = null;
 						try
 						{
-							lastTrack = currentTrack;
+                            if (isPlaying)
+							    lastTrack = currentTrack;
 							currentTrack = GetStuff();
-							if (!currentAlbum.Equals(new Album(currentTrack.AlbumTitle, currentTrack.Artist,
-								    currentTrack.AlbumArtist))
-							    || playerName != lastPlayer || currentTrack.Title != lastTrack.Title ||
-							    wasPlaying ^ isPlaying)
+							if (wasPlaying && !isPlaying)
+							{
+								Console.WriteLine(currentAlbum + " and " + new Album(currentTrack.AlbumTitle,
+									currentTrack.Artist,
+									currentTrack.AlbumArtist));
+								activeClient.UpdateSmallAsset("paused", "paused");
+								activeClient.Invoke();
+								SetConsole(lastTrack.Title, lastTrack.Artist, lastTrack.AlbumTitle,
+									currentAlbum);
+							}
+							else if (/*(!currentAlbum.Equals(new Album(currentTrack.AlbumTitle, currentTrack.Artist,
+								          currentTrack.AlbumArtist))
+							          || playerName != lastPlayer || currentTrack.Title != lastTrack.Title) &&*/
+							         isPlaying)
 							{
 								currentAlbum = new Album(currentTrack.AlbumTitle, currentTrack.Artist,
 									currentTrack.AlbumArtist);
@@ -317,6 +330,7 @@ namespace GroovyRP
 									});
 									SetConsole(currentTrack.Title, currentTrack.Artist, currentTrack.AlbumTitle,
 										currentAlbum);
+									Console.WriteLine("Using " + activeClient.ApplicationID);
 									activeClient.Invoke();
 								}
 
@@ -651,17 +665,30 @@ namespace GroovyRP
 					if (ValidPlayers.Contains(line.Split('=')[0].Trim().ToLower()))
 					{
 						EnabledClients[line.Split('=')[0]] = line.Split('=')[1].Trim().ToLower() == "true";
+						if (line.Split('=').Length > 2)
+						{
+							DefaultClients[line.Split('=')[0]] = new DiscordRpcClient(line.Split('=')[2], autoEvents: false);
+						}
 					}
 					else if (InverseWhatpeoplecallthisplayer.ContainsKey(line.Split('=')[0].Trim().ToLower()) &&
 					         ValidPlayers.Contains(InverseWhatpeoplecallthisplayer[line.Split('=')[0].Trim().ToLower()])
 					)
 					{
 						EnabledClients.Add(line.Split('=')[0], line.Split('=')[1].Trim().ToLower() == "true");
+						if (line.Split('=').Length > 2)
+						{
+							Console.WriteLine(InverseWhatpeoplecallthisplayer[line.Split('=')[0]]);
+							DefaultClients[InverseWhatpeoplecallthisplayer[line.Split('=')[0]]] = new DiscordRpcClient(line.Split('=')[2], autoEvents: false);
+						}
 					}
 					else if (line.Split('=')[0].Trim().ToLower() == "verbose" && line.Split('=').Length > 1)
 					{
 						ScreamAtUser = line.Split('=')[1].Trim().ToLower() == "true";
 					}
+				}
+				foreach (var VARIABLE in DefaultClients)
+				{
+					Console.WriteLine(VARIABLE.Key + ": " + VARIABLE.Value.ApplicationID);
 				}
 			}
 			catch (Exception)
@@ -905,6 +932,11 @@ namespace GroovyRP
 		{
 			Name = name;
 			Artists = artists.Where(artist => artist != "").ToArray();
+		}
+
+		public override string ToString()
+		{
+			return Name + " by " + String.Join(",", Artists);
 		}
 
 		public override bool Equals(object obj)

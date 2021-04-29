@@ -8,6 +8,7 @@
     </Principals>
     <Settings>
         <Enabled>true</Enabled>
+        <DisallowStartIfOnBatteries>false</DisallowStartIfOnBatteries>
         <AllowStartOnDemand>true</AllowStartOnDemand>
         <AllowHardTerminate>true</AllowHardTerminate>
     </Settings>
