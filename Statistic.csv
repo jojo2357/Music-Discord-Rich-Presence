@@ -1,16 +1,16 @@
 File,Lines (% total),Code Lines,% Code,Comment Lines,% Comment,Blank Lines,% Blank
-Program.cs,928 (100.0%),801,86.3%,17,1.8%,110,11.9%
-AssemblyInfo.cs,36 (3.7%),15,41.7%,17,47.2%,4,11.1%
-FindGroove.bat,62 (6.0%),38,61.3%,1,1.6%,23,37.1%
-FindMusicBee.bat,54 (5.0%),33,61.1%,1,1.9%,20,37.0%
-FindSpotify.bat,54 (4.8%),33,61.1%,1,1.9%,20,37.0%
+Program.cs,960 (100.0%),830,86.5%,19,2.0%,111,11.6%
+AssemblyInfo.cs,36 (3.6%),15,41.7%,17,47.2%,4,11.1%
+FindGroove.bat,62 (5.9%),38,61.3%,1,1.6%,23,37.1%
+FindMusicBee.bat,54 (4.9%),33,61.1%,1,1.9%,20,37.0%
+FindSpotify.bat,54 (4.6%),33,61.1%,1,1.9%,20,37.0%
 KillHidden.bat,3 (0.3%),2,66.7%,0,0.0%,1,33.3%
-LinkWithGroove.bat,53 (4.5%),34,64.2%,2,3.8%,17,32.1%
-LinkWithMusicBee.bat,51 (4.1%),33,64.7%,2,3.9%,16,31.4%
+LinkWithGroove.bat,53 (4.3%),34,64.2%,2,3.8%,17,32.1%
+LinkWithMusicBee.bat,51 (4.0%),33,64.7%,2,3.9%,16,31.4%
 LinkWithSpotify.bat,51 (3.9%),33,64.7%,2,3.9%,16,31.4%
 RunHidden.bat,12 (0.9%),7,58.3%,0,0.0%,5,41.7%
-UnlinkFromGroove.bat,22 (1.7%),15,68.2%,0,0.0%,7,31.8%
+UnlinkFromGroove.bat,22 (1.6%),15,68.2%,0,0.0%,7,31.8%
 UnlinkFromMusicBee.bat,22 (1.6%),15,68.2%,0,0.0%,7,31.8%
 UnlinkFromSpotify.bat,22 (1.6%),15,68.2%,0,0.0%,7,31.8%
-Music_DRP_Launcher.bat,61 (4.3%),41,67.2%,19,31.1%,1,1.6%
-Total,1431,1115,0.8,62,0.0,254,0.2
+Music_DRP_Launcher.bat,61 (4.2%),41,67.2%,19,31.1%,1,1.6%
+Total,1463,1144,0.8,64,0.0,255,0.2
