@@ -19,7 +19,7 @@ namespace GroovyRP
 {
 	class Program
 	{
-		private const string Version = "1.5.4";
+		private const string Version = "1.5.5";
 		private const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
 		private const string Title = "Discord Rich Presence For Groove";
 
@@ -161,12 +161,12 @@ namespace GroovyRP
 				return;
 
 			LoadSettings();
-			
+
 			foreach (DiscordRpcClient client in DefaultClients.Values)
 			{
 				if (!AllClients.ContainsKey(client.ApplicationID))
 					AllClients.Add(client.ApplicationID, client);
-				else 
+				else
 					AllClients[client.ApplicationID] = client;
 			}
 
@@ -221,8 +221,8 @@ namespace GroovyRP
 					{
 						try
 						{
-                            if (isPlaying)
-							    lastTrack = currentTrack;
+							if (isPlaying)
+								lastTrack = currentTrack;
 							currentTrack = GetStuff();
 							if (wasPlaying && !isPlaying)
 							{
@@ -234,10 +234,10 @@ namespace GroovyRP
 								SetConsole(lastTrack.Title, lastTrack.Artist, lastTrack.AlbumTitle,
 									currentAlbum);
 							}
-							else if (/*(!currentAlbum.Equals(new Album(currentTrack.AlbumTitle, currentTrack.Artist,
+							else if ( /*(!currentAlbum.Equals(new Album(currentTrack.AlbumTitle, currentTrack.Artist,
 								          currentTrack.AlbumArtist))
 							          || playerName != lastPlayer || currentTrack.Title != lastTrack.Title) &&*/
-							         isPlaying)
+								isPlaying)
 							{
 								currentAlbum = new Album(currentTrack.AlbumTitle, currentTrack.Artist,
 									currentTrack.AlbumArtist);
@@ -318,7 +318,9 @@ namespace GroovyRP
 											LargeImageText = currentTrack.AlbumTitle.Length > 0
 												? currentTrack.AlbumTitle.Length <= 2
 													? "_" + currentTrack.AlbumTitle + "_"
-													: currentTrack.AlbumTitle
+													: currentTrack.AlbumTitle.Length > 128
+														? currentTrack.AlbumTitle.Substring(0, 128)
+														: currentTrack.AlbumTitle
 												: "Unknown Album",
 											SmallImageKey = isPlaying
 												? (LittleAssets.ContainsKey(playerName)
@@ -467,14 +469,20 @@ namespace GroovyRP
 				Console.ForegroundColor = ConsoleColor.Gray;
 				Console.WriteLine(albumName);
 
-				if ((AlbumKeyMapping.ContainsKey(album) &&
-				     GetAlbum(AlbumKeyMapping, album).ContainsKey(activeClient.ApplicationID)
-						? GetAlbum(AlbumKeyMapping, album)[activeClient.ApplicationID]
-						: BigAssets[playerName])
-					.Length > 32)
+				string albumKey = ContainsAlbum(AlbumKeyMapping.Keys.ToArray(), album) &&
+				                  GetAlbum(AlbumKeyMapping, album).ContainsKey(activeClient.ApplicationID)
+					? GetAlbum(AlbumKeyMapping, album)[activeClient.ApplicationID]
+					: BigAssets[playerName];
+				if (albumKey.Length > 32)
 				{
 					Console.ForegroundColor = ConsoleColor.Red;
-					Console.WriteLine("The key for this album is too long. It must be 32 characters or less");
+					Console.WriteLine("         The key for this album is too long. It must be 32 characters or less");
+					if (ScreamAtUser && !ContainsAlbum(NotifiedAlbums.ToArray(), currentAlbum))
+					{
+						NotifiedAlbums.Add(currentAlbum);
+						SendNotification("Album key in discord too long",
+							$"The key for {currentAlbum.Name} ({albumKey}) is longer than the 32 character maximum");
+					}
 				}
 			}
 
@@ -666,7 +674,8 @@ namespace GroovyRP
 						EnabledClients[line.Split('=')[0]] = line.Split('=')[1].Trim().ToLower() == "true";
 						if (line.Split('=').Length > 2)
 						{
-							DefaultClients[line.Split('=')[0]] = new DiscordRpcClient(line.Split('=')[2], autoEvents: false);
+							DefaultClients[line.Split('=')[0]] =
+								new DiscordRpcClient(line.Split('=')[2], autoEvents: false);
 						}
 					}
 					else if (InverseWhatpeoplecallthisplayer.ContainsKey(line.Split('=')[0].Trim().ToLower()) &&
@@ -677,7 +686,8 @@ namespace GroovyRP
 						if (line.Split('=').Length > 2)
 						{
 							Console.WriteLine(InverseWhatpeoplecallthisplayer[line.Split('=')[0]]);
-							DefaultClients[InverseWhatpeoplecallthisplayer[line.Split('=')[0]]] = new DiscordRpcClient(line.Split('=')[2], autoEvents: false);
+							DefaultClients[InverseWhatpeoplecallthisplayer[line.Split('=')[0]]] =
+								new DiscordRpcClient(line.Split('=')[2], autoEvents: false);
 						}
 					}
 					else if (line.Split('=')[0].Trim().ToLower() == "verbose" && line.Split('=').Length > 1)
