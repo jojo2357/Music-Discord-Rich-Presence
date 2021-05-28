@@ -29,6 +29,7 @@ if the DRP doesnt show up within 5 seconds, run `Unlink Rich Presence With Groov
 If it still doesn't work, open up an issue and let me know whats going on.
 
 ## Custom Album Art
+* My bad video tutorial: https://www.youtube.com/watch?v=_qkxjf3T8Pw
 * In the `clientdata` folder you will find 6 text files by default. `chrome.dat` `groove.dat` and `spotify.dat` are required only to provide a default if there is no provided album art.
 * Since the provided files correlate to my own applications, you may create your own instead in order to upload art.
 * [Create a discord application](https://discord.com/developers/applications) and set the name to be what you want displayed under your avatar (as in `playing <name>`)
