@@ -12,6 +12,9 @@ Works with Groove, Spotify, and MusicBee
 ## Music Library Repo
 [@Smaltin](https://github.com/Smaltin) and I are maintaining a [library repo](https://github.com/jojo2357/Music-Discord-Rich-Presence-Library) that allows you to find and download album art packs and contribute your own album arts for others to use. You can read more [here.](https://github.com/jojo2357/Music-Discord-Rich-Presence-Library)
 
+## Data File Validator Tool
+If you get stuck, feel free to use the dat [file validator](https://jojo2357.github.io/MDRP-Validation-Tool/) and if you need more help, open an issue there. DO NOT OPEN ALBUM ART RELATED ISSUES IN THIS REPO.
+
 ## About linking Groove and DRP
 In order to have rich presence every time you open groovy, run the shortcut `Link Rich Presence With Groove`. If at any time you wish to disable this feature, simply run `Unlink Rich Presence With Groove`. See [Linking Groove](https://github.com/jojo2357/Music-Discord-Rich-Presence#linking-groove) for more 
 
@@ -30,8 +33,8 @@ If it still doesn't work, open up an issue and let me know whats going on.
 
 ## Custom Album Art
 * My bad video tutorial: https://www.youtube.com/watch?v=_qkxjf3T8Pw
-* In the `clientdata` folder you will find 6 text files by default. `chrome.dat` `groove.dat` and `spotify.dat` are required only to provide a default if there is no provided album art.
-* Since the provided files correlate to my own applications, you may create your own instead in order to upload art.
+* If you get stuck, feel free to use the dat [file validator](https://jojo2357.github.io/MDRP-Validation-Tool/) and if you need more help, open an issue there. DO NOT OPEN ALBUM ART RELATED ISSUES HERE.
+* In the `clientdata` folder you will find 1 text files by default for demoing. Feel free to take a look.
 * [Create a discord application](https://discord.com/developers/applications) and set the name to be what you want displayed under your avatar (as in `playing <name>`)
 * Grab the client ID. We will use this later.
 * Navigate to the rich presence tab and select art assets.
