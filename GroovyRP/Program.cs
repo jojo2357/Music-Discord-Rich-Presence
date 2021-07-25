@@ -19,7 +19,7 @@ namespace GroovyRP
 {
 	class Program
 	{
-		private const string Version = "1.5.5";
+		private const string Version = "1.5.6";
 		private const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
 		private const string Title = "Discord Rich Presence For Groove";
 
@@ -32,6 +32,7 @@ namespace GroovyRP
 			{
 				{"music.ui", new DiscordRpcClient("807774172574253056", autoEvents: false)},
 				{"musicbee", new DiscordRpcClient("820837854385012766", autoEvents: false)},
+				{"Apple Music", new DiscordRpcClient("820837854385012766", autoEvents: false)},
 				{"spotify", new DiscordRpcClient("802222525110812725", autoEvents: false)},
 				{"chrome", new DiscordRpcClient("802213652974272513", autoEvents: false)},
 				{"", new DiscordRpcClient("821398156905283585", autoEvents: false)},
@@ -62,6 +63,7 @@ namespace GroovyRP
 		{
 			{"music.ui", ConsoleColor.Blue},
 			{"chrome", ConsoleColor.Yellow},
+			{"Apple Music", ConsoleColor.DarkRed},
 			{"spotify", ConsoleColor.DarkGreen},
 			{"musicbee", ConsoleColor.Yellow}
 		};
@@ -69,7 +71,7 @@ namespace GroovyRP
 		private static string _presenceDetails = string.Empty;
 
 		private static readonly string[] ValidPlayers = new[]
-			{"music.ui", "chrome", "spotify", /*"brave", */"new_chrome", "musicbee" /*, "firefox" */};
+			{"apple music", "music.ui", "chrome", "spotify", /*"brave", */"new_chrome", "musicbee" /*, "firefox" */};
 
 		//For use in settings
 		private static readonly Dictionary<string, string> Aliases = new Dictionary<string, string>
@@ -77,6 +79,7 @@ namespace GroovyRP
 			{"musicbee", "Music Bee"},
 			{"chrome", "Something in Google Chrome"},
 			{"spotify", "Spotify Music"},
+			{"apple music", "Apple Music"},
 			{"groove", "Groove Music Player"},
 			{"new_chrome", "Something in Brave"},
 			{"music.ui", "Groove Music Player"},
@@ -91,6 +94,7 @@ namespace GroovyRP
 			{"new_chrome", "brave_small"},
 			{"brave", "brave_small"},
 			{"spotify", "spotify"},
+			{"apple music", "applemusic"},
 		};
 
 		//might just combine these later
@@ -102,6 +106,7 @@ namespace GroovyRP
 			{"new_chrome", "brave_small"},
 			{"brave", "brave"},
 			{"spotify", "spotify_small"},
+			{"apple music", "applemusic_small"},
 		};
 
 		private static readonly Dictionary<string, string> Whatpeoplecallthisplayer = new Dictionary<string, string>
@@ -112,6 +117,7 @@ namespace GroovyRP
 			{"new_chrome", "Brave"},
 			{"brave", "Brave"},
 			{"spotify", "Spotify"},
+			{"apple music", "Apple Music"},
 		};
 
 		private static readonly Dictionary<string, string> InverseWhatpeoplecallthisplayer =
@@ -122,6 +128,7 @@ namespace GroovyRP
 				{"chrome", "chrome"},
 				{"brave", "new_chrome"},
 				{"spotify", "spotify"},
+				{"apple music", "apple music"},
 			};
 
 		private static readonly string defaultPlayer = "groove";
@@ -667,6 +674,7 @@ namespace GroovyRP
 			try
 			{
 				string[] lines = File.ReadAllLines("../../../DiscordPresenceConfig.ini");
+				
 				foreach (string line in lines)
 				{
 					if (ValidPlayers.Contains(line.Split('=')[0].Trim().ToLower()))
