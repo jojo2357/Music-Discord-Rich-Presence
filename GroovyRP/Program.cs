@@ -398,11 +398,11 @@ namespace GroovyRP
 							Details = CapLength($"Title: {lastMessage.Title}", 32),
 							State = CapLength(
 								$"Artist: {(lastMessage.Artist == "" ? "Unkown Artist" : lastMessage.Artist)}", 32),
-							Timestamps = new Timestamps()
+							Timestamps = isPlaying ? new Timestamps()
 							{
 								End = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(lastMessage.TimeStamp))
 									.DateTime
-							},
+							} : null,
 							Assets = new Assets
 							{
 								LargeImageKey =
@@ -432,14 +432,35 @@ namespace GroovyRP
 							}
 						});
 						activeClient.Invoke();
+						foreach (DiscordRpcClient client in AllClients.Values)
+							if (client.CurrentPresence != null &&
+							    client.ApplicationID != activeClient.ApplicationID)
+							{
+#if DEBUG
+										Console.WriteLine("Cleared " + client.ApplicationID);
+#endif
+								client.ClearPresence();
+								try
+								{
+									client.Invoke();
+								}
+								catch (Exception e)
+								{
+#if DEBUG
+											Console.WriteLine(e);
+#endif
+								}
+							}
 						SetConsole(lastMessage.Title, lastMessage.Artist, lastMessage.Album.Name, lastMessage.Album);
+						if (!isPlaying)
+						{
+							Timer.Restart();
+						}
 					}
-
 					remoteControl = remoteControl
 						? (long) (DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds <
 						  resignRemoteControlAt
 						: false;
-
 					if (!remoteControl)
 					{
 						wasPlaying = isPlaying;
