@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Music Discord Rich Presence")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("Provides Discord Rich Presence for media playing on supported media players")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("jojo2357")]
 [assembly: AssemblyProduct("Music Discord Rich Presence")]

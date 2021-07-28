@@ -37,25 +37,25 @@ IF %O%==6 GOTO UNLINKDRPGROOVE
 IF %O%==7 GOTO UNLINKDRPMUSICBEE
 GOTO MENU
 :LAUNCHDRPHIDDEN
-"%mypath%\GroovyRP\bin\Release\GroovyRP.exe" Shortcuts_Only
+"%mypath%\MDRP\bin\Release\MDRP.exe" Shortcuts_Only
 start "" "%mypath%\Shortcuts\Run MDRP Background.lnk"
 exit
 GOTO MENU
 :LAUNCHDRP
-call "%mypath%\GroovyRP\bin\Release\RunHidden.bat"
+call "%mypath%\MDRP\bin\Release\RunHidden.bat"
 GOTO MENU
 :KILLHIDDENDRP
 call "%mypath%\KillHidden.bat"
 GOTO MENU
 :LINKDRPGROOVE
-call "%mypath%\GroovyRP\bin\Release\LinkWithGroove.bat"
+call "%mypath%\MDRP\bin\Release\LinkWithGroove.bat"
 GOTO MENU
 :LINKDRPMUSICBEE
-call "%mypath%\GroovyRP\bin\Release\LinkWithMusicBee.bat"
+call "%mypath%\MDRP\bin\Release\LinkWithMusicBee.bat"
 GOTO MENU
 :UNLINKDRPGROOVE
-call "%mypath%\GroovyRP\bin\Release\UnlinkFromGroove.bat"
+call "%mypath%\MDRP\bin\Release\UnlinkFromGroove.bat"
 GOTO MENU
 :UNLINKDRPMUSICBEE
-call "%mypath%\GroovyRP\bin\Release\UnlinkFromMusicBee.bat"
+call "%mypath%\MDRP\bin\Release\UnlinkFromMusicBee.bat"
 GOTO MENU
