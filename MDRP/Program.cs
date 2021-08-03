@@ -38,7 +38,7 @@ namespace GroovyRP
 			{
 				{"music.ui", new DiscordRpcClient("807774172574253056", autoEvents: false)},
 				{"musicbee", new DiscordRpcClient("820837854385012766", autoEvents: false)},
-				{"Apple Music", new DiscordRpcClient("820837854385012766", autoEvents: false)},
+				{"apple music", new DiscordRpcClient("870047192889577544", autoEvents: false)},
 				{"spotify", new DiscordRpcClient("802222525110812725", autoEvents: false)},
 				{"chrome", new DiscordRpcClient("802213652974272513", autoEvents: false)},
 				{"", new DiscordRpcClient("821398156905283585", autoEvents: false)},
@@ -69,7 +69,7 @@ namespace GroovyRP
 		{
 			{"music.ui", ConsoleColor.Blue},
 			{"chrome", ConsoleColor.Yellow},
-			{"Apple Music", ConsoleColor.DarkRed},
+			{"apple music", ConsoleColor.DarkRed},
 			{"spotify", ConsoleColor.DarkGreen},
 			{"musicbee", ConsoleColor.Yellow}
 		};
@@ -136,7 +136,7 @@ namespace GroovyRP
 				{"chrome", "chrome"},
 				{"brave", "new_chrome"},
 				{"spotify", "spotify"},
-				{"apple music", "apple music"},
+				{"Apple Music", "apple music"},
 			};
 
 		private static readonly string defaultPlayer = "groove";
@@ -206,7 +206,7 @@ namespace GroovyRP
 				try
 				{
 					var jason = JObject.Parse(decodedText);
-					Console.WriteLine("Tmes: " + jason["timestamp"]);
+					//Console.WriteLine("Tmes: " + jason["timestamp"]);
 					JsonResponse parsedJason = new JsonResponse(jason);
 					if (parsedJason.isValid())
 					{
@@ -224,6 +224,7 @@ namespace GroovyRP
 				{
 					response = "{response:\"failure to parse json\"}";
 					Console.WriteLine(response);
+					Console.WriteLine(e);
 				}
 
 				Console.WriteLine(decodedText);
@@ -251,17 +252,24 @@ namespace GroovyRP
 
 			public JsonResponse(JObject jObject)
 			{
-				//if (jObject["artist"].ToString() != String.Empty)
-				Artist = jObject["artist"].ToString();
-				//if (jObject["album"].ToString() != String.Empty)
-				Album = new Album(jObject["album"].ToString(), jObject["artist"].ToString());
-				//if (jObject["title"].ToString() != String.Empty)
-				Title = jObject["title"].ToString();
-				//if (jObject["timestamp"].ToString() != String.Empty)
-				TimeStamp = jObject["timestamp"].ToString();
-				//if (jObject["action"].ToString() != String.Empty)
+				if (jObject["artist"] != null && jObject["artist"].ToString() != String.Empty)
+					Artist = jObject["artist"].ToString();
+				else
+					Artist = "";
+				if (jObject["album"] != null && jObject["album"].ToString() != String.Empty)
+					Album = new Album(jObject["album"].ToString(), jObject["artist"].ToString());
+				else
+					Album = new Album("Unknown Album");
+				if (jObject["title"] != null && jObject["title"].ToString() != String.Empty)
+					Title = jObject["title"].ToString();
+				else
+					Title = "";
+				if (jObject["timestamp"] != null && jObject["timestamp"].ToString() != String.Empty)
+					TimeStamp = jObject["timestamp"].ToString();
+				else
+					TimeStamp = "";
+				
 				Action = jObject["action"].ToString();
-
 				Player = jObject["player"].ToString();
 			}
 
@@ -270,7 +278,7 @@ namespace GroovyRP
 				/*Console.WriteLine("Validity check: " + (Action != "play") + " " + (Action != "pause") + " " +
 				                  (ValidPlayers.Contains(Player)) + " " + (EnabledClients[Player]));
 				Console.WriteLine(this);*/
-				return (Action == "play" || Action == "pause") && ValidPlayers.Contains(Player) &&
+				return (Action == "play" || Action == "pause" || Action == "shutdown") && ValidPlayers.Contains(Player) &&
 				       EnabledClients[Player];
 			}
 
@@ -278,7 +286,7 @@ namespace GroovyRP
 			{
 				return Action == String.Empty
 					? "provide an action field"
-					: Action != "play" && Action != "pause"
+					: Action != "play" && Action != "pause" && Action != "shutdown"
 						? "invalid action. expected one of \"play\" or \"pause\" but got \"" + Action + "\" instead"
 						: !ValidPlayers.Contains(Player)
 							? "invalid player name. expected one of \"" + String.Join("\", \"", ValidPlayers) +
@@ -290,7 +298,8 @@ namespace GroovyRP
 
 			public override string ToString()
 			{
-				return Action + " " + Title + " by " + Artist + " on " + Album.Name + " ending " + TimeStamp + " from " + Player;
+				return Action + " " + Title + " by " + Artist + " on " + Album.Name + " ending " + TimeStamp +
+				       " from " + Player;
 			}
 		}
 
@@ -380,87 +389,144 @@ namespace GroovyRP
 						messages.Clear();
 						Console.WriteLine("Recieved on main thread {0}", lastMessage);
 						wasPlaying = isPlaying;
-						remoteControl = isPlaying = lastMessage.Action == "play";
-						currentAlbum = lastMessage.Album;
-						playerName = lastMessage.Player;
-						GetClient();
-
-						resignRemoteControlAt = long.Parse(lastMessage.TimeStamp) + 1000;
-
-						presenceIsRich = ContainsAlbum(AlbumKeyMapping.Keys.ToArray(), currentAlbum) &&
-						                 GetAlbum(AlbumKeyMapping, currentAlbum)
-							                 .ContainsKey(activeClient.ApplicationID);
-
-						WrongArtistFlag = HasNameNotQuite(new Album(lastMessage.Album.Name));
-
-						activeClient.SetPresence(new RichPresence()
+						remoteControl = lastMessage.Action != "shutdown";
+						isPlaying = lastMessage.Action == "play";
+						if (!remoteControl)
 						{
-							Details = CapLength($"Title: {lastMessage.Title}", 32),
-							State = CapLength(
-								$"Artist: {(lastMessage.Artist == "" ? "Unkown Artist" : lastMessage.Artist)}", 32),
-							Timestamps = isPlaying ? new Timestamps()
-							{
-								End = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(lastMessage.TimeStamp))
-									.DateTime
-							} : null,
-							Assets = new Assets
-							{
-								LargeImageKey =
-									ContainsAlbum(AlbumKeyMapping.Keys.ToArray(), currentAlbum)
-									&& GetAlbum(AlbumKeyMapping, currentAlbum)
-										.ContainsKey(activeClient.ApplicationID) &&
-									GetAlbum(AlbumKeyMapping, currentAlbum)[activeClient.ApplicationID]
-										.Length <= 32
-										? GetAlbum(AlbumKeyMapping, currentAlbum)[
-											activeClient.ApplicationID]
-										: BigAssets[playerName],
-								LargeImageText = lastMessage.Album.Name.Length > 0
-									? lastMessage.Album.Name.Length <= 2
-										? "_" + lastMessage.Album.Name + "_"
-										: lastMessage.Album.Name.Length > 128
-											? lastMessage.Album.Name.Substring(0, 128)
-											: lastMessage.Album.Name
-									: "Unknown Album",
-								SmallImageKey = isPlaying
-									? (LittleAssets.ContainsKey(playerName)
-										? LittleAssets[playerName]
-										: defaultPlayer)
-									: "paused",
-								SmallImageText = isPlaying
-									? ("Using " + Aliases[playerName])
-									: "paused"
-							}
-						});
-						activeClient.Invoke();
-						foreach (DiscordRpcClient client in AllClients.Values)
-							if (client.CurrentPresence != null &&
-							    client.ApplicationID != activeClient.ApplicationID)
-							{
-#if DEBUG
-										Console.WriteLine("Cleared " + client.ApplicationID);
-#endif
-								client.ClearPresence();
-								try
+							foreach (DiscordRpcClient client in AllClients.Values)
+								if (client.CurrentPresence != null)
 								{
+									client.SetPresence(null);
 									client.Invoke();
 								}
-								catch (Exception e)
+
+							resignRemoteControlAt = 0;
+						} 
+						else
+						{
+							currentAlbum = lastMessage.Album;
+							playerName = lastMessage.Player;
+							GetClient();
+
+							Console.WriteLine("Using " + activeClient.ApplicationID);
+
+							resignRemoteControlAt = isPlaying
+								? long.Parse(lastMessage.TimeStamp) + 1000
+								:
+								remoteControl
+									?
+									(long) DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds + 60000
+									: 0;
+
+							presenceIsRich = ContainsAlbum(AlbumKeyMapping.Keys.ToArray(), currentAlbum) &&
+							                 GetAlbum(AlbumKeyMapping, currentAlbum)
+								                 .ContainsKey(activeClient.ApplicationID);
+
+							WrongArtistFlag = HasNameNotQuite(new Album(lastMessage.Album.Name));
+
+							activeClient.SetPresence(new RichPresence()
+							{
+								Details = CapLength($"Title: {lastMessage.Title}", 32),
+								State = CapLength(
+									$"Artist: {(lastMessage.Artist == "" ? "Unkown Artist" : lastMessage.Artist)}", 32),
+								Timestamps = isPlaying
+									? new Timestamps()
+									{
+										End = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(lastMessage.TimeStamp))
+											.DateTime
+									}
+									: null,
+								Assets = new Assets
 								{
-#if DEBUG
-											Console.WriteLine(e);
-#endif
+									LargeImageKey =
+										ContainsAlbum(AlbumKeyMapping.Keys.ToArray(), currentAlbum)
+										&& GetAlbum(AlbumKeyMapping, currentAlbum)
+											.ContainsKey(activeClient.ApplicationID) &&
+										GetAlbum(AlbumKeyMapping, currentAlbum)[activeClient.ApplicationID]
+											.Length <= 32
+											? GetAlbum(AlbumKeyMapping, currentAlbum)[
+												activeClient.ApplicationID]
+											: BigAssets[playerName],
+									LargeImageText = lastMessage.Album.Name.Length > 0
+										? lastMessage.Album.Name.Length <= 2
+											? "_" + lastMessage.Album.Name + "_"
+											: lastMessage.Album.Name.Length > 128
+												? lastMessage.Album.Name.Substring(0, 128)
+												: lastMessage.Album.Name
+										: "Unknown Album",
+									SmallImageKey = isPlaying
+										? (LittleAssets.ContainsKey(playerName)
+											? LittleAssets[playerName]
+											: defaultPlayer)
+										: "paused",
+									SmallImageText = isPlaying
+										? ("Using " + Aliases[playerName])
+										: "paused"
+								}
+							});
+							activeClient.Invoke();
+							if (ScreamAtUser && !presenceIsRich && !NotifiedAlbums.Contains(currentAlbum) &&
+							    currentAlbum.Name != "")
+							{
+								NotifiedAlbums.Add(currentAlbum);
+								if (WrongArtistFlag)
+								{
+									SendNotification("Album keyed wrong",
+										currentAlbum.Name +
+										" is keyed for a different artist (check caps). To disable these notifications, set verbose to false in DiscordPresenceConfig.ini");
+								}
+								else
+								{
+									SendNotification("Album not keyed",
+										currentAlbum.Name +
+										" is not keyed. To disable these notifications, set verbose to false in DiscordPresenceConfig.ini");
 								}
 							}
-						SetConsole(lastMessage.Title, lastMessage.Artist, lastMessage.Album.Name, lastMessage.Album);
-						if (!isPlaying)
-						{
-							Timer.Restart();
+
+							foreach (DiscordRpcClient client in AllClients.Values)
+								if (client.CurrentPresence != null &&
+								    client.ApplicationID != activeClient.ApplicationID)
+								{
+#if DEBUG
+								Console.WriteLine("Cleared " + client.ApplicationID);
+#endif
+									client.ClearPresence();
+									try
+									{
+										client.Invoke();
+									}
+									catch (Exception e)
+									{
+#if DEBUG
+									Console.WriteLine(e);
+#endif
+									}
+								}
+
+							SetConsole(lastMessage.Title, lastMessage.Artist, lastMessage.Album.Name,
+								lastMessage.Album);
+							if (!isPlaying)
+							{
+								Timer.Restart();
+							}
 						}
 					}
-					remoteControl = remoteControl
-						? (long) (DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds <
-						  resignRemoteControlAt
-						: false;
+
+					if (remoteControl)
+					{
+						if ((long) (DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds > resignRemoteControlAt)
+						{
+							foreach (DiscordRpcClient client in AllClients.Values)
+								if (client.CurrentPresence != null)
+								{
+									client.SetPresence(null);
+									client.Invoke();
+								}
+
+							remoteControl = false;
+						}
+					}
+
 					if (!remoteControl)
 					{
 						wasPlaying = isPlaying;
@@ -528,15 +594,15 @@ namespace GroovyRP
 									    wasPlaying != isPlaying)
 									{
 #if DEBUG
-									Console.WriteLine("Using " + activeClient.ApplicationID + " (" +
-									                  (ContainsAlbum(AlbumKeyMapping.Keys.ToArray(), currentAlbum)
-									                   && GetAlbum(AlbumKeyMapping, currentAlbum)
-										                   .ContainsKey(activeClient.ApplicationID) &&
-									                   GetAlbum(AlbumKeyMapping, currentAlbum)[
-										                   activeClient.ApplicationID].Length <= 32
-										                  ? GetAlbum(AlbumKeyMapping, currentAlbum)[
-											                  activeClient.ApplicationID]
-										                  : BigAssets[playerName]) + ")");
+										Console.WriteLine("Using " + activeClient.ApplicationID + " (" +
+										                  (ContainsAlbum(AlbumKeyMapping.Keys.ToArray(), currentAlbum)
+										                   && GetAlbum(AlbumKeyMapping, currentAlbum)
+											                   .ContainsKey(activeClient.ApplicationID) &&
+										                   GetAlbum(AlbumKeyMapping, currentAlbum)[
+											                   activeClient.ApplicationID].Length <= 32
+											                  ? GetAlbum(AlbumKeyMapping, currentAlbum)[
+												                  activeClient.ApplicationID]
+											                  : BigAssets[playerName]) + ")");
 #endif
 										presenceIsRich = ContainsAlbum(AlbumKeyMapping.Keys.ToArray(), currentAlbum) &&
 										                 GetAlbum(AlbumKeyMapping, currentAlbum)
@@ -604,7 +670,7 @@ namespace GroovyRP
 										    client.ApplicationID != activeClient.ApplicationID)
 										{
 #if DEBUG
-										Console.WriteLine("Cleared " + client.ApplicationID);
+											Console.WriteLine("Cleared " + client.ApplicationID);
 #endif
 											client.ClearPresence();
 											try
@@ -614,23 +680,23 @@ namespace GroovyRP
 											catch (Exception e)
 											{
 #if DEBUG
-											Console.WriteLine(e);
+												Console.WriteLine(e);
 #endif
 											}
 										}
 								}
 
 #if DEBUG
-							Console.Write("" + (MetaTimer.ElapsedMilliseconds) + "(" +
-							              (Timer.ElapsedMilliseconds /* < timeout_seconds * 1000*/) + ") in " +
-							              playerName +
-							              '\r');
+								Console.Write("" + (MetaTimer.ElapsedMilliseconds) + "(" +
+								              (Timer.ElapsedMilliseconds /* < timeout_seconds * 1000*/) + ") in " +
+								              playerName +
+								              '\r');
 #endif
 							}
 							catch (Exception e)
 							{
 #if DEBUG
-							Console.WriteLine(e.StackTrace);
+								Console.WriteLine(e.StackTrace);
 #else
 								Console.WriteLine(e.Message);
 #endif
@@ -656,7 +722,7 @@ namespace GroovyRP
 						{
 							SetClear();
 #if DEBUG
-						Console.Write("Cleared " + (MetaTimer.ElapsedMilliseconds) + "\r");
+							Console.Write("Cleared " + (MetaTimer.ElapsedMilliseconds) + "\r");
 #endif
 							foreach (DiscordRpcClient client in AllClients.Values)
 								if (client != null && client.CurrentPresence != null)
@@ -1239,6 +1305,10 @@ namespace GroovyRP
 		{
 			Name = name;
 			Artists = artists.Where(artist => artist != "").ToArray();
+			for (int i = 0; i < Artists.Length; i++)
+			{
+				Artists[i] = Artists[i].ToLower();
+			}
 		}
 
 		public override string ToString()
