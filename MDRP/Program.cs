@@ -1,35 +1,32 @@
 ﻿using System;
-using System.Runtime.InteropServices;
-using DiscordRPC;
-using DiscordRPC.Message;
-using System.Diagnostics;
-using CSCore.CoreAudioAPI;
-using System.Linq;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
-using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using Windows.Media.Control;
 using Windows.Web.Http;
+using CSCore.CoreAudioAPI;
+using DiscordRPC;
+using DiscordRPC.Message;
 using IWshRuntimeLibrary;
 using Microsoft.Toolkit.Uwp.Notifications;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using File = System.IO.File;
 
-namespace GroovyRP
+namespace MDRP
 {
-	class Program
+	internal class Program
 	{
 		private const string Version = "1.6.0";
 		private const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
 		private const string Title = "Discord Rich Presence For Groove";
 
-		private static readonly Uri uri =
+		private static readonly Uri _GithubUrl =
 			new Uri("https://api.github.com/repos/jojo2357/Music-Discord-Rich-Presence/releases/latest");
 
 		//Player Name, client
@@ -40,8 +37,7 @@ namespace GroovyRP
 				{"musicbee", new DiscordRpcClient("820837854385012766", autoEvents: false)},
 				{"apple music", new DiscordRpcClient("870047192889577544", autoEvents: false)},
 				{"spotify", new DiscordRpcClient("802222525110812725", autoEvents: false)},
-				{"chrome", new DiscordRpcClient("802213652974272513", autoEvents: false)},
-				{"", new DiscordRpcClient("821398156905283585", autoEvents: false)},
+				{"", new DiscordRpcClient("821398156905283585", autoEvents: false)}
 			};
 
 		private static readonly List<Album> NotifiedAlbums = new List<Album>();
@@ -62,13 +58,12 @@ namespace GroovyRP
 		//process name, enabled y/n
 		private static readonly Dictionary<string, bool> EnabledClients = new Dictionary<string, bool>
 		{
-			{"music.ui", true},
+			{"music.ui", true}
 		};
 
 		private static readonly Dictionary<string, ConsoleColor> PlayerColors = new Dictionary<string, ConsoleColor>
 		{
 			{"music.ui", ConsoleColor.Blue},
-			{"chrome", ConsoleColor.Yellow},
 			{"apple music", ConsoleColor.DarkRed},
 			{"spotify", ConsoleColor.DarkGreen},
 			{"musicbee", ConsoleColor.Yellow}
@@ -76,33 +71,27 @@ namespace GroovyRP
 
 		private static string _presenceDetails = string.Empty;
 
-		private static readonly string[] ValidPlayers = new[]
-			{"apple music", "music.ui", "chrome", "spotify", /*"brave", */"new_chrome", "musicbee" /*, "firefox" */};
+		private static readonly string[] ValidPlayers =
+			{"apple music", "music.ui", "spotify", "musicbee"};
 
-		private static readonly string[] RequiresPipeline = new[] {"musicbee"};
+		private static readonly string[] RequiresPipeline = {"musicbee"};
 
 		//For use in settings
 		private static readonly Dictionary<string, string> Aliases = new Dictionary<string, string>
 		{
 			{"musicbee", "Music Bee"},
-			{"chrome", "Something in Google Chrome"},
 			{"spotify", "Spotify Music"},
 			{"apple music", "Apple Music"},
 			{"groove", "Groove Music Player"},
-			{"new_chrome", "Something in Brave"},
 			{"music.ui", "Groove Music Player"},
-			{"brave", "Something in Brave"},
 		};
 
 		private static readonly Dictionary<string, string> BigAssets = new Dictionary<string, string>
 		{
 			{"musicbee", "musicbee"},
 			{"music.ui", "groove"},
-			{"chrome", "chrome"},
-			{"new_chrome", "brave_small"},
-			{"brave", "brave_small"},
 			{"spotify", "spotify"},
-			{"apple music", "applemusic"},
+			{"apple music", "applemusic"}
 		};
 
 		//might just combine these later
@@ -110,22 +99,16 @@ namespace GroovyRP
 		{
 			{"musicbee", "musicbee_small"},
 			{"music.ui", "groove_small"},
-			{"chrome", "chrome_small"},
-			{"new_chrome", "brave_small"},
-			{"brave", "brave"},
 			{"spotify", "spotify_small"},
-			{"apple music", "applemusic_small"},
+			{"apple music", "applemusic_small"}
 		};
 
 		private static readonly Dictionary<string, string> Whatpeoplecallthisplayer = new Dictionary<string, string>
 		{
 			{"musicbee", "Music Bee"},
 			{"music.ui", "Groove Music"},
-			{"chrome", "Google Chrome"},
-			{"new_chrome", "Brave"},
-			{"brave", "Brave"},
 			{"spotify", "Spotify"},
-			{"apple music", "Apple Music"},
+			{"apple music", "Apple Music"}
 		};
 
 		private static readonly Dictionary<string, string> InverseWhatpeoplecallthisplayer =
@@ -133,10 +116,8 @@ namespace GroovyRP
 			{
 				{"musicbee", "musicbee"},
 				{"groove", "music.ui"},
-				{"chrome", "chrome"},
-				{"brave", "new_chrome"},
 				{"spotify", "spotify"},
-				{"Apple Music", "apple music"},
+				{"Apple Music", "apple music"}
 			};
 
 		private static readonly string defaultPlayer = "groove";
@@ -146,10 +127,10 @@ namespace GroovyRP
 			MetaTimer = new Stopwatch(),
 			UpdateTimer = new Stopwatch();
 
-		private static string playerName = string.Empty, lastPlayer = String.Empty;
+		private static string _playerName = string.Empty, _lastPlayer = string.Empty;
 
-		private static bool justcleared,
-			justUnknowned,
+		private static bool _justcleared,
+			_justUnknowned,
 			ScreamAtUser,
 			presenceIsRich,
 			WrongArtistFlag,
@@ -159,19 +140,16 @@ namespace GroovyRP
 		private static DiscordRpcClient activeClient;
 		private static Album currentAlbum = new Album("");
 		private static readonly HttpClient Client = new HttpClient();
-		private static int updateCheckInterval = 36000000;
+		private static readonly int updateCheckInterval = 36000000;
 		private static string UpdateVersion;
 
 		public static HttpListener listener;
 		public static string url = "http://localhost:2357/";
-		public static int pageViews = 0;
-		public static int requestCount = 0;
-		public static string pageData = "{response:\"Verified\"}";
 
-		public static bool remoteControl = false;
-		public static long resignRemoteControlAt = 0;
+		public static bool remoteControl;
+		public static long resignRemoteControlAt;
 
-		private static Queue<JsonResponse> messages = new Queue<JsonResponse>();
+		private static readonly Queue<JsonResponse> _PendingMessages = new Queue<JsonResponse>();
 
 		public static async Task HandleIncomingConnections()
 		{
@@ -194,7 +172,7 @@ namespace GroovyRP
 				                  (long) (DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds);
 #endif
 				string text;
-				using (var reader = new StreamReader(req.InputStream,
+				using (StreamReader reader = new StreamReader(req.InputStream,
 					req.ContentEncoding))
 				{
 					text = reader.ReadToEnd();
@@ -205,30 +183,39 @@ namespace GroovyRP
 				string response;
 				try
 				{
-					var jason = JObject.Parse(decodedText);
+					JObject jason = JObject.Parse(decodedText);
 					//Console.WriteLine("Tmes: " + jason["timestamp"]);
 					JsonResponse parsedJason = new JsonResponse(jason);
 					if (parsedJason.isValid())
 					{
+#if DEBUG
 						Console.WriteLine("Enqueuing");
-						messages.Enqueue(parsedJason);
+#endif
+						_PendingMessages.Enqueue(parsedJason);
 						response = "{response:\"success\"}";
 					}
 					else
 					{
+#if DEBUG
 						Console.WriteLine("Invalid JSON ");
+#endif
 						response = "{response:\"invalid json " + parsedJason.getReasonInvalid() + "\"}";
 					}
 				}
 				catch (Exception e)
 				{
+					SendToDebugServer(e);
+					SendToDebugServer("failure to parse incoming json: \n" + text);
 					response = "{response:\"failure to parse json\"}";
+#if DEBUG
 					Console.WriteLine(response);
 					Console.WriteLine(e);
+#endif
 				}
-
+#if DEBUG
 				Console.WriteLine(decodedText);
 				Console.WriteLine();
+#endif
 
 				byte[] data = Encoding.UTF8.GetBytes(response);
 				resp.ContentType = "text/json";
@@ -241,74 +228,12 @@ namespace GroovyRP
 			}
 		}
 
-		private class JsonResponse
-		{
-			public string Artist { get; private set; }
-			public Album Album { get; private set; }
-			public string Title { get; private set; }
-			public string TimeStamp { get; private set; }
-			public string Action { get; private set; }
-			public string Player { get; private set; }
-
-			public JsonResponse(JObject jObject)
-			{
-				if (jObject["artist"] != null && jObject["artist"].ToString() != String.Empty)
-					Artist = jObject["artist"].ToString();
-				else
-					Artist = "";
-				if (jObject["album"] != null && jObject["album"].ToString() != String.Empty)
-					Album = new Album(jObject["album"].ToString(), jObject["artist"].ToString());
-				else
-					Album = new Album("Unknown Album");
-				if (jObject["title"] != null && jObject["title"].ToString() != String.Empty)
-					Title = jObject["title"].ToString();
-				else
-					Title = "";
-				if (jObject["timestamp"] != null && jObject["timestamp"].ToString() != String.Empty)
-					TimeStamp = jObject["timestamp"].ToString();
-				else
-					TimeStamp = "";
-				
-				Action = jObject["action"].ToString();
-				Player = jObject["player"].ToString();
-			}
-
-			public bool isValid()
-			{
-				/*Console.WriteLine("Validity check: " + (Action != "play") + " " + (Action != "pause") + " " +
-				                  (ValidPlayers.Contains(Player)) + " " + (EnabledClients[Player]));
-				Console.WriteLine(this);*/
-				return (Action == "play" || Action == "pause" || Action == "shutdown") && ValidPlayers.Contains(Player) &&
-				       EnabledClients[Player];
-			}
-
-			public string getReasonInvalid()
-			{
-				return Action == String.Empty
-					? "provide an action field"
-					: Action != "play" && Action != "pause" && Action != "shutdown"
-						? "invalid action. expected one of \"play\" or \"pause\" but got \"" + Action + "\" instead"
-						: !ValidPlayers.Contains(Player)
-							? "invalid player name. expected one of \"" + String.Join("\", \"", ValidPlayers) +
-							  "\" got " + Player + " instead"
-							: !EnabledClients[Player]
-								? "user has disabled this player"
-								: "valid";
-			}
-
-			public override string ToString()
-			{
-				return Action + " " + Title + " by " + Artist + " on " + Album.Name + " ending " + TimeStamp +
-				       " from " + Player;
-			}
-		}
-
 		private static void doServer()
 		{
 			listener = new HttpListener();
 			listener.Prefixes.Add(url);
 			listener.Start();
-			Console.WriteLine("Listening for connections on {0}", url);
+			//Console.WriteLine("Listening for connections on {0}", url);
 
 			// Handle requests
 			Task listenTask = HandleIncomingConnections();
@@ -321,14 +246,13 @@ namespace GroovyRP
 
 		private static void Main(string[] args)
 		{
-			ThreadStart ts = doServer;
-			Thread t = new Thread(ts);
+			Thread t = new Thread(doServer);
 			t.Start();
-			Console.OutputEncoding = System.Text.Encoding.UTF8;
+			Console.OutputEncoding = Encoding.UTF8;
 			Console.Title = "Discord Rich Presence for Groove";
 
 			Client.DefaultRequestHeaders["User-Agent"] = "c#";
-			Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
+			//Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
 			Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
 			GenerateShortcuts();
@@ -339,18 +263,18 @@ namespace GroovyRP
 			LoadSettings();
 
 			foreach (DiscordRpcClient client in DefaultClients.Values)
-			{
 				if (!AllClients.ContainsKey(client.ApplicationID))
 					AllClients.Add(client.ApplicationID, client);
 				else
 					AllClients[client.ApplicationID] = client;
-			}
 
 			MetaTimer.Start();
 			Timer.Start();
 			UpdateTimer.Start();
 
 			CheckForUpdate();
+			
+			SendToDebugServer("Starting up");
 
 			foreach (DiscordRpcClient client in AllClients.Values)
 			{
@@ -368,54 +292,47 @@ namespace GroovyRP
 			}
 			catch (Exception e)
 			{
-#if DEBUG
-				Console.WriteLine(e);
-#endif
+				SendToDebugServer(e);
 			}
 
 			bool isPlaying = IsUsingAudio(), wasPlaying;
 
 			while (IsInitialized())
-			{
 				try
 				{
 					//limit performace impact
 					if (UpdateTimer.ElapsedMilliseconds > updateCheckInterval)
 						CheckForUpdate();
 					Thread.Sleep(2000);
-					if (messages.Count > 0)
+					if (_PendingMessages.Count > 0)
 					{
-						JsonResponse lastMessage = messages.Last();
-						messages.Clear();
+						JsonResponse lastMessage = _PendingMessages.Last();
+						_PendingMessages.Clear();
+#if DEBUG
 						Console.WriteLine("Recieved on main thread {0}", lastMessage);
+#endif
 						wasPlaying = isPlaying;
 						remoteControl = lastMessage.Action != "shutdown";
 						isPlaying = lastMessage.Action == "play";
 						if (!remoteControl)
 						{
-							foreach (DiscordRpcClient client in AllClients.Values)
-								if (client.CurrentPresence != null)
-								{
-									client.SetPresence(null);
-									client.Invoke();
-								}
-
+							UnsetAllPresences();
+							SetClear();
 							resignRemoteControlAt = 0;
-						} 
+						}
 						else
 						{
 							currentAlbum = lastMessage.Album;
-							playerName = lastMessage.Player;
+							_playerName = lastMessage.Player;
 							GetClient();
-
+#if DEBUG
 							Console.WriteLine("Using " + activeClient.ApplicationID);
-
+#endif
 							resignRemoteControlAt = isPlaying
 								? long.Parse(lastMessage.TimeStamp) + 1000
-								:
-								remoteControl
-									?
-									(long) DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds + 60000
+								: remoteControl
+									? (long) DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds +
+									  60000
 									: 0;
 
 							presenceIsRich = ContainsAlbum(AlbumKeyMapping.Keys.ToArray(), currentAlbum) &&
@@ -424,13 +341,13 @@ namespace GroovyRP
 
 							WrongArtistFlag = HasNameNotQuite(new Album(lastMessage.Album.Name));
 
-							activeClient.SetPresence(new RichPresence()
+							activeClient.SetPresence(new RichPresence
 							{
 								Details = CapLength($"Title: {lastMessage.Title}", 32),
 								State = CapLength(
 									$"Artist: {(lastMessage.Artist == "" ? "Unkown Artist" : lastMessage.Artist)}", 32),
 								Timestamps = isPlaying
-									? new Timestamps()
+									? new Timestamps
 									{
 										End = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(lastMessage.TimeStamp))
 											.DateTime
@@ -446,7 +363,7 @@ namespace GroovyRP
 											.Length <= 32
 											? GetAlbum(AlbumKeyMapping, currentAlbum)[
 												activeClient.ApplicationID]
-											: BigAssets[playerName],
+											: BigAssets[_playerName],
 									LargeImageText = lastMessage.Album.Name.Length > 0
 										? lastMessage.Album.Name.Length <= 2
 											? "_" + lastMessage.Album.Name + "_"
@@ -455,32 +372,29 @@ namespace GroovyRP
 												: lastMessage.Album.Name
 										: "Unknown Album",
 									SmallImageKey = isPlaying
-										? (LittleAssets.ContainsKey(playerName)
-											? LittleAssets[playerName]
-											: defaultPlayer)
+										? LittleAssets.ContainsKey(_playerName)
+											? LittleAssets[_playerName]
+											: defaultPlayer
 										: "paused",
 									SmallImageText = isPlaying
-										? ("Using " + Aliases[playerName])
+										? "Using " + Aliases[_playerName]
 										: "paused"
 								}
 							});
 							activeClient.Invoke();
+							
 							if (ScreamAtUser && !presenceIsRich && !NotifiedAlbums.Contains(currentAlbum) &&
 							    currentAlbum.Name != "")
 							{
 								NotifiedAlbums.Add(currentAlbum);
 								if (WrongArtistFlag)
-								{
 									SendNotification("Album keyed wrong",
 										currentAlbum.Name +
 										" is keyed for a different artist (check caps). To disable these notifications, set verbose to false in DiscordPresenceConfig.ini");
-								}
 								else
-								{
 									SendNotification("Album not keyed",
 										currentAlbum.Name +
 										" is not keyed. To disable these notifications, set verbose to false in DiscordPresenceConfig.ini");
-								}
 							}
 
 							foreach (DiscordRpcClient client in AllClients.Values)
@@ -490,42 +404,31 @@ namespace GroovyRP
 #if DEBUG
 								Console.WriteLine("Cleared " + client.ApplicationID);
 #endif
-									client.ClearPresence();
 									try
 									{
+										client.ClearPresence();
 										client.Invoke();
 									}
 									catch (Exception e)
 									{
-#if DEBUG
-									Console.WriteLine(e);
-#endif
+										SendToDebugServer(e);
 									}
 								}
 
 							SetConsole(lastMessage.Title, lastMessage.Artist, lastMessage.Album.Name,
 								lastMessage.Album);
-							if (!isPlaying)
-							{
-								Timer.Restart();
-							}
+							if (!isPlaying) Timer.Restart();
 						}
 					}
 
 					if (remoteControl)
-					{
-						if ((long) (DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds > resignRemoteControlAt)
+						if ((long) DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds >
+						    resignRemoteControlAt)
 						{
-							foreach (DiscordRpcClient client in AllClients.Values)
-								if (client.CurrentPresence != null)
-								{
-									client.SetPresence(null);
-									client.Invoke();
-								}
+							UnsetAllPresences();
 
 							remoteControl = false;
 						}
-					}
 
 					if (!remoteControl)
 					{
@@ -534,28 +437,29 @@ namespace GroovyRP
 						{
 							isPlaying = IsUsingAudio();
 						}
-						catch (Exception)
+						catch (Exception e)
 						{
+							SendToDebugServer(e);
 							isPlaying = false;
 						}
 
 						if (wasPlaying && !isPlaying)
 							Timer.Restart();
-						if (RequiresPipeline.Contains(playerName))
+						if (RequiresPipeline.Contains(_playerName))
 						{
 							if (!NotifiedRequiredPipeline)
 							{
 								Console.Clear();
 								DrawPersistentHeader();
 								Console.ForegroundColor = ConsoleColor.DarkRed;
-								Console.WriteLine("Detected volume in " + playerName +
+								Console.WriteLine("Detected volume in " + _playerName +
 								                  " but no data has been recieved from it. You may need to update the player, install a plugin, or just pause and resume the music. See more at " +
 								                  Github);
 								NotifiedRequiredPipeline = true;
 								Console.ForegroundColor = ConsoleColor.White;
 							}
 						}
-						else if (EnabledClients.ContainsKey(playerName) && EnabledClients[playerName] &&
+						else if (EnabledClients.ContainsKey(_playerName) && EnabledClients[_playerName] &&
 						         (isPlaying || Timer.ElapsedMilliseconds < timeout_seconds * 1000))
 						{
 							try
@@ -563,6 +467,8 @@ namespace GroovyRP
 								if (isPlaying)
 									lastTrack = currentTrack;
 								currentTrack = GetStuff();
+								if (currentTrack == null)
+									continue;
 								if (wasPlaying && !isPlaying)
 								{
 									Console.WriteLine(currentAlbum + " and " + new Album(currentTrack.AlbumTitle,
@@ -615,17 +521,13 @@ namespace GroovyRP
 										{
 											NotifiedAlbums.Add(currentAlbum);
 											if (WrongArtistFlag)
-											{
 												SendNotification("Album keyed wrong",
 													currentAlbum.Name +
 													" is keyed for a different artist (check caps). To disable these notifications, set verbose to false in DiscordPresenceConfig.ini");
-											}
 											else
-											{
 												SendNotification("Album not keyed",
 													currentAlbum.Name +
 													" is not keyed. To disable these notifications, set verbose to false in DiscordPresenceConfig.ini");
-											}
 										}
 
 										activeClient.SetPresence(new RichPresence
@@ -642,7 +544,7 @@ namespace GroovyRP
 														.Length <= 32
 														? GetAlbum(AlbumKeyMapping, currentAlbum)[
 															activeClient.ApplicationID]
-														: BigAssets[playerName],
+														: BigAssets[_playerName],
 												LargeImageText = currentTrack.AlbumTitle.Length > 0
 													? currentTrack.AlbumTitle.Length <= 2
 														? "_" + currentTrack.AlbumTitle + "_"
@@ -651,12 +553,12 @@ namespace GroovyRP
 															: currentTrack.AlbumTitle
 													: "Unknown Album",
 												SmallImageKey = isPlaying
-													? (LittleAssets.ContainsKey(playerName)
-														? LittleAssets[playerName]
-														: defaultPlayer)
+													? LittleAssets.ContainsKey(_playerName)
+														? LittleAssets[_playerName]
+														: defaultPlayer
 													: "paused",
 												SmallImageText = isPlaying
-													? ("Using " + Aliases[playerName])
+													? "Using " + Aliases[_playerName]
 													: "paused"
 											}
 										});
@@ -669,9 +571,6 @@ namespace GroovyRP
 										if (client.CurrentPresence != null &&
 										    client.ApplicationID != activeClient.ApplicationID)
 										{
-#if DEBUG
-											Console.WriteLine("Cleared " + client.ApplicationID);
-#endif
 											client.ClearPresence();
 											try
 											{
@@ -679,9 +578,7 @@ namespace GroovyRP
 											}
 											catch (Exception e)
 											{
-#if DEBUG
-												Console.WriteLine(e);
-#endif
+												SendToDebugServer(e);
 											}
 										}
 								}
@@ -695,67 +592,111 @@ namespace GroovyRP
 							}
 							catch (Exception e)
 							{
-#if DEBUG
-								Console.WriteLine(e.StackTrace);
-#else
-								Console.WriteLine(e.Message);
-#endif
+								SendToDebugServer(e);
 								if (activeClient != null)
-									activeClient.SetPresence(new RichPresence()
+									activeClient.SetPresence(new RichPresence
 									{
 										Details = "Failed to get track info"
 									});
 								Console.Write("Failed to get track info \r");
 							}
 						}
-						else if (!EnabledClients.ContainsKey(playerName))
+						else if (!EnabledClients.ContainsKey(_playerName))
 						{
 							SetUnknown();
-							foreach (DiscordRpcClient client in AllClients.Values)
-								if (client.CurrentPresence != null)
-								{
-									client.ClearPresence();
-									client.Invoke();
-								}
+							UnsetAllPresences();
 						}
 						else
 						{
 							SetClear();
-#if DEBUG
-							Console.Write("Cleared " + (MetaTimer.ElapsedMilliseconds) + "\r");
-#endif
-							foreach (DiscordRpcClient client in AllClients.Values)
-								if (client != null && client.CurrentPresence != null)
-								{
-									client.ClearPresence();
-									//client.Invoke();
-								}
+							UnsetAllPresences();
 						}
 					}
 				}
 				catch (Exception e)
 				{
-					Console.WriteLine(e.Message);
-					Console.WriteLine(e.StackTrace);
-					Console.WriteLine("Something unexpected has occured");
+					SendToDebugServer(e);
 				}
+		}
+
+		private static void UnsetAllPresences()
+		{
+			foreach (DiscordRpcClient client in AllClients.Values)
+				if (client.CurrentPresence != null)
+				{
+					client.ClearPresence();
+					client.Invoke();
+				}
+		}
+
+		private static void SendToDebugServer(Exception exception)
+		{
+#if DEBUG
+			Console.WriteLine(e.Message);
+			Console.WriteLine(e.StackTrace);
+			Console.WriteLine("Something unexpected has occured");
+#else
+			Uri debugUri = new Uri("http://localhost:7532/");
+			HttpWebRequest request = (HttpWebRequest) WebRequest.Create(debugUri);
+			request.Method = "POST";
+			request.ContentType = "text/json";
+			string urlEncoded = Uri.EscapeUriString(exception.ToString());
+			byte[] arr = Encoding.UTF8.GetBytes(urlEncoded);
+			try
+			{
+				Stream rs = request.GetRequestStream();
+				rs.Write(arr, 0, arr.Length);
+				request.GetResponse().Close();
 			}
+			catch (Exception)
+			{
+				Console.ForegroundColor = ConsoleColor.DarkRed;
+				Console.WriteLine(
+					"An error has occured. If the issue is severe, or you would like to know more, run the debug tool and use the printouts there. If this is severely hindering your MDRP experience, please open an issue on GitHub.");
+				Console.ForegroundColor = ConsoleColor.White;
+			}
+#endif
+		}
+
+		private static void SendToDebugServer(string message)
+		{
+#if DEBUG
+			Console.WriteLine(message);
+#else
+			Uri url = new Uri("http://localhost:7532/");
+			HttpWebRequest request = (HttpWebRequest) WebRequest.Create(url);
+			request.Method = "POST";
+			request.ContentType = "text/json";
+			string urlEncoded = Uri.EscapeUriString(message);
+			byte[] arr = Encoding.UTF8.GetBytes(urlEncoded);
+			try
+			{
+				Stream rs = request.GetRequestStream();
+				rs.Write(arr, 0, arr.Length);
+				request.GetResponse().Close();
+			}
+			catch (Exception)
+			{
+				Console.ForegroundColor = ConsoleColor.DarkRed;
+				Console.WriteLine(
+					"An error has occured. Please run the debug tool to get a better readout and then open an issue on github with that printout.");
+				Console.ForegroundColor = ConsoleColor.White;
+			}
+#endif
 		}
 
 		private static void GetClient()
 		{
 			if (ContainsAlbum(AlbumKeyMapping.Keys.ToArray(), currentAlbum))
-			{
 				activeClient = GetBestClient(GetAlbum(AlbumKeyMapping, currentAlbum));
-			}
-			else if (DefaultClients.ContainsKey(playerName))
-				activeClient = DefaultClients[playerName];
+			else if (DefaultClients.ContainsKey(_playerName))
+				activeClient = DefaultClients[_playerName];
 			else
 				activeClient = DefaultClients[""];
 
 			if (activeClient == null)
 			{
-				activeClient = DefaultClients[playerName];
+				activeClient = DefaultClients[_playerName];
 				Console.WriteLine("Uh oh!!!");
 			}
 		}
@@ -764,21 +705,17 @@ namespace GroovyRP
 		{
 			try
 			{
-				if (PlayersClients.ContainsKey(playerName))
-					foreach (DiscordRpcClient klient in PlayersClients[playerName])
-					{
+				if (PlayersClients.ContainsKey(_playerName))
+					foreach (DiscordRpcClient klient in PlayersClients[_playerName])
 						if (album.ContainsKey(klient.ApplicationID))
 							return klient;
-					}
 			}
 			catch (Exception e)
 			{
-#if DEBUG
-				Console.WriteLine(e);
-#endif
+				SendToDebugServer(e);
 			}
 
-			return DefaultClients[playerName];
+			return DefaultClients[_playerName];
 		}
 
 		public static string CapLength(string instring, int capLength)
@@ -789,12 +726,8 @@ namespace GroovyRP
 		private static bool IsInitialized()
 		{
 			foreach (DiscordRpcClient client in AllClients.Values)
-			{
 				if (!client.IsInitialized)
 					client.Initialize();
-				//return false;
-			}
-
 			return true;
 		}
 
@@ -830,7 +763,7 @@ namespace GroovyRP
 				string albumKey = ContainsAlbum(AlbumKeyMapping.Keys.ToArray(), album) &&
 				                  GetAlbum(AlbumKeyMapping, album).ContainsKey(activeClient.ApplicationID)
 					? GetAlbum(AlbumKeyMapping, album)[activeClient.ApplicationID]
-					: BigAssets[playerName];
+					: BigAssets[_playerName];
 				if (albumKey.Length > 32)
 				{
 					Console.ForegroundColor = ConsoleColor.Red;
@@ -848,13 +781,10 @@ namespace GroovyRP
 			Console.Write(" Player: ");
 
 			Console.ForegroundColor =
-				PlayerColors.ContainsKey(playerName) ? PlayerColors[playerName] : ConsoleColor.White;
-			Console.Write(Whatpeoplecallthisplayer[playerName]);
+				PlayerColors.ContainsKey(_playerName) ? PlayerColors[_playerName] : ConsoleColor.White;
+			Console.Write(Whatpeoplecallthisplayer[_playerName]);
 
-			if (remoteControl)
-			{
-				Console.Write(" using special integration!");
-			}
+			if (remoteControl) Console.Write(" using special integration!");
 
 			Console.WriteLine();
 
@@ -875,15 +805,15 @@ namespace GroovyRP
 			}
 
 			Console.ForegroundColor = ConsoleColor.White;
-			justcleared = false;
-			justUnknowned = false;
+			_justcleared = false;
+			_justUnknowned = false;
 		}
 
 		private static void SetClear()
 		{
-			if (!justcleared)
+			if (!_justcleared)
 			{
-				justcleared = true;
+				_justcleared = true;
 				Console.Clear();
 				DrawPersistentHeader();
 				Console.Write("Nothing Playing (probably paused)\r");
@@ -921,9 +851,9 @@ namespace GroovyRP
 
 		private static void SetUnknown()
 		{
-			if (!justUnknowned)
+			if (!_justUnknowned)
 			{
-				justUnknowned = true;
+				_justUnknowned = true;
 				Console.Clear();
 				DrawPersistentHeader();
 				Console.Write(
@@ -936,9 +866,7 @@ namespace GroovyRP
 			if (args.Presence != null)
 			{
 				if (_presenceDetails != args.Presence.Details)
-				{
 					_presenceDetails = AllClients[args.ApplicationID].CurrentPresence?.Details;
-				}
 			}
 			else
 			{
@@ -954,9 +882,19 @@ namespace GroovyRP
 		//Get palying details
 		private static GlobalSystemMediaTransportControlsSessionMediaProperties GetStuff()
 		{
-			var gsmtcsm = GlobalSystemMediaTransportControlsSessionManager.RequestAsync().GetAwaiter().GetResult()
-				.GetCurrentSession();
-			return gsmtcsm.TryGetMediaPropertiesAsync().GetAwaiter().GetResult();
+			try
+			{
+				GlobalSystemMediaTransportControlsSession gsmtcsm = GlobalSystemMediaTransportControlsSessionManager
+					.RequestAsync().GetAwaiter().GetResult()
+					.GetCurrentSession();
+				return gsmtcsm.TryGetMediaPropertiesAsync().GetAwaiter().GetResult();
+			}
+			catch (Exception)
+			{
+				//happens all the time but trying again works so dw ab it
+				//SendToDebugServer("Something went wrong getting playing stuff.");
+				return null;
+			}
 		}
 
 		private static bool IsUsingAudio()
@@ -970,19 +908,19 @@ namespace GroovyRP
 			if (candidates.Any())
 			{
 				AudioSessionManager2 sessionManager;
-				using (var enumerator = new MMDeviceEnumerator())
+				using (MMDeviceEnumerator enumerator = new MMDeviceEnumerator())
 				{
-					using (var device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia))
+					using (MMDevice device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia))
 					{
 						sessionManager = AudioSessionManager2.FromMMDevice(device);
 					}
 				}
 
-				using (var sessionEnumerator = sessionManager.GetSessionEnumerator())
+				using (AudioSessionEnumerator sessionEnumerator = sessionManager.GetSessionEnumerator())
 				{
-					foreach (var session in sessionEnumerator)
+					foreach (AudioSessionControl session in sessionEnumerator)
 					{
-						var process = session.QueryInterface<AudioSessionControl2>().Process;
+						Process process = session.QueryInterface<AudioSessionControl2>().Process;
 						try
 						{
 							if (ValidPlayers.Contains(process.ProcessName.ToLower()) &&
@@ -990,18 +928,14 @@ namespace GroovyRP
 							    EnabledClients[process.ProcessName.ToLower()] &&
 							    session.QueryInterface<AudioMeterInformation>().GetPeakValue() > 0)
 							{
-								lastPlayer = playerName;
-								playerName = process.ProcessName.ToLower();
+								_lastPlayer = _playerName;
+								_playerName = process.ProcessName.ToLower();
 								return true;
 							}
 						}
 						catch (Exception e)
 						{
-#if DEBUG
-							Console.WriteLine(e.StackTrace);
-#else
-							Console.WriteLine(e.Message);
-#endif
+							SendToDebugServer(e);
 						}
 					}
 				}
@@ -1033,15 +967,12 @@ namespace GroovyRP
 			{
 				string[] lines = File.ReadAllLines("../../../DiscordPresenceConfig.ini");
 				foreach (string line in lines)
-				{
 					if (ValidPlayers.Contains(line.Split('=')[0].Trim().ToLower()))
 					{
 						EnabledClients[line.Split('=')[0]] = line.Split('=')[1].Trim().ToLower() == "true";
 						if (line.Split('=').Length > 2)
-						{
 							DefaultClients[line.Split('=')[0]] =
 								new DiscordRpcClient(line.Split('=')[2], autoEvents: false);
-						}
 					}
 					else if (InverseWhatpeoplecallthisplayer.ContainsKey(line.Split('=')[0].Trim().ToLower()) &&
 					         ValidPlayers.Contains(InverseWhatpeoplecallthisplayer[line.Split('=')[0].Trim().ToLower()])
@@ -1049,40 +980,36 @@ namespace GroovyRP
 					{
 						EnabledClients.Add(line.Split('=')[0], line.Split('=')[1].Trim().ToLower() == "true");
 						if (line.Split('=').Length > 2)
-						{
-							Console.WriteLine(InverseWhatpeoplecallthisplayer[line.Split('=')[0]]);
 							DefaultClients[InverseWhatpeoplecallthisplayer[line.Split('=')[0]]] =
 								new DiscordRpcClient(line.Split('=')[2], autoEvents: false);
-						}
 					}
 					else if (line.Split('=')[0].Trim().ToLower() == "verbose" && line.Split('=').Length > 1)
 					{
 						ScreamAtUser = line.Split('=')[1].Trim().ToLower() == "true";
 					}
-				}
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
-				Console.Error.WriteLine(
+				SendToDebugServer(e);
+				SendToDebugServer(
 					"DiscordPresenceConfig.ini not found! this is the settings file to enable or disable certain features");
-				Thread.Sleep(5000);
 			}
 
 			try
 			{
 				ReadKeyingFromFile(new DirectoryInfo("../../../clientdata"));
 			}
-			catch (Exception)
+			catch (Exception e)
 			{
-				Console.WriteLine("Something bad happened");
+				SendToDebugServer(e);
 			}
 		}
 
 		private static void ReadKeyingFromFile(DirectoryInfo files)
 		{
-			foreach (var dir in files.GetDirectories())
+			foreach (DirectoryInfo dir in files.GetDirectories())
 				ReadKeyingFromFile(dir);
-			foreach (var file in files.GetFiles())
+			foreach (FileInfo file in files.GetFiles())
 			{
 				if (file.Name == "demo.dat")
 					continue;
@@ -1147,25 +1074,21 @@ namespace GroovyRP
 						}
 
 						if (parsedLine.Length == 2)
-						{
 							album = new Album(parsedLine[0]);
-						}
 						else
-						{
 							album = new Album(parsedLine[0],
 								parsedLine.Skip(2).Take(parsedLine.Length - 2).ToArray());
-						}
 
 						if (!ContainsAlbum(AlbumKeyMapping.Keys.ToArray(), album))
+						{
 							AlbumKeyMapping.Add(album, new Dictionary<string, string>());
+						}
 						else
 						{
 							foreach (DiscordRpcClient otherKlient in PlayersClients[lines[0].Split('=')[0]])
-							{
 								if (otherKlient.ApplicationID != id)
 									foundDupe |= GetAlbum(AlbumKeyMapping, album)
 										.ContainsKey(otherKlient.ApplicationID);
-							}
 
 							if (foundDupe)
 								continue;
@@ -1177,8 +1100,7 @@ namespace GroovyRP
 				}
 				catch (Exception e)
 				{
-					Console.Error.WriteLine(e);
-					Thread.Sleep(1000);
+					SendToDebugServer(e);
 				}
 			}
 		}
@@ -1186,11 +1108,10 @@ namespace GroovyRP
 		private static void CheckForUpdate()
 		{
 			UpdateTimer.Restart();
-			Client.GetAsync(uri).AsTask().ContinueWith((Task<HttpResponseMessage> response) =>
+			Client.GetAsync(_GithubUrl).AsTask().ContinueWith(response =>
 			{
 				IHttpContent responseContent = response.Result.Content;
 				foreach (string str in Regex.Split(responseContent.ToString(), ","))
-				{
 					if (str.Contains("\"tag_name\":"))
 					{
 						UpdateVersion = str.Replace("\"tag_name\":\"", "").Replace("\"", "");
@@ -1200,7 +1121,6 @@ namespace GroovyRP
 									UpdateVersion + " is published on github. Go there for the latest version");
 						UpdateAvailibleFlag = UpdateVersion != Version;
 					}
-				}
 			});
 		}
 
@@ -1290,12 +1210,75 @@ namespace GroovyRP
 					return true;
 			return false;
 		}
+
+		private class JsonResponse
+		{
+			public JsonResponse(JObject jObject)
+			{
+				if (jObject["artist"] != null && jObject["artist"].ToString() != string.Empty)
+					Artist = jObject["artist"].ToString();
+				else
+					Artist = "";
+				if (jObject["album"] != null && jObject["album"].ToString() != string.Empty)
+					Album = new Album(jObject["album"].ToString(), jObject["artist"].ToString());
+				else
+					Album = new Album("Unknown Album");
+				if (jObject["title"] != null && jObject["title"].ToString() != string.Empty)
+					Title = jObject["title"].ToString();
+				else
+					Title = "";
+				if (jObject["timestamp"] != null && jObject["timestamp"].ToString() != string.Empty)
+					TimeStamp = jObject["timestamp"].ToString();
+				else
+					TimeStamp = "";
+
+				Action = jObject["action"].ToString();
+				Player = jObject["player"].ToString();
+			}
+
+			public string Artist { get; }
+			public Album Album { get; }
+			public string Title { get; }
+			public string TimeStamp { get; }
+			public string Action { get; }
+			public string Player { get; }
+
+			public bool isValid()
+			{
+				/*Console.WriteLine("Validity check: " + (Action != "play") + " " + (Action != "pause") + " " +
+				                  (ValidPlayers.Contains(Player)) + " " + (EnabledClients[Player]));
+				Console.WriteLine(this);*/
+				return (Action == "play" || Action == "pause" || Action == "shutdown") &&
+				       ValidPlayers.Contains(Player) &&
+				       EnabledClients[Player];
+			}
+
+			public string getReasonInvalid()
+			{
+				return Action == string.Empty
+					? "provide an action field"
+					: Action != "play" && Action != "pause" && Action != "shutdown"
+						? "invalid action. expected one of \"play\" or \"pause\" but got \"" + Action + "\" instead"
+						: !ValidPlayers.Contains(Player)
+							? "invalid player name. expected one of \"" + string.Join("\", \"", ValidPlayers) +
+							  "\" got " + Player + " instead"
+							: !EnabledClients[Player]
+								? "user has disabled this player"
+								: "valid";
+			}
+
+			public override string ToString()
+			{
+				return Action + " " + Title + " by " + Artist + " on " + Album.Name + " ending " + TimeStamp +
+				       " from " + Player;
+			}
+		}
 	}
 
-	class Album
+	internal class Album
 	{
-		public string Name;
-		private string[] Artists;
+		private readonly string[] Artists;
+		public readonly string Name;
 
 		public Album(string name) : this(name, "*")
 		{
@@ -1305,15 +1288,17 @@ namespace GroovyRP
 		{
 			Name = name;
 			Artists = artists.Where(artist => artist != "").ToArray();
-			for (int i = 0; i < Artists.Length; i++)
-			{
-				Artists[i] = Artists[i].ToLower();
-			}
+			for (int i = 0; i < Artists.Length; i++) Artists[i] = Artists[i].ToLower();
+		}
+
+		public override int GetHashCode()
+		{
+			return (Name, Artists).GetHashCode();
 		}
 
 		public override string ToString()
 		{
-			return Name + " by " + String.Join(",", Artists);
+			return Name + " by " + string.Join(",", Artists);
 		}
 
 		/**
