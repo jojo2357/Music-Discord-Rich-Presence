@@ -165,7 +165,6 @@ namespace MDRP
 
 				// Print out some info about the request
 #if DEBUG
-				Console.WriteLine("Request #: {0}", ++requestCount);
 				Console.WriteLine(req.Url.ToString());
 				Console.WriteLine(req.HttpMethod);
 				Console.WriteLine("Time: " +
@@ -192,7 +191,24 @@ namespace MDRP
 						Console.WriteLine("Enqueuing");
 #endif
 						_PendingMessages.Enqueue(parsedJason);
-						response = "{response:\"success\"}";
+						GetClient(parsedJason.Album, parsedJason.Player);
+						presenceIsRich = AlbumKeyMapping.ContainsKey(parsedJason.Album) &&
+						                 AlbumKeyMapping[parsedJason.Album]
+							                 .ContainsKey(activeClient.ApplicationID);
+
+						WrongArtistFlag = HasNameNotQuite(new Album(parsedJason.Album.Name));
+						if (!presenceIsRich)
+						{
+							if (WrongArtistFlag)
+							{
+								response = "{response:\"keyed incorrectly\"}";
+							} else
+								response = "{response:\"no key\"}";
+						}
+						else
+						{
+							response = "{response:\"keyed successfully\"}";
+						}
 					}
 					else
 					{
@@ -273,14 +289,13 @@ namespace MDRP
 			UpdateTimer.Start();
 
 			CheckForUpdate();
-			
+
 			SendToDebugServer("Starting up");
 
 			foreach (DiscordRpcClient client in AllClients.Values)
 			{
 				client.Initialize();
 				client.OnError += _client_OnError;
-				client.OnPresenceUpdate += _client_OnPresenceUpdate;
 			}
 
 			GlobalSystemMediaTransportControlsSessionMediaProperties currentTrack = null, lastTrack = null;
@@ -307,6 +322,7 @@ namespace MDRP
 					if (_PendingMessages.Count > 0)
 					{
 						JsonResponse lastMessage = _PendingMessages.Last();
+
 						_PendingMessages.Clear();
 #if DEBUG
 						Console.WriteLine("Recieved on main thread {0}", lastMessage);
@@ -322,7 +338,29 @@ namespace MDRP
 						}
 						else
 						{
-							currentAlbum = lastMessage.Album;
+                            foreach (DiscordRpcClient client in AllClients.Values)
+                                if (client.CurrentPresence != null && client.ApplicationID != activeClient.ApplicationID)
+                                {
+#if DEBUG
+                                    Console.WriteLine("Cleared " + client.ApplicationID);
+#endif
+                                    try
+                                    {
+                                        ClearAPresence(client);
+                                        /*client.ClearPresence();
+                                        client.Invoke();*/
+                                    }
+                                    catch (Exception e)
+                                    {
+#if DEBUG
+                                        Console.WriteLine("Failed to clear " + client.ApplicationID);
+#endif
+                                        SendToDebugServer(e);
+                                    }
+                                }
+                                else client.Invoke();
+
+                            currentAlbum = lastMessage.Album;
 							_playerName = lastMessage.Player;
 							GetClient();
 #if DEBUG
@@ -335,8 +373,8 @@ namespace MDRP
 									  60000
 									: 0;
 
-							presenceIsRich = ContainsAlbum(AlbumKeyMapping.Keys.ToArray(), currentAlbum) &&
-							                 GetAlbum(AlbumKeyMapping, currentAlbum)
+							presenceIsRich = AlbumKeyMapping.Keys.ToArray().Contains(currentAlbum) &&
+							                 AlbumKeyMapping[currentAlbum]
 								                 .ContainsKey(activeClient.ApplicationID);
 
 							WrongArtistFlag = HasNameNotQuite(new Album(lastMessage.Album.Name));
@@ -356,12 +394,12 @@ namespace MDRP
 								Assets = new Assets
 								{
 									LargeImageKey =
-										ContainsAlbum(AlbumKeyMapping.Keys.ToArray(), currentAlbum)
-										&& GetAlbum(AlbumKeyMapping, currentAlbum)
+										AlbumKeyMapping.Keys.ToArray().Contains(currentAlbum)
+										&& AlbumKeyMapping[currentAlbum]
 											.ContainsKey(activeClient.ApplicationID) &&
-										GetAlbum(AlbumKeyMapping, currentAlbum)[activeClient.ApplicationID]
+										AlbumKeyMapping[currentAlbum][activeClient.ApplicationID]
 											.Length <= 32
-											? GetAlbum(AlbumKeyMapping, currentAlbum)[
+											? AlbumKeyMapping[currentAlbum][
 												activeClient.ApplicationID]
 											: BigAssets[_playerName],
 									LargeImageText = lastMessage.Album.Name.Length > 0
@@ -382,7 +420,7 @@ namespace MDRP
 								}
 							});
 							activeClient.Invoke();
-							
+
 							if (ScreamAtUser && !presenceIsRich && !NotifiedAlbums.Contains(currentAlbum) &&
 							    currentAlbum.Name != "")
 							{
@@ -396,24 +434,6 @@ namespace MDRP
 										currentAlbum.Name +
 										" is not keyed. To disable these notifications, set verbose to false in DiscordPresenceConfig.ini");
 							}
-
-							foreach (DiscordRpcClient client in AllClients.Values)
-								if (client.CurrentPresence != null &&
-								    client.ApplicationID != activeClient.ApplicationID)
-								{
-#if DEBUG
-								Console.WriteLine("Cleared " + client.ApplicationID);
-#endif
-									try
-									{
-										client.ClearPresence();
-										client.Invoke();
-									}
-									catch (Exception e)
-									{
-										SendToDebugServer(e);
-									}
-								}
 
 							SetConsole(lastMessage.Title, lastMessage.Artist, lastMessage.Album.Name,
 								lastMessage.Album);
@@ -449,7 +469,10 @@ namespace MDRP
 						{
 							if (!NotifiedRequiredPipeline)
 							{
+#if DEBUG
+#else
 								Console.Clear();
+#endif
 								DrawPersistentHeader();
 								Console.ForegroundColor = ConsoleColor.DarkRed;
 								Console.WriteLine("Detected volume in " + _playerName +
@@ -489,7 +512,21 @@ namespace MDRP
 										currentTrack.AlbumArtist);
 									GetClient();
 
-									string details = $"Title: {currentTrack.Title}",
+                                    foreach (DiscordRpcClient client in AllClients.Values)
+                                        if (client.CurrentPresence != null &&
+                                            client.ApplicationID != activeClient.ApplicationID)
+                                        {
+                                            try
+                                            {
+	                                            ClearAPresence(client);
+                                            }
+                                            catch (Exception e)
+                                            {
+                                                SendToDebugServer(e);
+                                            }
+                                        }
+
+                                    string details = $"Title: {currentTrack.Title}",
 										state =
 											$"Artist: {(currentTrack.Artist == "" ? "Unkown Artist" : currentTrack.Artist)}";
 									if (activeClient.CurrentPresence == null ||
@@ -501,17 +538,17 @@ namespace MDRP
 									{
 #if DEBUG
 										Console.WriteLine("Using " + activeClient.ApplicationID + " (" +
-										                  (ContainsAlbum(AlbumKeyMapping.Keys.ToArray(), currentAlbum)
-										                   && GetAlbum(AlbumKeyMapping, currentAlbum)
+										                  (AlbumKeyMapping.ContainsKey(currentAlbum)
+										                   && AlbumKeyMapping[currentAlbum]
 											                   .ContainsKey(activeClient.ApplicationID) &&
-										                   GetAlbum(AlbumKeyMapping, currentAlbum)[
+                                                           AlbumKeyMapping[currentAlbum][
 											                   activeClient.ApplicationID].Length <= 32
-											                  ? GetAlbum(AlbumKeyMapping, currentAlbum)[
+											                  ? AlbumKeyMapping[currentAlbum][
 												                  activeClient.ApplicationID]
-											                  : BigAssets[playerName]) + ")");
+											                  : BigAssets[_playerName]) + ")");
 #endif
-										presenceIsRich = ContainsAlbum(AlbumKeyMapping.Keys.ToArray(), currentAlbum) &&
-										                 GetAlbum(AlbumKeyMapping, currentAlbum)
+										presenceIsRich = AlbumKeyMapping.Keys.ToArray().Contains(currentAlbum) &&
+										                 AlbumKeyMapping[currentAlbum]
 											                 .ContainsKey(activeClient.ApplicationID);
 
 										WrongArtistFlag = HasNameNotQuite(new Album(currentTrack.AlbumTitle));
@@ -537,12 +574,12 @@ namespace MDRP
 											Assets = new Assets
 											{
 												LargeImageKey =
-													ContainsAlbum(AlbumKeyMapping.Keys.ToArray(), currentAlbum)
-													&& GetAlbum(AlbumKeyMapping, currentAlbum)
+													AlbumKeyMapping.Keys.ToArray().Contains(currentAlbum)
+													&& AlbumKeyMapping[currentAlbum]
 														.ContainsKey(activeClient.ApplicationID) &&
-													GetAlbum(AlbumKeyMapping, currentAlbum)[activeClient.ApplicationID]
+													AlbumKeyMapping[currentAlbum][activeClient.ApplicationID]
 														.Length <= 32
-														? GetAlbum(AlbumKeyMapping, currentAlbum)[
+														? AlbumKeyMapping[currentAlbum][
 															activeClient.ApplicationID]
 														: BigAssets[_playerName],
 												LargeImageText = currentTrack.AlbumTitle.Length > 0
@@ -566,27 +603,12 @@ namespace MDRP
 											currentAlbum);
 										activeClient.Invoke();
 									}
-
-									foreach (DiscordRpcClient client in AllClients.Values)
-										if (client.CurrentPresence != null &&
-										    client.ApplicationID != activeClient.ApplicationID)
-										{
-											client.ClearPresence();
-											try
-											{
-												client.Invoke();
-											}
-											catch (Exception e)
-											{
-												SendToDebugServer(e);
-											}
-										}
 								}
 
 #if DEBUG
 								Console.Write("" + (MetaTimer.ElapsedMilliseconds) + "(" +
 								              (Timer.ElapsedMilliseconds /* < timeout_seconds * 1000*/) + ") in " +
-								              playerName +
+								              _playerName +
 								              '\r');
 #endif
 							}
@@ -624,16 +646,15 @@ namespace MDRP
 			foreach (DiscordRpcClient client in AllClients.Values)
 				if (client.CurrentPresence != null)
 				{
-					client.ClearPresence();
-					client.Invoke();
+					ClearAPresence(client);
 				}
 		}
 
 		private static void SendToDebugServer(Exception exception)
 		{
 #if DEBUG
-			Console.WriteLine(e.Message);
-			Console.WriteLine(e.StackTrace);
+			Console.WriteLine(exception.Message);
+			Console.WriteLine(exception.StackTrace);
 			Console.WriteLine("Something unexpected has occured");
 #else
 			Uri debugUri = new Uri("http://localhost:7532/");
@@ -685,20 +706,25 @@ namespace MDRP
 #endif
 		}
 
-		private static void GetClient()
+		private static void GetClient(Album album, string playerName)
 		{
-			if (ContainsAlbum(AlbumKeyMapping.Keys.ToArray(), currentAlbum))
-				activeClient = GetBestClient(GetAlbum(AlbumKeyMapping, currentAlbum));
-			else if (DefaultClients.ContainsKey(_playerName))
-				activeClient = DefaultClients[_playerName];
+			if (AlbumKeyMapping.Keys.ToArray().Contains(album))
+				activeClient = GetBestClient(AlbumKeyMapping[album]);
+			else if (DefaultClients.ContainsKey(playerName))
+				activeClient = DefaultClients[playerName];
 			else
 				activeClient = DefaultClients[""];
 
 			if (activeClient == null)
 			{
-				activeClient = DefaultClients[_playerName];
+				activeClient = DefaultClients[playerName];
 				Console.WriteLine("Uh oh!!!");
 			}
+		}
+
+		private static void GetClient()
+		{
+			GetClient(currentAlbum, _playerName);
 		}
 
 		private static DiscordRpcClient GetBestClient(Dictionary<string, string> album)
@@ -733,7 +759,10 @@ namespace MDRP
 
 		private static void SetConsole(string title, string artist, string albumName, Album album)
 		{
+#if DEBUG
+#else
 			Console.Clear();
+#endif
 
 			DrawPersistentHeader();
 
@@ -760,15 +789,15 @@ namespace MDRP
 				Console.ForegroundColor = ConsoleColor.Gray;
 				Console.WriteLine(albumName);
 
-				string albumKey = ContainsAlbum(AlbumKeyMapping.Keys.ToArray(), album) &&
-				                  GetAlbum(AlbumKeyMapping, album).ContainsKey(activeClient.ApplicationID)
-					? GetAlbum(AlbumKeyMapping, album)[activeClient.ApplicationID]
+				string albumKey = AlbumKeyMapping.Keys.ToArray().Contains(album) &&
+				                  AlbumKeyMapping[album].ContainsKey(activeClient.ApplicationID)
+					? AlbumKeyMapping[album][activeClient.ApplicationID]
 					: BigAssets[_playerName];
 				if (albumKey.Length > 32)
 				{
 					Console.ForegroundColor = ConsoleColor.Red;
 					Console.WriteLine("         The key for this album is too long. It must be 32 characters or less");
-					if (ScreamAtUser && !ContainsAlbum(NotifiedAlbums.ToArray(), currentAlbum))
+					if (ScreamAtUser && !NotifiedAlbums.ToArray().Contains(currentAlbum))
 					{
 						NotifiedAlbums.Add(currentAlbum);
 						SendNotification("Album key in discord too long",
@@ -814,7 +843,10 @@ namespace MDRP
 			if (!_justcleared)
 			{
 				_justcleared = true;
+#if DEBUG
+#else
 				Console.Clear();
+#endif
 				DrawPersistentHeader();
 				Console.Write("Nothing Playing (probably paused)\r");
 			}
@@ -854,15 +886,19 @@ namespace MDRP
 			if (!_justUnknowned)
 			{
 				_justUnknowned = true;
+#if DEBUG
+#else
 				Console.Clear();
+#endif
 				DrawPersistentHeader();
 				Console.Write(
 					"Detected volume in something but not showing as it is not currently supported or is disabled");
 			}
 		}
 
-		private static void _client_OnPresenceUpdate(object sender, PresenceMessage args)
+		/*private static void _client_OnPresenceUpdate(object sender, PresenceMessage args)
 		{
+			Console.WriteLine("Update presence: " + args.Name + " | " + args.Presence.State + " | " + args.Type);
 			if (args.Presence != null)
 			{
 				if (_presenceDetails != args.Presence.Details)
@@ -872,10 +908,11 @@ namespace MDRP
 			{
 				_presenceDetails = string.Empty;
 			}
-		}
+		}*/
 
 		private static void _client_OnError(object sender, ErrorMessage args)
 		{
+			SendToDebugServer(args.ToString());
 			Console.WriteLine(args.Message);
 		}
 
@@ -1079,23 +1116,26 @@ namespace MDRP
 							album = new Album(parsedLine[0],
 								parsedLine.Skip(2).Take(parsedLine.Length - 2).ToArray());
 
-						if (!ContainsAlbum(AlbumKeyMapping.Keys.ToArray(), album))
+						if (!AlbumKeyMapping.ContainsKey(album))
 						{
 							AlbumKeyMapping.Add(album, new Dictionary<string, string>());
 						}
 						else
 						{
 							foreach (DiscordRpcClient otherKlient in PlayersClients[lines[0].Split('=')[0]])
-								if (otherKlient.ApplicationID != id)
-									foundDupe |= GetAlbum(AlbumKeyMapping, album)
-										.ContainsKey(otherKlient.ApplicationID);
+								if (otherKlient.ApplicationID != id && AlbumKeyMapping.ContainsKey(album))
+									foundDupe |= AlbumKeyMapping[album].ContainsKey(otherKlient.ApplicationID);
 
 							if (foundDupe)
 								continue;
 						}
 
-						if (!GetAlbum(AlbumKeyMapping, album).ContainsKey(id))
-							GetAlbum(AlbumKeyMapping, album).Add(id, parsedLine[1]);
+                        if (!AlbumKeyMapping.ContainsKey(album))
+                        {
+                            Console.WriteLine("Uh oh");
+                        }
+						if (!AlbumKeyMapping[album].ContainsKey(id))
+							AlbumKeyMapping[album].Add(id, parsedLine[1]);
 					}
 				}
 				catch (Exception e)
@@ -1104,6 +1144,18 @@ namespace MDRP
 				}
 			}
 		}
+
+        private static void ClearAPresence(DiscordRpcClient client)
+        {
+            try {
+                client.ClearPresence();
+            } catch (NullReferenceException e)
+            {
+                Console.WriteLine("Excepted " + e);
+                client.SetPresence(null);
+                client.Invoke();
+            }
+        }
 
 		private static void CheckForUpdate()
 		{
@@ -1181,23 +1233,6 @@ namespace MDRP
 			shortcut.Description = "Kills MDRP";
 			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\KillHidden.vbs";
 			shortcut.Save();
-		}
-
-		private static bool ContainsAlbum(Album[] albumArray, Album album)
-		{
-			foreach (Album alboom in albumArray)
-				if (alboom.Equals(album))
-					return true;
-			return false;
-		}
-
-		private static Dictionary<string, string> GetAlbum(
-			Dictionary<Album, Dictionary<string, string>> idkwhattocallthis, Album query)
-		{
-			foreach (Album alboom in idkwhattocallthis.Keys)
-				if (alboom.Equals(query))
-					return idkwhattocallthis[alboom];
-			throw new KeyNotFoundException();
 		}
 
 		/**
@@ -1293,7 +1328,7 @@ namespace MDRP
 
 		public override int GetHashCode()
 		{
-			return (Name, Artists).GetHashCode();
+			return (Name, string.Join("", Artists)).GetHashCode();
 		}
 
 		public override string ToString()
@@ -1306,7 +1341,7 @@ namespace MDRP
 		 */
 		public override bool Equals(object obj)
 		{
-			if (obj != null && typeof(Album).IsInstanceOfType(obj) && ((Album) obj).Name == Name)
+			if (obj != null && typeof(Album).IsInstanceOfType(obj) && ((Album) obj).Name.Equals(Name))
 			{
 				if (((Album) obj).Artists.Length == 0 || ((Album) obj).Artists[0] == "*" || Artists.Length == 0 ||
 				    Artists[0] == "*")
