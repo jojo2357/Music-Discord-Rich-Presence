@@ -24,7 +24,10 @@ namespace MDRP
 	{
 		private const string Version = "1.6.0";
 		private const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
-		private const string Title = "Discord Rich Presence For Groove";
+		private const string Title = "Music Discord Rich Presence";
+		private const int titleLength = 64;
+		private const int artistLength = 64;
+		private const int keyLength = 32;
 
 		private static readonly Uri _GithubUrl =
 			new Uri("https://api.github.com/repos/jojo2357/Music-Discord-Rich-Presence/releases/latest");
@@ -33,11 +36,11 @@ namespace MDRP
 		private static readonly Dictionary<string, DiscordRpcClient> DefaultClients =
 			new Dictionary<string, DiscordRpcClient>
 			{
-				{"music.ui", new DiscordRpcClient("807774172574253056", autoEvents: false)},
-				{"musicbee", new DiscordRpcClient("820837854385012766", autoEvents: false)},
-				{"apple music", new DiscordRpcClient("870047192889577544", autoEvents: false)},
-				{"spotify", new DiscordRpcClient("802222525110812725", autoEvents: false)},
-				{"", new DiscordRpcClient("821398156905283585", autoEvents: false)}
+				{ "music.ui", new DiscordRpcClient("807774172574253056", autoEvents: false) },
+				{ "musicbee", new DiscordRpcClient("820837854385012766", autoEvents: false) },
+				{ "apple music", new DiscordRpcClient("870047192889577544", autoEvents: false) },
+				{ "spotify", new DiscordRpcClient("802222525110812725", autoEvents: false) },
+				{ "", new DiscordRpcClient("821398156905283585", autoEvents: false) }
 			};
 
 		private static readonly List<Album> NotifiedAlbums = new List<Album>();
@@ -58,66 +61,66 @@ namespace MDRP
 		//process name, enabled y/n
 		private static readonly Dictionary<string, bool> EnabledClients = new Dictionary<string, bool>
 		{
-			{"music.ui", true}
+			{ "music.ui", true }
 		};
 
 		private static readonly Dictionary<string, ConsoleColor> PlayerColors = new Dictionary<string, ConsoleColor>
 		{
-			{"music.ui", ConsoleColor.Blue},
-			{"apple music", ConsoleColor.DarkRed},
-			{"spotify", ConsoleColor.DarkGreen},
-			{"musicbee", ConsoleColor.Yellow}
+			{ "music.ui", ConsoleColor.Blue },
+			{ "apple music", ConsoleColor.DarkRed },
+			{ "spotify", ConsoleColor.DarkGreen },
+			{ "musicbee", ConsoleColor.Yellow }
 		};
 
 		private static string _presenceDetails = string.Empty;
 
 		private static readonly string[] ValidPlayers =
-			{"apple music", "music.ui", "spotify", "musicbee"};
+			{ "apple music", "music.ui", "spotify", "musicbee" };
 
-		private static readonly string[] RequiresPipeline = {"musicbee"};
+		private static readonly string[] RequiresPipeline = { "musicbee" };
 
 		//For use in settings
 		private static readonly Dictionary<string, string> Aliases = new Dictionary<string, string>
 		{
-			{"musicbee", "Music Bee"},
-			{"spotify", "Spotify Music"},
-			{"apple music", "Apple Music"},
-			{"groove", "Groove Music Player"},
-			{"music.ui", "Groove Music Player"},
+			{ "musicbee", "Music Bee" },
+			{ "spotify", "Spotify Music" },
+			{ "apple music", "Apple Music" },
+			{ "groove", "Groove Music Player" },
+			{ "music.ui", "Groove Music Player" }
 		};
 
 		private static readonly Dictionary<string, string> BigAssets = new Dictionary<string, string>
 		{
-			{"musicbee", "musicbee"},
-			{"music.ui", "groove"},
-			{"spotify", "spotify"},
-			{"apple music", "applemusic"}
+			{ "musicbee", "musicbee" },
+			{ "music.ui", "groove" },
+			{ "spotify", "spotify" },
+			{ "apple music", "applemusic" }
 		};
 
 		//might just combine these later
 		private static readonly Dictionary<string, string> LittleAssets = new Dictionary<string, string>
 		{
-			{"musicbee", "musicbee_small"},
-			{"music.ui", "groove_small"},
-			{"spotify", "spotify_small"},
-			{"apple music", "applemusic_small"}
+			{ "musicbee", "musicbee_small" },
+			{ "music.ui", "groove_small" },
+			{ "spotify", "spotify_small" },
+			{ "apple music", "applemusic_small" }
 		};
 
 		private static readonly Dictionary<string, string> Whatpeoplecallthisplayer = new Dictionary<string, string>
 		{
-			{"musicbee", "Music Bee"},
-			{"music.ui", "Groove Music"},
-			{"spotify", "Spotify"},
-			{"apple music", "Apple Music"}
+			{ "musicbee", "Music Bee" },
+			{ "music.ui", "Groove Music" },
+			{ "spotify", "Spotify" },
+			{ "apple music", "Apple Music" }
 		};
 
 		private static readonly Dictionary<string, string> InverseWhatpeoplecallthisplayer =
 			new Dictionary<string, string>
 			{
-				{"musicbee", "musicbee"},
-				{"groove", "music.ui"},
-				{"spotify", "spotify"},
-				{"Apple Music", "apple music"}
+				{ "musicbee", "musicbee" },
+				{ "groove", "music.ui" },
+				{ "spotify", "spotify" },
+				{ "Apple Music", "apple music" }
 			};
 
 		private static readonly string defaultPlayer = "groove";
@@ -150,6 +153,8 @@ namespace MDRP
 		public static long resignRemoteControlAt;
 
 		private static readonly Queue<JsonResponse> _PendingMessages = new Queue<JsonResponse>();
+		private static bool spawnedFromApplication;
+		private static string ArtistLabel, TitleLabel;
 
 		public static async Task HandleIncomingConnections()
 		{
@@ -168,7 +173,7 @@ namespace MDRP
 				Console.WriteLine(req.Url.ToString());
 				Console.WriteLine(req.HttpMethod);
 				Console.WriteLine("Time: " +
-				                  (long) (DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1))).TotalMilliseconds);
+				                  (long)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds);
 #endif
 				string text;
 				using (StreamReader reader = new StreamReader(req.InputStream,
@@ -200,15 +205,18 @@ namespace MDRP
 						if (!presenceIsRich)
 						{
 							if (WrongArtistFlag)
-							{
 								response = "{response:\"keyed incorrectly\"}";
-							} else
+							else
 								response = "{response:\"no key\"}";
 						}
 						else
 						{
 							response = "{response:\"keyed successfully\"}";
 						}
+					}
+					else if (jason.ContainsKey("player") || decodedText == "")
+					{
+						response = "{application:\"MDRP\",version:\"" + Version + "\"}";
 					}
 					else
 					{
@@ -221,7 +229,7 @@ namespace MDRP
 				catch (Exception e)
 				{
 					SendToDebugServer(e);
-					SendToDebugServer("failure to parse incoming json: \n" + text);
+					SendToDebugServer("failure to parse incoming json: \n" + text + " (" + decodedText + ")");
 					response = "{response:\"failure to parse json\"}";
 #if DEBUG
 					Console.WriteLine(response);
@@ -274,7 +282,10 @@ namespace MDRP
 			GenerateShortcuts();
 
 			if (args.Length > 0)
-				return;
+				if (args[0] == "Shortcuts_Only")
+					return;
+				else
+					spawnedFromApplication = true;
 
 			LoadSettings();
 
@@ -338,29 +349,39 @@ namespace MDRP
 						}
 						else
 						{
-                            foreach (DiscordRpcClient client in AllClients.Values)
-                                if (client.CurrentPresence != null && client.ApplicationID != activeClient.ApplicationID)
-                                {
+							foreach (DiscordRpcClient client in AllClients.Values)
+								if (client.CurrentPresence != null && client.ApplicationID != activeClient.ApplicationID)
+								{
 #if DEBUG
-                                    Console.WriteLine("Cleared " + client.ApplicationID);
+									Console.WriteLine("Cleared " + client.ApplicationID);
 #endif
-                                    try
-                                    {
-                                        ClearAPresence(client);
-                                        /*client.ClearPresence();
-                                        client.Invoke();*/
-                                    }
-                                    catch (Exception e)
-                                    {
+									try
+									{
+										ClearAPresence(client);
+										/*client.ClearPresence();
+										client.Invoke();*/
+									}
+									catch (Exception e)
+									{
 #if DEBUG
-                                        Console.WriteLine("Failed to clear " + client.ApplicationID);
+										Console.WriteLine("Failed to clear " + client.ApplicationID);
 #endif
-                                        SendToDebugServer(e);
-                                    }
-                                }
-                                else client.Invoke();
+										SendToDebugServer(e);
+									}
+								}
+								else
+								{
+									try
+									{
+										client.Invoke();
+									}
+									catch (Exception e)
+									{
+										SendToDebugServer(e);
+									}
+								}
 
-                            currentAlbum = lastMessage.Album;
+							currentAlbum = lastMessage.Album;
 							_playerName = lastMessage.Player;
 							GetClient();
 #if DEBUG
@@ -369,11 +390,11 @@ namespace MDRP
 							resignRemoteControlAt = isPlaying
 								? long.Parse(lastMessage.TimeStamp) + 1000
 								: remoteControl
-									? (long) DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds +
+									? (long)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds +
 									  60000
 									: 0;
 
-							presenceIsRich = AlbumKeyMapping.Keys.ToArray().Contains(currentAlbum) &&
+							presenceIsRich = AlbumKeyMapping.ContainsKey(currentAlbum) &&
 							                 AlbumKeyMapping[currentAlbum]
 								                 .ContainsKey(activeClient.ApplicationID);
 
@@ -381,9 +402,9 @@ namespace MDRP
 
 							activeClient.SetPresence(new RichPresence
 							{
-								Details = CapLength($"Title: {lastMessage.Title}", 32),
+								Details = CapLength($"{TitleLabel}{(TitleLabel.Length > 0 ? ": " : "")}{lastMessage.Title}", titleLength),
 								State = CapLength(
-									$"Artist: {(lastMessage.Artist == "" ? "Unkown Artist" : lastMessage.Artist)}", 32),
+									$"{ArtistLabel}{(ArtistLabel.Length > 0 ? ": " : "")}{(lastMessage.Artist == "" ? "Unkown Artist" : lastMessage.Artist)}", artistLength),
 								Timestamps = isPlaying
 									? new Timestamps
 									{
@@ -394,11 +415,11 @@ namespace MDRP
 								Assets = new Assets
 								{
 									LargeImageKey =
-										AlbumKeyMapping.Keys.ToArray().Contains(currentAlbum)
+										AlbumKeyMapping.ContainsKey(currentAlbum)
 										&& AlbumKeyMapping[currentAlbum]
 											.ContainsKey(activeClient.ApplicationID) &&
 										AlbumKeyMapping[currentAlbum][activeClient.ApplicationID]
-											.Length <= 32
+											.Length <= keyLength
 											? AlbumKeyMapping[currentAlbum][
 												activeClient.ApplicationID]
 											: BigAssets[_playerName],
@@ -442,7 +463,7 @@ namespace MDRP
 					}
 
 					if (remoteControl)
-						if ((long) DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds >
+						if ((long)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds >
 						    resignRemoteControlAt)
 						{
 							UnsetAllPresences();
@@ -512,23 +533,21 @@ namespace MDRP
 										currentTrack.AlbumArtist);
 									GetClient();
 
-                                    foreach (DiscordRpcClient client in AllClients.Values)
-                                        if (client.CurrentPresence != null &&
-                                            client.ApplicationID != activeClient.ApplicationID)
-                                        {
-                                            try
-                                            {
-	                                            ClearAPresence(client);
-                                            }
-                                            catch (Exception e)
-                                            {
-                                                SendToDebugServer(e);
-                                            }
-                                        }
+									foreach (DiscordRpcClient client in AllClients.Values)
+										if (client.CurrentPresence != null &&
+										    client.ApplicationID != activeClient.ApplicationID)
+											try
+											{
+												ClearAPresence(client);
+											}
+											catch (Exception e)
+											{
+												SendToDebugServer(e);
+											}
 
-                                    string details = $"Title: {currentTrack.Title}",
+									string details = $"{TitleLabel}{(TitleLabel.Length > 0 ? ": " : "")}{currentTrack.Title}",
 										state =
-											$"Artist: {(currentTrack.Artist == "" ? "Unkown Artist" : currentTrack.Artist)}";
+											$"{ArtistLabel}{(ArtistLabel.Length > 0 ? ": " : "")}{(currentTrack.Artist == "" ? "Unkown Artist" : currentTrack.Artist)}";
 									if (activeClient.CurrentPresence == null ||
 									    activeClient.CurrentPresence.Details !=
 									    details.Substring(0, Math.Min(32, details.Length)) ||
@@ -541,13 +560,13 @@ namespace MDRP
 										                  (AlbumKeyMapping.ContainsKey(currentAlbum)
 										                   && AlbumKeyMapping[currentAlbum]
 											                   .ContainsKey(activeClient.ApplicationID) &&
-                                                           AlbumKeyMapping[currentAlbum][
+										                   AlbumKeyMapping[currentAlbum][
 											                   activeClient.ApplicationID].Length <= 32
 											                  ? AlbumKeyMapping[currentAlbum][
 												                  activeClient.ApplicationID]
 											                  : BigAssets[_playerName]) + ")");
 #endif
-										presenceIsRich = AlbumKeyMapping.Keys.ToArray().Contains(currentAlbum) &&
+										presenceIsRich = AlbumKeyMapping.ContainsKey(currentAlbum) &&
 										                 AlbumKeyMapping[currentAlbum]
 											                 .ContainsKey(activeClient.ApplicationID);
 
@@ -569,16 +588,16 @@ namespace MDRP
 
 										activeClient.SetPresence(new RichPresence
 										{
-											Details = details.Length > 32 ? details.Substring(0, 32) : details,
-											State = state.Length > 32 ? state.Substring(0, 32) : state,
+											Details = details.Length > titleLength ? details.Substring(0, titleLength) : details,
+											State = state.Length > artistLength ? state.Substring(0, artistLength) : state,
 											Assets = new Assets
 											{
 												LargeImageKey =
-													AlbumKeyMapping.Keys.ToArray().Contains(currentAlbum)
+													AlbumKeyMapping.ContainsKey(currentAlbum)
 													&& AlbumKeyMapping[currentAlbum]
 														.ContainsKey(activeClient.ApplicationID) &&
 													AlbumKeyMapping[currentAlbum][activeClient.ApplicationID]
-														.Length <= 32
+														.Length <= keyLength
 														? AlbumKeyMapping[currentAlbum][
 															activeClient.ApplicationID]
 														: BigAssets[_playerName],
@@ -606,8 +625,8 @@ namespace MDRP
 								}
 
 #if DEBUG
-								Console.Write("" + (MetaTimer.ElapsedMilliseconds) + "(" +
-								              (Timer.ElapsedMilliseconds /* < timeout_seconds * 1000*/) + ") in " +
+								Console.Write("" + MetaTimer.ElapsedMilliseconds + "(" +
+								              Timer.ElapsedMilliseconds + ") in " +
 								              _playerName +
 								              '\r');
 #endif
@@ -645,9 +664,7 @@ namespace MDRP
 		{
 			foreach (DiscordRpcClient client in AllClients.Values)
 				if (client.CurrentPresence != null)
-				{
 					ClearAPresence(client);
-				}
 		}
 
 		private static void SendToDebugServer(Exception exception)
@@ -708,7 +725,7 @@ namespace MDRP
 
 		private static void GetClient(Album album, string playerName)
 		{
-			if (AlbumKeyMapping.Keys.ToArray().Contains(album))
+			if (AlbumKeyMapping.ContainsKey(album))
 				activeClient = GetBestClient(AlbumKeyMapping[album]);
 			else if (DefaultClients.ContainsKey(playerName))
 				activeClient = DefaultClients[playerName];
@@ -789,19 +806,19 @@ namespace MDRP
 				Console.ForegroundColor = ConsoleColor.Gray;
 				Console.WriteLine(albumName);
 
-				string albumKey = AlbumKeyMapping.Keys.ToArray().Contains(album) &&
+				string albumKey = AlbumKeyMapping.ContainsKey(album) &&
 				                  AlbumKeyMapping[album].ContainsKey(activeClient.ApplicationID)
 					? AlbumKeyMapping[album][activeClient.ApplicationID]
 					: BigAssets[_playerName];
-				if (albumKey.Length > 32)
+				if (albumKey.Length > keyLength)
 				{
 					Console.ForegroundColor = ConsoleColor.Red;
-					Console.WriteLine("         The key for this album is too long. It must be 32 characters or less");
+					Console.WriteLine("         The key for this album is too long. It must be " + keyLength + " characters or less");
 					if (ScreamAtUser && !NotifiedAlbums.ToArray().Contains(currentAlbum))
 					{
 						NotifiedAlbums.Add(currentAlbum);
 						SendNotification("Album key in discord too long",
-							$"The key for {currentAlbum.Name} ({albumKey}) is longer than the 32 character maximum");
+							$"The key for {currentAlbum.Name} ({albumKey}) is longer than the " + keyLength + " character maximum");
 					}
 				}
 			}
@@ -988,10 +1005,12 @@ namespace MDRP
 
 		private static void SendNotification(string messageTitle, string message)
 		{
-			new ToastContentBuilder()
-				.AddText(messageTitle)
-				.AddText(message)
-				.Show();
+			//todo make a notif system for mb
+			if (!spawnedFromApplication)
+				new ToastContentBuilder()
+					.AddText(messageTitle)
+					.AddText(message)
+					.Show();
 			/*ProcessStartInfo errornotif =
 				new ProcessStartInfo("sendNotification.bat", "\"" + messageTitle + "\" \"" + message + "\"");
 			errornotif.WindowStyle = ProcessWindowStyle.Hidden;
@@ -1004,6 +1023,7 @@ namespace MDRP
 			{
 				string[] lines = File.ReadAllLines("../../../DiscordPresenceConfig.ini");
 				foreach (string line in lines)
+				{
 					if (ValidPlayers.Contains(line.Split('=')[0].Trim().ToLower()))
 					{
 						EnabledClients[line.Split('=')[0]] = line.Split('=')[1].Trim().ToLower() == "true";
@@ -1023,7 +1043,15 @@ namespace MDRP
 					else if (line.Split('=')[0].Trim().ToLower() == "verbose" && line.Split('=').Length > 1)
 					{
 						ScreamAtUser = line.Split('=')[1].Trim().ToLower() == "true";
+					} 
+					else if (line.Split('=')[0].Trim().ToLower() == "artist label")
+					{
+						ArtistLabel = line.Split('=')[1];
+					} else if (line.Split('=')[0].Trim().ToLower() == "title label")
+					{
+						TitleLabel = line.Split('=')[1];
 					}
+				}
 			}
 			catch (Exception e)
 			{
@@ -1100,7 +1128,7 @@ namespace MDRP
 						}
 						else
 						{
-							if (!warnedFile)
+							if (lines[i].Trim() != "" && !warnedFile)
 							{
 								warnedFile = true;
 								SendNotification("Deprecation Notice",
@@ -1130,10 +1158,8 @@ namespace MDRP
 								continue;
 						}
 
-                        if (!AlbumKeyMapping.ContainsKey(album))
-                        {
-                            Console.WriteLine("Uh oh");
-                        }
+						if (!AlbumKeyMapping.ContainsKey(album)) Console.WriteLine("Uh oh");
+
 						if (!AlbumKeyMapping[album].ContainsKey(id))
 							AlbumKeyMapping[album].Add(id, parsedLine[1]);
 					}
@@ -1145,17 +1171,19 @@ namespace MDRP
 			}
 		}
 
-        private static void ClearAPresence(DiscordRpcClient client)
-        {
-            try {
-                client.ClearPresence();
-            } catch (NullReferenceException e)
-            {
-                Console.WriteLine("Excepted " + e);
-                client.SetPresence(null);
-                client.Invoke();
-            }
-        }
+		private static void ClearAPresence(DiscordRpcClient client)
+		{
+			try
+			{
+				client.ClearPresence();
+			}
+			catch (NullReferenceException e)
+			{
+				Console.WriteLine("Excepted " + e);
+				client.SetPresence(null);
+				client.Invoke();
+			}
+		}
 
 		private static void CheckForUpdate()
 		{
@@ -1187,49 +1215,49 @@ namespace MDRP
 
 			Directory.CreateDirectory(rootFolder + "\\Shortcuts");
 
-			shortcut = (IWshShortcut) shell.CreateShortcut(rootFolder + "\\Shortcuts\\Run MDRP Windowed.lnk");
+			shortcut = (IWshShortcut)shell.CreateShortcut(rootFolder + "\\Shortcuts\\Run MDRP Windowed.lnk");
 			shortcut.Description = "Run MDRP";
-			shortcut.IconLocation = Directory.GetCurrentDirectory() + "\\GroovyRP.exe";
+			shortcut.IconLocation = Directory.GetCurrentDirectory() + "\\MDRP.exe";
 			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\RunHidden.bat";
 			shortcut.Save();
 
-			shortcut = (IWshShortcut) shell.CreateShortcut(rootFolder + "\\Shortcuts\\Run MDRP Background.lnk");
+			shortcut = (IWshShortcut)shell.CreateShortcut(rootFolder + "\\Shortcuts\\Run MDRP Background.lnk");
 			shortcut.Description = "Run MDRP";
-			shortcut.IconLocation = Directory.GetCurrentDirectory() + "\\GroovyRP.exe";
+			shortcut.IconLocation = Directory.GetCurrentDirectory() + "\\MDRP.exe";
 			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\RunHidden.vbs";
 			shortcut.Save();
 
-			shortcut = (IWshShortcut) shell.CreateShortcut(rootFolder + "\\Shortcuts\\Link With MusicBee.lnk");
+			shortcut = (IWshShortcut)shell.CreateShortcut(rootFolder + "\\Shortcuts\\Link With MusicBee.lnk");
 			shortcut.Description = "Link With MusicBee";
 			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\LinkWithMusicBee.bat";
 			shortcut.Save();
 
-			shortcut = (IWshShortcut) shell.CreateShortcut(rootFolder + "\\Shortcuts\\Link With Groove.lnk");
+			shortcut = (IWshShortcut)shell.CreateShortcut(rootFolder + "\\Shortcuts\\Link With Groove.lnk");
 			shortcut.Description = "Link With Groove";
 			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\LinkWithGroove.bat";
 			shortcut.Save();
 
-			shortcut = (IWshShortcut) shell.CreateShortcut(rootFolder + "\\Shortcuts\\Link With Spotify.lnk");
+			shortcut = (IWshShortcut)shell.CreateShortcut(rootFolder + "\\Shortcuts\\Link With Spotify.lnk");
 			shortcut.Description = "Link With Spotify";
 			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\LinkWithSpotify.bat";
 			shortcut.Save();
 
-			shortcut = (IWshShortcut) shell.CreateShortcut(rootFolder + "\\Shortcuts\\Unlink MusicBee.lnk");
+			shortcut = (IWshShortcut)shell.CreateShortcut(rootFolder + "\\Shortcuts\\Unlink MusicBee.lnk");
 			shortcut.Description = "Unlink With MusicBee";
 			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\UnlinkFromMusicBee.bat";
 			shortcut.Save();
 
-			shortcut = (IWshShortcut) shell.CreateShortcut(rootFolder + "\\Shortcuts\\Unlink Spotify.lnk");
+			shortcut = (IWshShortcut)shell.CreateShortcut(rootFolder + "\\Shortcuts\\Unlink Spotify.lnk");
 			shortcut.Description = "Unlink With Spotify";
 			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\UnlinkFromSpotify.bat";
 			shortcut.Save();
 
-			shortcut = (IWshShortcut) shell.CreateShortcut(rootFolder + "\\Shortcuts\\Unlink Groove.lnk");
+			shortcut = (IWshShortcut)shell.CreateShortcut(rootFolder + "\\Shortcuts\\Unlink Groove.lnk");
 			shortcut.Description = "Unlink With Groove";
 			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\UnlinkFromGroove.bat";
 			shortcut.Save();
 
-			shortcut = (IWshShortcut) shell.CreateShortcut(rootFolder + "\\Shortcuts\\Kill Hidden.lnk");
+			shortcut = (IWshShortcut)shell.CreateShortcut(rootFolder + "\\Shortcuts\\Kill Hidden.lnk");
 			shortcut.Description = "Kills MDRP";
 			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\KillHidden.vbs";
 			shortcut.Save();
@@ -1266,9 +1294,14 @@ namespace MDRP
 					TimeStamp = jObject["timestamp"].ToString();
 				else
 					TimeStamp = "";
-
-				Action = jObject["action"].ToString();
-				Player = jObject["player"].ToString();
+				if (jObject["action"] != null && jObject["action"].ToString() != string.Empty)
+					Action = jObject["action"].ToString();
+				else
+					Action = "";
+				if (jObject["player"] != null && jObject["player"].ToString() != string.Empty)
+					Player = jObject["player"].ToString();
+				else
+					Player = "";
 			}
 
 			public string Artist { get; }
@@ -1284,7 +1317,7 @@ namespace MDRP
 				                  (ValidPlayers.Contains(Player)) + " " + (EnabledClients[Player]));
 				Console.WriteLine(this);*/
 				return (Action == "play" || Action == "pause" || Action == "shutdown") &&
-				       ValidPlayers.Contains(Player) &&
+				       ValidPlayers.Contains(Player) && EnabledClients.ContainsKey(Player) &&
 				       EnabledClients[Player];
 			}
 
@@ -1328,7 +1361,7 @@ namespace MDRP
 
 		public override int GetHashCode()
 		{
-			return (Name, string.Join("", Artists)).GetHashCode();
+			return (Name).GetHashCode();
 		}
 
 		public override string ToString()
@@ -1341,14 +1374,14 @@ namespace MDRP
 		 */
 		public override bool Equals(object obj)
 		{
-			if (obj != null && typeof(Album).IsInstanceOfType(obj) && ((Album) obj).Name.Equals(Name))
+			if (obj != null && typeof(Album).IsInstanceOfType(obj) && ((Album)obj).Name.Equals(Name))
 			{
-				if (((Album) obj).Artists.Length == 0 || ((Album) obj).Artists[0] == "*" || Artists.Length == 0 ||
+				if (((Album)obj).Artists.Length == 0 || ((Album)obj).Artists[0] == "*" || Artists.Length == 0 ||
 				    Artists[0] == "*")
 					return true;
 				foreach (string arteest in Artists)
 					if (arteest != "")
-						foreach (string whyamithisdeep in ((Album) obj).Artists)
+						foreach (string whyamithisdeep in ((Album)obj).Artists)
 							if (whyamithisdeep != "" &&
 							    (whyamithisdeep.Contains(arteest) || arteest.Contains(whyamithisdeep)))
 								return true;
