@@ -424,27 +424,12 @@ namespace MDRP
 									SendToDebugServer(e);
 								}
 
-						string details = $"{TitleLabel}{(TitleLabel.Length > 0 ? ": " : "")}{_currentTrack.Title}",
-							state =
-								$"{ArtistLabel}{(ArtistLabel.Length > 0 ? ": " : "")}{(_currentTrack.Artist == "" ? "Unkown Artist" : _currentTrack.Artist)}";
-						if (activeClient.CurrentPresence == null ||
-						    activeClient.CurrentPresence.Details !=
-						    details.Substring(0, Math.Min(32, details.Length)) ||
-						    activeClient.CurrentPresence.State !=
-						    state.Substring(0, Math.Min(32, state.Length)) ||
-						    _wasPlaying != _isPlaying)
+						string newDetailsWithTitle = CapLength($"{TitleLabel}{(TitleLabel.Length > 0 ? ": " : "")}{_currentTrack.Title}", titleLength),
+							newStateWithArtist =
+								CapLength($"{ArtistLabel}{(ArtistLabel.Length > 0 ? ": " : "")}{(_currentTrack.Artist == "" ? "Unkown Artist" : _currentTrack.Artist)}", artistLength);
+						if (activeClient.CurrentPresence == null || activeClient.CurrentPresence.Details != newDetailsWithTitle || 
+						    activeClient.CurrentPresence.State != newStateWithArtist || _wasPlaying != _isPlaying)
 						{
-#if DEBUG
-						Console.WriteLine("Using " + activeClient.ApplicationID + " (" +
-						                  (AlbumKeyMapping.ContainsKey(currentAlbum)
-						                   && AlbumKeyMapping[currentAlbum]
-							                   .ContainsKey(activeClient.ApplicationID) &&
-						                   AlbumKeyMapping[currentAlbum][
-							                   activeClient.ApplicationID].Length <= 32
-							                  ? AlbumKeyMapping[currentAlbum][
-								                  activeClient.ApplicationID]
-							                  : BigAssets[_playerName]) + ")");
-#endif
 							presenceIsRich = AlbumKeyMapping.ContainsKey(currentAlbum) &&
 							                 AlbumKeyMapping[currentAlbum]
 								                 .ContainsKey(activeClient.ApplicationID);
@@ -467,34 +452,14 @@ namespace MDRP
 
 							activeClient.SetPresence(new RichPresence
 							{
-								Details = details.Length > titleLength ? details.Substring(0, titleLength) : details,
-								State = state.Length > artistLength ? state.Substring(0, artistLength) : state,
+								Details = newDetailsWithTitle,
+								State = newStateWithArtist,
 								Assets = new Assets
 								{
-									LargeImageKey =
-										AlbumKeyMapping.ContainsKey(currentAlbum)
-										&& AlbumKeyMapping[currentAlbum]
-											.ContainsKey(activeClient.ApplicationID) &&
-										AlbumKeyMapping[currentAlbum][activeClient.ApplicationID]
-											.Length <= keyLength
-											? AlbumKeyMapping[currentAlbum][
-												activeClient.ApplicationID]
-											: BigAssets[_playerName],
-									LargeImageText = _currentTrack.AlbumTitle.Length > 0
-										? _currentTrack.AlbumTitle.Length <= 2
-											? "_" + _currentTrack.AlbumTitle + "_"
-											: _currentTrack.AlbumTitle.Length > 128
-												? _currentTrack.AlbumTitle.Substring(0, 128)
-												: _currentTrack.AlbumTitle
-										: "Unknown Album",
-									SmallImageKey = _isPlaying
-										? LittleAssets.ContainsKey(_playerName)
-											? LittleAssets[_playerName]
-											: defaultPlayer
-										: "paused",
-									SmallImageText = _isPlaying
-										? "Using " + Aliases[_playerName]
-										: "paused"
+									LargeImageKey = GetLargeImageKey(),
+									LargeImageText = GetLargeImageText(_currentTrack.AlbumTitle),
+									SmallImageKey = GetSmallImageKey(),
+									SmallImageText = GetSmallImageText()
 								}
 							});
 							SetConsole(_currentTrack.Title, _currentTrack.Artist, _currentTrack.AlbumTitle,
@@ -521,14 +486,12 @@ namespace MDRP
 					Console.Write("Failed to get track info \r");
 				}
 			}
-			else if (!EnabledClients.ContainsKey(_playerName))
-			{
-				SetUnknown();
-				UnsetAllPresences();
-			}
 			else
 			{
-				SetClear();
+				if (!EnabledClients.ContainsKey(_playerName))
+					SetUnknown();
+				else
+					SetClear();
 				UnsetAllPresences();
 			}
 		}
@@ -542,8 +505,8 @@ namespace MDRP
 						Console.WriteLine("Recieved on main thread {0}", lastMessage);
 #endif
 			_wasPlaying = _isPlaying;
-			remoteControl = lastMessage.Action != "shutdown";
-			_isPlaying = lastMessage.Action == "play";
+			remoteControl = lastMessage.Action != RemoteAction.Shutdown;
+			_isPlaying = lastMessage.Action == RemoteAction.Play;
 			if (!remoteControl)
 			{
 				UnsetAllPresences();
@@ -555,20 +518,14 @@ namespace MDRP
 				foreach (DiscordRpcClient client in AllClients.Values)
 					if (client.CurrentPresence != null && client.ApplicationID != activeClient.ApplicationID)
 					{
-#if DEBUG
-									Console.WriteLine("Cleared " + client.ApplicationID);
-#endif
 						try
 						{
 							ClearAPresence(client);
 							/*client.ClearPresence();
-										client.Invoke();*/
+							client.Invoke();*/
 						}
 						catch (Exception e)
 						{
-#if DEBUG
-										Console.WriteLine("Failed to clear " + client.ApplicationID);
-#endif
 							SendToDebugServer(e);
 						}
 					}
@@ -605,8 +562,7 @@ namespace MDRP
 				activeClient.SetPresence(new RichPresence
 				{
 					Details = CapLength($"{TitleLabel}{(TitleLabel.Length > 0 ? ": " : "")}{lastMessage.Title}", titleLength),
-					State = CapLength(
-						$"{ArtistLabel}{(ArtistLabel.Length > 0 ? ": " : "")}{(lastMessage.Artist == "" ? "Unkown Artist" : lastMessage.Artist)}", artistLength),
+					State = CapLength($"{ArtistLabel}{(ArtistLabel.Length > 0 ? ": " : "")}{(lastMessage.Artist == "" ? "Unkown Artist" : lastMessage.Artist)}", artistLength),
 					Timestamps = _isPlaying
 						? new Timestamps
 						{
@@ -616,30 +572,10 @@ namespace MDRP
 						: null,
 					Assets = new Assets
 					{
-						LargeImageKey =
-							AlbumKeyMapping.ContainsKey(currentAlbum)
-							&& AlbumKeyMapping[currentAlbum]
-								.ContainsKey(activeClient.ApplicationID) &&
-							AlbumKeyMapping[currentAlbum][activeClient.ApplicationID]
-								.Length <= keyLength
-								? AlbumKeyMapping[currentAlbum][
-									activeClient.ApplicationID]
-								: BigAssets[_playerName],
-						LargeImageText = lastMessage.Album.Name.Length > 0
-							? lastMessage.Album.Name.Length <= 2
-								? "_" + lastMessage.Album.Name + "_"
-								: lastMessage.Album.Name.Length > 128
-									? lastMessage.Album.Name.Substring(0, 128)
-									: lastMessage.Album.Name
-							: "Unknown Album",
-						SmallImageKey = _isPlaying
-							? LittleAssets.ContainsKey(_playerName)
-								? LittleAssets[_playerName]
-								: defaultPlayer
-							: "paused",
-						SmallImageText = _isPlaying
-							? "Using " + Aliases[_playerName]
-							: "paused"
+						LargeImageKey = GetLargeImageKey(),
+						LargeImageText = GetLargeImageText(lastMessage.Album.Name),
+						SmallImageKey = GetSmallImageKey(),
+						SmallImageText = GetSmallImageText()
 					}
 				});
 				activeClient.Invoke();
@@ -662,6 +598,47 @@ namespace MDRP
 					lastMessage.Album);
 				if (!_isPlaying) Timer.Restart();
 			}
+		}
+
+		private static string GetSmallImageText()
+		{
+			if (_isPlaying)
+				return "Using " + Aliases[_playerName];
+			else
+				return "paused";
+		}
+
+		private static string GetSmallImageKey()
+		{
+			if (_isPlaying)
+				if (LittleAssets.ContainsKey(_playerName))
+					return LittleAssets[_playerName];
+				else
+					return defaultPlayer;
+			else
+				return "paused";
+		}
+
+		private static string GetLargeImageKey()
+		{
+			if (AlbumKeyMapping.ContainsKey(currentAlbum) &&
+			    AlbumKeyMapping[currentAlbum].ContainsKey(activeClient.ApplicationID) &&
+			    //make sure it is not too long, this will be warned about
+			    AlbumKeyMapping[currentAlbum][activeClient.ApplicationID].Length <= keyLength)
+				return AlbumKeyMapping[currentAlbum][activeClient.ApplicationID];
+			else
+				return BigAssets[_playerName];
+		}
+		
+		private static string GetLargeImageText(string albumName)
+		{
+			if (albumName.Length > 0)
+				if (albumName.Length <= 2)
+					return "_" + albumName + "_";
+				else
+					return CapLength(albumName, 128);
+			else
+				return "Unknown Album";
 		}
 
 		private static void UnsetAllPresences()

@@ -16,7 +16,8 @@ namespace MDRP
 					Album = new Album("Unknown Album");
 				Title = GetJasonField(jObject, "title");
 				TimeStamp = GetJasonField(jObject, "timestamp");
-				Action = GetJasonField(jObject, "action");
+				ActionString = GetJasonField(jObject, "action");
+				Action = ParseAction(ActionString);
 				Player = GetJasonField(jObject, "player");
 			}
 
@@ -32,48 +33,36 @@ namespace MDRP
 			public Album Album { get; }
 			public string Title { get; }
 			public string TimeStamp { get; }
-			public string Action { get; }
+			public RemoteAction Action { get; }
+			private string ActionString;
 			public string Player { get; }
 
 			public bool isValid()
 			{
-				/*Console.WriteLine("Validity check: " + (Action != "play") + " " + (Action != "pause") + " " +
-				                  (ValidPlayers.Contains(Player)) + " " + (EnabledClients[Player]));
-				Console.WriteLine(this);*/
-				return (Action == "play" || Action == "pause" || Action == "shutdown") &&
+				return (Action != RemoteAction.NumActions) &&
 				       ValidPlayers.Contains(Player) && EnabledClients.ContainsKey(Player) &&
 				       EnabledClients[Player];
 			}
 
 			public string getReasonInvalid()
 			{
-				switch (Action)
+				if (ActionString == "")
 				{
-					case "":
-						return "provide an action field";
-					case "play":
-					case "pause":
-					case "shutdown":
-						if (!ValidPlayers.Contains(Player))
-							return "invalid player name. expected one of \"" + string.Join("\", \"", ValidPlayers) +
-							       "\" got " + Player + " instead";
-						else if (!EnabledClients[Player])
-							return "user has disabled this player";
-						else
-							return "valid";
-					default:
-						return "invalid action. expected one of \"play\" or \"pause\" but got \"" + Action + "\" instead";
+					return "provide an action field";
 				}
-				/*return Action == string.Empty
-					? "provide an action field"
-					: Action != "play" && Action != "pause" && Action != "shutdown"
-						? "invalid action. expected one of \"play\" or \"pause\" but got \"" + Action + "\" instead"
-						: !ValidPlayers.Contains(Player)
-							? "invalid player name. expected one of \"" + string.Join("\", \"", ValidPlayers) +
-							  "\" got " + Player + " instead"
-							: !EnabledClients[Player]
-								? "user has disabled this player"
-								: "valid";*/
+				else if (Action == RemoteAction.NumActions)
+				{
+					return "invalid action. expected one of \"play\" or \"pause\" but got \"" + Action + "\" instead";
+				}
+				else
+				{
+					if (!ValidPlayers.Contains(Player))
+						return "invalid player name. expected one of \"" + string.Join("\", \"", ValidPlayers) + "\" got " + Player + " instead";
+					else if (!EnabledClients[Player])
+						return "user has disabled this player";
+					else
+						return "valid";
+				}
 			}
 
 			public override string ToString()
@@ -81,6 +70,31 @@ namespace MDRP
 				return Action + " " + Title + " by " + Artist + " on " + Album.Name + " ending " + TimeStamp +
 				       " from " + Player;
 			}
+
+			private RemoteAction ParseAction(string actionIn)
+			{
+				switch (actionIn.ToLower().Trim())
+				{
+					case "play":
+						return RemoteAction.Play;
+					case "pause":
+						return RemoteAction.Pause;
+					case "shutdown":
+						return RemoteAction.Shutdown;
+					default:
+						return RemoteAction.NumActions;
+				}
+			}
+		}
+
+		public enum RemoteAction
+		{
+			Play,
+			Pause,
+			Shutdown,
+
+			//You can use this to get the length of the enums, and also as a default, non null return
+			NumActions
 		}
 	}
 }
