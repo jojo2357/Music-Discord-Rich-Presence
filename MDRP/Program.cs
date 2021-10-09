@@ -154,7 +154,7 @@ namespace MDRP
 
 		private static readonly Queue<JsonResponse> _PendingMessages = new Queue<JsonResponse>();
 		private static bool spawnedFromApplication;
-		private static string ArtistLabel, TitleLabel;
+		private static string ArtistLabel = "Artist", TitleLabel = "Title";
 		private static bool _isPlaying;
 		private static bool _wasPlaying;
 		private static GlobalSystemMediaTransportControlsSessionMediaProperties _currentTrack = null;
@@ -427,7 +427,7 @@ namespace MDRP
 						string newDetailsWithTitle = CapLength($"{TitleLabel}{(TitleLabel.Length > 0 ? ": " : "")}{_currentTrack.Title}", titleLength),
 							newStateWithArtist =
 								CapLength($"{ArtistLabel}{(ArtistLabel.Length > 0 ? ": " : "")}{(_currentTrack.Artist == "" ? "Unkown Artist" : _currentTrack.Artist)}", artistLength);
-						if (activeClient.CurrentPresence == null || activeClient.CurrentPresence.Details != newDetailsWithTitle || 
+						if (activeClient.CurrentPresence == null || activeClient.CurrentPresence.Details != newDetailsWithTitle ||
 						    activeClient.CurrentPresence.State != newStateWithArtist || _wasPlaying != _isPlaying)
 						{
 							presenceIsRich = AlbumKeyMapping.ContainsKey(currentAlbum) &&
@@ -469,10 +469,10 @@ namespace MDRP
 					}
 
 #if DEBUG
-				Console.Write("" + MetaTimer.ElapsedMilliseconds + "(" +
-				              Timer.ElapsedMilliseconds + ") in " +
-				              _playerName +
-				              '\r');
+					Console.Write("" + MetaTimer.ElapsedMilliseconds + "(" +
+					              Timer.ElapsedMilliseconds + ") in " +
+					              _playerName +
+					              '\r');
 #endif
 				}
 				catch (Exception e)
@@ -502,7 +502,7 @@ namespace MDRP
 
 			_PendingMessages.Clear();
 #if DEBUG
-						Console.WriteLine("Recieved on main thread {0}", lastMessage);
+			Console.WriteLine("Recieved on main thread {0}", lastMessage);
 #endif
 			_wasPlaying = _isPlaying;
 			remoteControl = lastMessage.Action != RemoteAction.Shutdown;
@@ -545,7 +545,7 @@ namespace MDRP
 				_playerName = lastMessage.Player;
 				GetClient();
 #if DEBUG
-							Console.WriteLine("Using " + activeClient.ApplicationID);
+				Console.WriteLine("Using " + activeClient.ApplicationID);
 #endif
 				if (_isPlaying)
 					resignRemoteControlAt = long.Parse(lastMessage.TimeStamp) + 1000;
@@ -558,6 +558,21 @@ namespace MDRP
 				                 AlbumKeyMapping[currentAlbum].ContainsKey(activeClient.ApplicationID);
 
 				WrongArtistFlag = HasNameNotQuite(new Album(lastMessage.Album.Name));
+
+				Console.WriteLine(CapLength($"{TitleLabel}{(TitleLabel.Length > 0 ? ": " : "")}{lastMessage.Title}", titleLength));
+				Console.WriteLine(CapLength($"{ArtistLabel}{(ArtistLabel.Length > 0 ? ": " : "")}{(lastMessage.Artist == "" ? "Unkown Artist" : lastMessage.Artist)}", artistLength));
+				Console.WriteLine(_isPlaying
+					? new Timestamps
+					{
+						End = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(lastMessage.TimeStamp))
+							.DateTime
+					}
+					: null);
+				Console.WriteLine(GetLargeImageKey());
+				Console.WriteLine(GetLargeImageText(lastMessage.Album.Name));
+				Console.WriteLine(GetSmallImageKey());
+				Console.WriteLine(GetSmallImageText());
+
 
 				activeClient.SetPresence(new RichPresence
 				{
@@ -629,7 +644,7 @@ namespace MDRP
 			else
 				return BigAssets[_playerName];
 		}
-		
+
 		private static string GetLargeImageText(string albumName)
 		{
 			if (albumName.Length > 0)

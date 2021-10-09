@@ -51,7 +51,7 @@ namespace MDRP
 					return true;
 				foreach (string myArtist in Artists.Where(artist => artist != ""))
 				foreach (string theirArtist in otherAlbum.Artists.Where(artist => artist != ""))
-					if (theirArtist.Contains(myArtist) || myArtist.Contains(theirArtist))
+					if (theirArtist.Trim().Contains(myArtist.Trim()) || myArtist.Trim().Contains(theirArtist.Trim()))
 						return true;
 			}
 
