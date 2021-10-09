@@ -32,13 +32,13 @@ if the DRP doesnt show up within 5 seconds, run `Unlink Rich Presence With Groov
 If it still doesn't work, open up an issue and let me know whats going on.
 
 ## Custom Album Art
-* My bad video tutorial: https://www.youtube.com/watch?v=_qkxjf3T8Pw
+* My bad video tutorial: https://www.youtube.com/watch?v=_qkxjf3T8Pw (new video for 1.6.0 coming soon)
 * If you get stuck, feel free to use the dat [file validator](https://jojo2357.github.io/MDRP-Validation-Tool/) and if you need more help, open an issue there. DO NOT OPEN ALBUM ART RELATED ISSUES HERE.
 * In the `clientdata` folder you will find 1 text files by default for demoing. Feel free to take a look.
 * [Create a discord application](https://discord.com/developers/applications) and set the name to be what you want displayed under your avatar (as in `playing <name>`)
 * Grab the client ID. We will use this later.
 * Navigate to the rich presence tab and select art assets.
-* Add an image (note that the MINIMUM size is 512x512 so you may need to open the image in mspaint to resize)
+* Add an image (note that the MINIMUM size is 512x512 so you may need to resize it)
 * Set the name to be the album name with no spaces, all lower case, and remove any special characters the regex rejects (i dont know what will pass and what wont so if it doesnt work later, lmk what special characters you had and I'll add them to my filter)
 * Once you save, it may take up to 10 minutes for discord to show your pictures. Don't worry though, if you did everything right it will show.
 * Create a file in the `clientdata` directory and follow the model in `demo.dat`
@@ -59,12 +59,11 @@ If you really want to, you can go into the ini config and swap the application i
 ### Supported Players
 - Groove Music (music.ui)
 - Spotify
-- Chrome (Possible removal soon)
 - MusicBee
 (More can be added, I just dunno if it's needed)
 
 ## Music Bee
-- In order to be compatible with music bee, you have to add [this plugin](https://getmusicbee.com/forum/index.php?topic=21240.0).
+- In order to be compatible with music bee, you have to add [my new plugin](https://github.com/jojo2357/MDRP-MusicBee-Bridge). The WMC plugin required before is no longer needed.
 
 The new icon is thanks to [Ghoelian](https://github.com/Ghoelian) so thanks for that!
 
