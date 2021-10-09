@@ -13,9 +13,9 @@
 ::: [2] Launch DRP
 ::: [3] Kill Hidden DRP
 ::: [4] Link Rich Presence with Groove
-::: [5] Link with MusicBee
+::: [5] Link with MusicBee (deprecated)
 ::: [6] Unlink Rich Presence with Groove
-::: [7] Unlink from MusicBee
+::: [7] Unlink from MusicBee (deprecated)
 :::
 
 @echo off
@@ -32,9 +32,9 @@ IF %O%==1 GOTO LAUNCHDRPHIDDEN
 IF %O%==2 GOTO LAUNCHDRP
 IF %O%==3 GOTO KILLHIDDENDRP
 IF %O%==4 GOTO LINKDRPGROOVE
-IF %O%==5 GOTO LINKDRPMUSICBEE
+REM IF %O%==5 GOTO LINKDRPMUSICBEE
 IF %O%==6 GOTO UNLINKDRPGROOVE
-IF %O%==7 GOTO UNLINKDRPMUSICBEE
+REM IF %O%==7 GOTO UNLINKDRPMUSICBEE
 GOTO MENU
 :LAUNCHDRPHIDDEN
 "%mypath%\MDRP\bin\Release\MDRP.exe" Shortcuts_Only
