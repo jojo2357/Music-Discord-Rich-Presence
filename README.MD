@@ -32,7 +32,8 @@ if the DRP doesnt show up within 5 seconds, run `Unlink Rich Presence With Groov
 If it still doesn't work, open up an issue and let me know whats going on.
 
 ## Custom Album Art
-* My bad video tutorial: https://www.youtube.com/watch?v=_qkxjf3T8Pw (new video for 1.6.0 coming soon)
+* Tutorial for 1.5 and groove and album art: https://www.youtube.com/watch?v=_qkxjf3T8Pw (new video for 1.6.0 coming soon)
+* Tutorial for 1.6 and musicbee: https://youtu.be/GucN2WiteOM
 * If you get stuck, feel free to use the dat [file validator](https://jojo2357.github.io/MDRP-Validation-Tool/) and if you need more help, open an issue there. DO NOT OPEN ALBUM ART RELATED ISSUES HERE.
 * In the `clientdata` folder you will find 1 text files by default for demoing. Feel free to take a look.
 * [Create a discord application](https://discord.com/developers/applications) and set the name to be what you want displayed under your avatar (as in `playing <name>`)
