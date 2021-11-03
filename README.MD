@@ -4,10 +4,13 @@ Works with Groove, Spotify, and MusicBee
 
 ## Features
 * Allows uploading album art to custom applications to display and exceed the ~~150~~ 300 (got changed recently) asset maximum (see [uploading custom album art](https://github.com/jojo2357/Music-Discord-Rich-Presence#custom-album-art) for instructions) 
-* Shows song title, artist, and album on any song.
+* Shows song title, artist, and album on any song in a customizable way.
 * Includes batch scripts to enable rich presence to launch when groove is opened
 * Ability to toggle media players showing up in rich presence.
 * Can run in the background or with a pretty terminal
+
+## Custom presentation
+In the `.ini` file, you can edit the two allotted lines. There are spotify-style and MDRP-style templates, and can be customized by adding text, or the title (`${title}`), artist (`${artist}`), and album (`${album}) as you see fit.
 
 ## Music Library Repo
 [@Smaltin](https://github.com/Smaltin) and I are maintaining a [library repo](https://github.com/jojo2357/Music-Discord-Rich-Presence-Library) that allows you to find and download album art packs and contribute your own album arts for others to use. You can read more [here.](https://github.com/jojo2357/Music-Discord-Rich-Presence-Library)
@@ -32,7 +35,7 @@ if the DRP doesnt show up within 5 seconds, run `Unlink Rich Presence With Groov
 If it still doesn't work, open up an issue and let me know whats going on.
 
 ## Custom Album Art
-* Tutorial for 1.5 and groove and album art: https://www.youtube.com/watch?v=_qkxjf3T8Pw (new video for 1.6.0 coming soon)
+* Tutorial for 1.5 and groove and album art: https://www.youtube.com/watch?v=_qkxjf3T8Pw
 * Tutorial for 1.6 and musicbee: https://youtu.be/GucN2WiteOM
 * If you get stuck, feel free to use the dat [file validator](https://jojo2357.github.io/MDRP-Validation-Tool/) and if you need more help, open an issue there. DO NOT OPEN ALBUM ART RELATED ISSUES HERE.
 * In the `clientdata` folder you will find 1 text files by default for demoing. Feel free to take a look.
