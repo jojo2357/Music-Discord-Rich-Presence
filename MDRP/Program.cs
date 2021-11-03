@@ -22,7 +22,7 @@ namespace MDRP
 {
 	internal partial class Program
 	{
-		private const string Version = "1.6.0";
+		private const string Version = "1.6.1";
 		private const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
 		private const string Title = "Music Discord Rich Presence";
 		private const int titleLength = 64;
@@ -154,11 +154,13 @@ namespace MDRP
 
 		private static readonly Queue<JsonResponse> _PendingMessages = new Queue<JsonResponse>();
 		private static bool spawnedFromApplication;
-		private static string ArtistLabel = "Artist", TitleLabel = "Title";
 		private static bool _isPlaying;
 		private static bool _wasPlaying;
 		private static GlobalSystemMediaTransportControlsSessionMediaProperties _currentTrack = null;
 		private static GlobalSystemMediaTransportControlsSessionMediaProperties _lastTrack = null;
+
+		private static string lineData = "";
+		private static bool foundFirst = false, foundSecond = false;
 
 		public static async Task HandleIncomingConnections()
 		{
@@ -334,15 +336,15 @@ namespace MDRP
 					Thread.Sleep(2000);
 					if (_PendingMessages.Count > 0) HandleRemoteRequests();
 
+					if (!remoteControl) HandleLocalRequests();
+					
 					if (remoteControl && (long)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds >
 						resignRemoteControlAt)
 					{
 						UnsetAllPresences();
-
+						SetClear();
 						remoteControl = false;
 					}
-
-					if (!remoteControl) HandleLocalRequests();
 				}
 				catch (Exception e)
 				{
@@ -424,9 +426,11 @@ namespace MDRP
 									SendToDebugServer(e);
 								}
 
-						string newDetailsWithTitle = CapLength($"{TitleLabel}{(TitleLabel.Length > 0 ? ": " : "")}{_currentTrack.Title}", titleLength),
+						string newDetailsWithTitle = CapLength(lineData.Split('\n')[0].Replace("${artist}", (_currentTrack.Artist == "" ? "Unkown Artist" : _currentTrack.Artist)).Replace("${title}", _currentTrack.Title).Replace("${album}", _currentTrack.AlbumTitle), titleLength);
+						string newStateWithArtist = CapLength(lineData.Split('\n')[1].Replace("${artist}", (_currentTrack.Artist == "" ? "Unkown Artist" : _currentTrack.Artist)).Replace("${title}", _currentTrack.Title).Replace("${album}", _currentTrack.AlbumTitle), artistLength);
+						/*string newDetailsWithTitle = CapLength($"{TitleLabel}{(TitleLabel.Length > 0 ? ": " : "")}{_currentTrack.Title}", titleLength),
 							newStateWithArtist =
-								CapLength($"{ArtistLabel}{(ArtistLabel.Length > 0 ? ": " : "")}{(_currentTrack.Artist == "" ? "Unkown Artist" : _currentTrack.Artist)}", artistLength);
+								CapLength($"{ArtistLabel}{(ArtistLabel.Length > 0 ? ": " : "")}{(_currentTrack.Artist == "" ? "Unkown Artist" : _currentTrack.Artist)}", artistLength);*/
 						if (activeClient.CurrentPresence == null || activeClient.CurrentPresence.Details != newDetailsWithTitle ||
 						    activeClient.CurrentPresence.State != newStateWithArtist || _wasPlaying != _isPlaying)
 						{
@@ -559,8 +563,8 @@ namespace MDRP
 
 				WrongArtistFlag = HasNameNotQuite(new Album(lastMessage.Album.Name));
 
-				Console.WriteLine(CapLength($"{TitleLabel}{(TitleLabel.Length > 0 ? ": " : "")}{lastMessage.Title}", titleLength));
-				Console.WriteLine(CapLength($"{ArtistLabel}{(ArtistLabel.Length > 0 ? ": " : "")}{(lastMessage.Artist == "" ? "Unkown Artist" : lastMessage.Artist)}", artistLength));
+				Console.WriteLine(CapLength($"Title: {lastMessage.Title}", titleLength));
+				Console.WriteLine(CapLength($"Artist: {(lastMessage.Artist == "" ? "Unkown Artist" : lastMessage.Artist)}", artistLength));
 				Console.WriteLine(_isPlaying
 					? new Timestamps
 					{
@@ -576,8 +580,11 @@ namespace MDRP
 
 				activeClient.SetPresence(new RichPresence
 				{
-					Details = CapLength($"{TitleLabel}{(TitleLabel.Length > 0 ? ": " : "")}{lastMessage.Title}", titleLength),
-					State = CapLength($"{ArtistLabel}{(ArtistLabel.Length > 0 ? ": " : "")}{(lastMessage.Artist == "" ? "Unkown Artist" : lastMessage.Artist)}", artistLength),
+					Details = CapLength(lineData.Split('\n')[0].Replace("${artist}", (lastMessage.Artist == "" ? "Unkown Artist" : lastMessage.Artist)).Replace("${title}", lastMessage.Title).Replace("${album}", lastMessage.Album.Name), titleLength),
+					State = CapLength(lineData.Split('\n')[1].Replace("${artist}", (lastMessage.Artist == "" ? "Unkown Artist" : lastMessage.Artist)).Replace("${title}", lastMessage.Title).Replace("${album}", lastMessage.Album.Name), artistLength),
+
+					//Details = CapLength($"{TitleLabel}{(TitleLabel.Length > 0 ? ": " : "")}{lastMessage.Title}", titleLength),
+					//State = CapLength($"{ArtistLabel}{(ArtistLabel.Length > 0 ? ": " : "")}{(lastMessage.Artist == "" ? "Unkown Artist" : lastMessage.Artist)}", artistLength),
 					Timestamps = _isPlaying
 						? new Timestamps
 						{
@@ -1039,20 +1046,35 @@ namespace MDRP
 					{
 						ScreamAtUser = line.Split('=')[1].Trim().ToLower() == "true";
 					}
-					else if (line.Split('=')[0].Trim().ToLower() == "artist label")
+					else if (!foundFirst && line.Split('=')[0].Trim().ToLower() == "first line")
+					{
+						foundFirst = true;
+						lineData = String.Join("=", line.Split('=').Skip(1)) + lineData;
+					}
+					else if (!foundSecond && line.Split('=')[0].Trim().ToLower() == "second line")
+					{
+						foundSecond = true;
+						lineData = lineData + "\n" + String.Join("=", line.Split('=').Skip(1));
+					}
+					/*else if (line.Split('=')[0].Trim().ToLower() == "artist label")
 					{
 						ArtistLabel = line.Split('=')[1];
 					}
 					else if (line.Split('=')[0].Trim().ToLower() == "title label")
 					{
 						TitleLabel = line.Split('=')[1];
-					}
+					}*/
 			}
 			catch (Exception e)
 			{
 				SendToDebugServer(e);
 				SendToDebugServer(
 					"DiscordPresenceConfig.ini not found! this is the settings file to enable or disable certain features");
+			}
+
+			if (!foundFirst && !foundSecond)
+			{
+				lineData = "Title: ${title}\nArtist: ${artist}";
 			}
 
 			try
