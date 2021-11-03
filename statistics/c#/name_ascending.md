@@ -1,9 +1,9 @@
 
 |[File](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/statistics%2Fc%23%2Fname_descending.md%2F)|[Lines (% total)](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/statistics%2Fc%23%2Flines_descending.md%2F)|[Code Lines](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/statistics%2Fc%23%2Fcode_descending.md%2F)|[% Code](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/statistics%2Fc%23%2Fproportion_code_descending.md%2F)|[Comment Lines](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/statistics%2Fc%23%2Fcomments_descending.md%2F)|[% Comment](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/statistics%2Fc%23%2Fproportion_comments_descending.md%2F)|[Blank Lines](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/statistics%2Fc%23%2Fblanks_descending.md%2F)|[% Blank](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/statistics%2Fc%23%2Fproportion_blanks_descending.md%2F)|
 | --- | --- | --- | --- | --- | --- | --- | --- |
-|[Album.cs](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/MDRP%2Futil%2FAlbum.cs)|66 (4.5%)|49|74.2%|8|12.1%|9|13.6%|
+|[Album.cs](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/MDRP%2Futil%2FAlbum.cs)|66 (4.4%)|49|74.2%|8|12.1%|9|13.6%|
 |[AssemblyInfo.cs](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/MDRP%2FProperties%2FAssemblyInfo.cs)|36 (2.4%)|15|41.7%|17|47.2%|4|11.1%|
-|[JsonResponse.cs](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/MDRP%2Futil%2FJsonResponse.cs)|100 (6.8%)|90|90.0%|1|1.0%|9|9.0%|
-|[Program.cs](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/MDRP%2FProgram.cs)|1272 (86.3%)|1077|84.7%|50|3.9%|145|11.4%|
-|Average |368.5|307.8|X|19.0|X|41.8|X|
-|Total (4)|1474|1231|83.5%|76| 5.2%|167|11.3%|
+|[JsonResponse.cs](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/MDRP%2Futil%2FJsonResponse.cs)|100 (6.7%)|90|90.0%|1|1.0%|9|9.0%|
+|[Program.cs](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/MDRP%2FProgram.cs)|1294 (86.5%)|1084|83.8%|63|4.9%|147|11.4%|
+|Average |374.0|309.5|X|22.3|X|42.3|X|
+|Total (4)|1496|1238|82.8%|89| 5.9%|169|11.3%|
