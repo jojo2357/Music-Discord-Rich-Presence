@@ -22,7 +22,7 @@ namespace MDRP
 {
 	internal partial class Program
 	{
-		private const string Version = "1.6.1";
+		private const string Version = "1.6.2";
 		private const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
 		private const string Title = "Music Discord Rich Presence";
 		private const int titleLength = 64;
@@ -37,6 +37,7 @@ namespace MDRP
 			new Dictionary<string, DiscordRpcClient>
 			{
 				{ "music.ui", new DiscordRpcClient("807774172574253056", autoEvents: false) },
+				{ "microsoft.media.player", new DiscordRpcClient("807774172574253056", autoEvents: false)},
 				{ "musicbee", new DiscordRpcClient("820837854385012766", autoEvents: false) },
 				{ "apple music", new DiscordRpcClient("870047192889577544", autoEvents: false) },
 				{ "spotify", new DiscordRpcClient("802222525110812725", autoEvents: false) },
@@ -67,6 +68,7 @@ namespace MDRP
 		private static readonly Dictionary<string, ConsoleColor> PlayerColors = new Dictionary<string, ConsoleColor>
 		{
 			{ "music.ui", ConsoleColor.Blue },
+			{ "microsoft.media.player", ConsoleColor.Blue},
 			{ "apple music", ConsoleColor.DarkRed },
 			{ "spotify", ConsoleColor.DarkGreen },
 			{ "musicbee", ConsoleColor.Yellow }
@@ -74,8 +76,8 @@ namespace MDRP
 
 		private static string _presenceDetails = string.Empty;
 
-		private static readonly string[] ValidPlayers =
-			{ "apple music", "music.ui", "spotify", "musicbee" };
+		private static readonly string[] ValidPlayers = 
+			{ "apple music", "music.ui", "spotify", "musicbee", "microsoft.media.player" };
 
 		private static readonly string[] RequiresPipeline = { "musicbee" };
 
@@ -86,6 +88,7 @@ namespace MDRP
 			{ "spotify", "Spotify Music" },
 			{ "apple music", "Apple Music" },
 			{ "groove", "Groove Music Player" },
+			{ "microsoft.media.player", "Windows Media Player" },
 			{ "music.ui", "Groove Music Player" }
 		};
 
@@ -93,6 +96,7 @@ namespace MDRP
 		{
 			{ "musicbee", "musicbee" },
 			{ "music.ui", "groove" },
+			{ "microsoft.media.player", "groove"},
 			{ "spotify", "spotify" },
 			{ "apple music", "applemusic" }
 		};
@@ -102,6 +106,7 @@ namespace MDRP
 		{
 			{ "musicbee", "musicbee_small" },
 			{ "music.ui", "groove_small" },
+			{ "microsoft.media.player", "groove_small"},
 			{ "spotify", "spotify_small" },
 			{ "apple music", "applemusic_small" }
 		};
@@ -110,19 +115,21 @@ namespace MDRP
 		{
 			{ "musicbee", "Music Bee" },
 			{ "music.ui", "Groove Music" },
+			{ "microsoft.media.player", "Windows Media Player"},
 			{ "spotify", "Spotify" },
 			{ "apple music", "Apple Music" }
 		};
-
+		
 		private static readonly Dictionary<string, string> InverseWhatpeoplecallthisplayer =
 			new Dictionary<string, string>
 			{
 				{ "musicbee", "musicbee" },
 				{ "groove", "music.ui" },
+				{ "Microsoft.Media.Player", "microsoft.media.player"},
 				{ "spotify", "spotify" },
 				{ "Apple Music", "apple music" }
 			};
-
+		
 		private static readonly string defaultPlayer = "groove";
 		private static readonly int timeout_seconds = 60;
 
