@@ -16,14 +16,14 @@ EXIT /B
 
 auditpol /set /category:{6997984C-797A-11D9-BED3-505054503030} /success:enable>nul
 
-taskkill /im microsoft.media.player.exe 1>nul 2>nul
+taskkill /im Microsoft.Media.Player.exe 1>nul 2>nul
 
 echo Please ensure WMP is closed then reopen it. once you have, reopen WMP and then come back here and press any key to continue
 pause>nul
 
 wevtutil qe Security /c:200 /f:text /rd:true /q:"*[System[(EventID=4688)]]">openedfiles.dat
 
-findstr /i "microsoft.media.player.exe" openedfiles.dat>wmplocation.dat
+findstr /i "Microsoft.Media.Player.exe" openedfiles.dat>wmplocation.dat
 
 set /p loc=<wmplocation.dat
 
@@ -41,7 +41,7 @@ set /p fgiddle=<fdoogle.dat
 echo|set /p="%parsed%%fgiddle%"
 )
 
-taskkill /im microsoft.media.player.exe 1>nul 2>nul
+taskkill /im Microsoft.Media.Player.exe 1>nul 2>nul
 
 del openedfiles.dat 1>nul 2>nul
 
