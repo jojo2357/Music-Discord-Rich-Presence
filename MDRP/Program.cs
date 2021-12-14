@@ -22,9 +22,10 @@ namespace MDRP
 {
 	internal partial class Program
 	{
+		public static LangHelper langHelper = new LangHelper();
 		private const string Version = "1.6.2";
 		private const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
-		private const string Title = "Music Discord Rich Presence";
+		private static readonly string Title = langHelper.get(LocalizableStrings.MDRP_FULL);
 		private const int titleLength = 64;
 		private const int artistLength = 64;
 		private const int keyLength = 32;
@@ -286,7 +287,7 @@ namespace MDRP
 			Thread t = new Thread(doServer);
 			t.Start();
 			Console.OutputEncoding = Encoding.UTF8;
-			Console.Title = "Discord Rich Presence for Groove";
+			Console.Title = langHelper.get(LocalizableStrings.CONSOLE_NAME);
 
 			Client.DefaultRequestHeaders["User-Agent"] = "c#";
 			//Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
@@ -344,7 +345,7 @@ namespace MDRP
 					if (_PendingMessages.Count > 0) HandleRemoteRequests();
 
 					if (!remoteControl) HandleLocalRequests();
-					
+
 					if (remoteControl && (long)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds >
 						resignRemoteControlAt)
 					{
@@ -384,9 +385,8 @@ namespace MDRP
 #endif
 					DrawPersistentHeader();
 					Console.ForegroundColor = ConsoleColor.DarkRed;
-					Console.WriteLine("Detected volume in " + _playerName +
-					                  " but no data has been recieved from it. You may need to update the player, install a plugin, or just pause and resume the music. See more at " +
-					                  Github);
+					Console.WriteLine(string.Format(langHelper[LocalizableStrings.REQUIRE_PIPELINE], _playerName) +
+					                  " " + Github);
 					NotifiedRequiredPipeline = true;
 					Console.ForegroundColor = ConsoleColor.White;
 				}
@@ -403,7 +403,7 @@ namespace MDRP
 						return;
 					if (_wasPlaying && !_isPlaying)
 					{
-						Console.WriteLine(currentAlbum + " and " + new Album(_currentTrack.AlbumTitle,
+						Console.WriteLine(currentAlbum + " " + langHelper[LocalizableStrings.AND] + " " + new Album(_currentTrack.AlbumTitle,
 							_currentTrack.Artist,
 							_currentTrack.AlbumArtist));
 						activeClient.UpdateSmallAsset("paused", "paused");
@@ -433,11 +433,8 @@ namespace MDRP
 									SendToDebugServer(e);
 								}
 
-						string newDetailsWithTitle = CapLength(lineData.Split('\n')[0].Replace("${artist}", (_currentTrack.Artist == "" ? "Unkown Artist" : _currentTrack.Artist)).Replace("${title}", _currentTrack.Title).Replace("${album}", _currentTrack.AlbumTitle), titleLength);
-						string newStateWithArtist = CapLength(lineData.Split('\n')[1].Replace("${artist}", (_currentTrack.Artist == "" ? "Unkown Artist" : _currentTrack.Artist)).Replace("${title}", _currentTrack.Title).Replace("${album}", _currentTrack.AlbumTitle), artistLength);
-						/*string newDetailsWithTitle = CapLength($"{TitleLabel}{(TitleLabel.Length > 0 ? ": " : "")}{_currentTrack.Title}", titleLength),
-							newStateWithArtist =
-								CapLength($"{ArtistLabel}{(ArtistLabel.Length > 0 ? ": " : "")}{(_currentTrack.Artist == "" ? "Unkown Artist" : _currentTrack.Artist)}", artistLength);*/
+						string newDetailsWithTitle = CapLength(lineData.Split('\n')[0].Replace("${artist}", (_currentTrack.Artist == "" ? langHelper[LocalizableStrings.UNKNOWN_ARTIST] : _currentTrack.Artist)).Replace("${title}", _currentTrack.Title).Replace("${album}", _currentTrack.AlbumTitle), titleLength);
+						string newStateWithArtist = CapLength(lineData.Split('\n')[1].Replace("${artist}", (_currentTrack.Artist == "" ? langHelper[LocalizableStrings.UNKNOWN_ARTIST] : _currentTrack.Artist)).Replace("${title}", _currentTrack.Title).Replace("${album}", _currentTrack.AlbumTitle), artistLength);
 						if (activeClient.CurrentPresence == null || activeClient.CurrentPresence.Details != newDetailsWithTitle ||
 						    activeClient.CurrentPresence.State != newStateWithArtist || _wasPlaying != _isPlaying)
 						{
@@ -452,13 +449,12 @@ namespace MDRP
 							{
 								NotifiedAlbums.Add(currentAlbum);
 								if (WrongArtistFlag)
-									SendNotification("Album keyed wrong",
+									SendNotification(langHelper[LocalizableStrings.NOTIF_KEYED_WRONG_HEADER],
 										currentAlbum.Name +
-										" is keyed for a different artist (check caps). To disable these notifications, set verbose to false in DiscordPresenceConfig.ini");
+										" " + langHelper[LocalizableStrings.NOTIF_KEYED_WRONG_BODY]);
 								else
-									SendNotification("Album not keyed",
-										currentAlbum.Name +
-										" is not keyed. To disable these notifications, set verbose to false in DiscordPresenceConfig.ini");
+									SendNotification(langHelper[LocalizableStrings.NOTIF_UNKEYED_HEADER],
+										currentAlbum.Name + " " + langHelper[LocalizableStrings.NOTIF_UNKEYED_BODY]);
 							}
 
 							activeClient.SetPresence(new RichPresence
@@ -492,9 +488,9 @@ namespace MDRP
 					if (activeClient != null)
 						activeClient.SetPresence(new RichPresence
 						{
-							Details = "Failed to get track info"
+							Details = langHelper[LocalizableStrings.FAILED_TO_GET_INFO]
 						});
-					Console.Write("Failed to get track info \r");
+					Console.Write(langHelper[LocalizableStrings.FAILED_TO_GET_INFO] + " \r");
 				}
 			}
 			else
@@ -570,8 +566,8 @@ namespace MDRP
 
 				WrongArtistFlag = HasNameNotQuite(new Album(lastMessage.Album.Name));
 
-				Console.WriteLine(CapLength($"Title: {lastMessage.Title}", titleLength));
-				Console.WriteLine(CapLength($"Artist: {(lastMessage.Artist == "" ? "Unkown Artist" : lastMessage.Artist)}", artistLength));
+				Console.WriteLine(CapLength($"{langHelper[LocalizableStrings.TITLE]}: {lastMessage.Title}", titleLength));
+				Console.WriteLine(CapLength($"{langHelper[LocalizableStrings.ARTIST]}: {(lastMessage.Artist == "" ? langHelper[LocalizableStrings.UNKNOWN_ARTIST] : lastMessage.Artist)}", artistLength));
 				Console.WriteLine(_isPlaying
 					? new Timestamps
 					{
@@ -587,8 +583,8 @@ namespace MDRP
 
 				activeClient.SetPresence(new RichPresence
 				{
-					Details = CapLength(lineData.Split('\n')[0].Replace("${artist}", (lastMessage.Artist == "" ? "Unkown Artist" : lastMessage.Artist)).Replace("${title}", lastMessage.Title).Replace("${album}", lastMessage.Album.Name), titleLength),
-					State = CapLength(lineData.Split('\n')[1].Replace("${artist}", (lastMessage.Artist == "" ? "Unkown Artist" : lastMessage.Artist)).Replace("${title}", lastMessage.Title).Replace("${album}", lastMessage.Album.Name), artistLength),
+					Details = CapLength(lineData.Split('\n')[0].Replace("${artist}", (lastMessage.Artist == "" ? langHelper[LocalizableStrings.UNKNOWN_ARTIST] : lastMessage.Artist)).Replace("${title}", lastMessage.Title).Replace("${album}", lastMessage.Album.Name), titleLength),
+					State = CapLength(lineData.Split('\n')[1].Replace("${artist}", (lastMessage.Artist == "" ? langHelper[LocalizableStrings.UNKNOWN_ARTIST] : lastMessage.Artist)).Replace("${title}", lastMessage.Title).Replace("${album}", lastMessage.Album.Name), artistLength),
 
 					//Details = CapLength($"{TitleLabel}{(TitleLabel.Length > 0 ? ": " : "")}{lastMessage.Title}", titleLength),
 					//State = CapLength($"{ArtistLabel}{(ArtistLabel.Length > 0 ? ": " : "")}{(lastMessage.Artist == "" ? "Unkown Artist" : lastMessage.Artist)}", artistLength),
@@ -614,13 +610,11 @@ namespace MDRP
 				{
 					NotifiedAlbums.Add(currentAlbum);
 					if (WrongArtistFlag)
-						SendNotification("Album keyed wrong",
-							currentAlbum.Name +
-							" is keyed for a different artist (check caps). To disable these notifications, set verbose to false in DiscordPresenceConfig.ini");
+						SendNotification(langHelper[LocalizableStrings.NOTIF_KEYED_WRONG_HEADER],
+							currentAlbum.Name + " " + langHelper[LocalizableStrings.NOTIF_KEYED_WRONG_BODY]);
 					else
-						SendNotification("Album not keyed",
-							currentAlbum.Name +
-							" is not keyed. To disable these notifications, set verbose to false in DiscordPresenceConfig.ini");
+						SendNotification(langHelper[LocalizableStrings.NOTIF_UNKEYED_HEADER],
+							currentAlbum.Name + " " + langHelper[LocalizableStrings.NOTIF_UNKEYED_BODY]);
 				}
 
 				SetConsole(lastMessage.Title, lastMessage.Artist, lastMessage.Album.Name,
@@ -632,9 +626,9 @@ namespace MDRP
 		private static string GetSmallImageText()
 		{
 			if (_isPlaying)
-				return "Using " + Aliases[_playerName];
+				return langHelper[LocalizableStrings.USING] + " " + Aliases[_playerName];
 			else
-				return "paused";
+				return langHelper[LocalizableStrings.PAUSED];
 		}
 
 		private static string GetSmallImageKey()
@@ -645,7 +639,7 @@ namespace MDRP
 				else
 					return defaultPlayer;
 			else
-				return "paused";
+				return langHelper[LocalizableStrings.PAUSED];
 		}
 
 		private static string GetLargeImageKey()
@@ -667,7 +661,7 @@ namespace MDRP
 				else
 					return CapLength(albumName, 128);
 			else
-				return "Unknown Album";
+				return langHelper[LocalizableStrings.UNKNOWN_ALBUM];
 		}
 
 		private static void UnsetAllPresences()
@@ -699,8 +693,7 @@ namespace MDRP
 			catch (Exception)
 			{
 				Console.ForegroundColor = ConsoleColor.DarkRed;
-				Console.WriteLine(
-					"An error has occured. If the issue is severe, or you would like to know more, run the debug tool and use the printouts there. If this is severely hindering your MDRP experience, please open an issue on GitHub.");
+				Console.WriteLine(langHelper[LocalizableStrings.ERROR_OCCURRED]);
 				Console.ForegroundColor = ConsoleColor.White;
 			}
 #endif
@@ -726,8 +719,7 @@ namespace MDRP
 			catch (Exception)
 			{
 				Console.ForegroundColor = ConsoleColor.DarkRed;
-				Console.WriteLine(
-					"An error has occured. Please run the debug tool to get a better readout and then open an issue on github with that printout.");
+				Console.WriteLine(langHelper[LocalizableStrings.REQUEST_DEBUG_TOOL]);
 				Console.ForegroundColor = ConsoleColor.White;
 			}
 #endif
@@ -786,6 +778,7 @@ namespace MDRP
 
 		private static void SetConsole(string title, string artist, string albumName, Album album)
 		{
+			int totalBufLen = Math.Max(langHelper.get(LocalizableStrings.ALBUM).Length, Math.Max(langHelper.get(LocalizableStrings.PLAYER).Length, Math.Max(langHelper[LocalizableStrings.TITLE].Length, langHelper[LocalizableStrings.ARTIST].Length)));
 #if DEBUG
 #else
 			Console.Clear();
@@ -794,24 +787,24 @@ namespace MDRP
 			DrawPersistentHeader();
 
 			Console.ForegroundColor = ConsoleColor.White;
-			Console.WriteLine("Music details:");
+			Console.WriteLine(langHelper.get(LocalizableStrings.DETAILS) + ":");
 
 			Console.ForegroundColor = ConsoleColor.White;
-			Console.Write("  Title: ");
+			Console.Write(new string(' ', totalBufLen - langHelper.get(LocalizableStrings.TITLE).Length + 1) + langHelper.get(LocalizableStrings.TITLE) + ": ");
 
 			Console.ForegroundColor = ConsoleColor.Gray;
 			Console.WriteLine(title);
 
 			Console.ForegroundColor = ConsoleColor.White;
-			Console.Write(" Artist: ");
+			Console.Write(new string(' ', totalBufLen - langHelper.get(LocalizableStrings.ARTIST).Length + 1) + langHelper.get(LocalizableStrings.ARTIST) + ": ");
 
 			Console.ForegroundColor = ConsoleColor.Gray;
-			Console.WriteLine(artist == "" ? "Unknown Artist" : artist);
+			Console.WriteLine(artist == "" ? langHelper.get(LocalizableStrings.UNKNOWN_ARTIST) : artist);
 
 			if (!albumName.Equals(string.Empty))
 			{
 				Console.ForegroundColor = ConsoleColor.White;
-				Console.Write("  Album: ");
+				Console.Write(new string(' ', totalBufLen - langHelper.get(LocalizableStrings.ALBUM).Length + 1) + langHelper.get(LocalizableStrings.ALBUM) + ": ");
 
 				Console.ForegroundColor = ConsoleColor.Gray;
 				Console.WriteLine(albumName);
@@ -823,41 +816,41 @@ namespace MDRP
 				if (albumKey.Length > keyLength)
 				{
 					Console.ForegroundColor = ConsoleColor.Red;
-					Console.WriteLine("         The key for this album is too long. It must be " + keyLength + " characters or less");
+					Console.WriteLine(string.Format("         " + langHelper[LocalizableStrings.KEY_TOO_LONG], keyLength));
 					if (ScreamAtUser && !NotifiedAlbums.ToArray().Contains(currentAlbum))
 					{
 						NotifiedAlbums.Add(currentAlbum);
-						SendNotification("Album key in discord too long",
-							$"The key for {currentAlbum.Name} ({albumKey}) is longer than the " + keyLength + " character maximum");
+						SendNotification(langHelper[LocalizableStrings.NOTIF_KEY_TOO_LONG_HEADER],
+							string.Format(langHelper[LocalizableStrings.NOTIF_KEY_TOO_LONG_BODY], currentAlbum.Name, albumKey, keyLength));
 					}
 				}
 			}
 
 			Console.ForegroundColor = ConsoleColor.White;
-			Console.Write(" Player: ");
+			Console.Write(new string(' ', totalBufLen - langHelper.get(LocalizableStrings.PLAYER).Length + 1) + langHelper.get(LocalizableStrings.PLAYER) + ": ");
 
 			Console.ForegroundColor =
 				PlayerColors.ContainsKey(_playerName) ? PlayerColors[_playerName] : ConsoleColor.White;
 			Console.Write(Whatpeoplecallthisplayer[_playerName]);
 
-			if (remoteControl) Console.Write(" using special integration!");
+			if (remoteControl) Console.Write(" " + langHelper[LocalizableStrings.SPECIAL_INTEGRATION]);
 
 			Console.WriteLine();
 
 			if (presenceIsRich)
 			{
 				Console.ForegroundColor = ConsoleColor.Green;
-				Console.WriteLine("\nThis is a good one, check ur DRP ;)");
+				Console.WriteLine("\n" + langHelper.get(LocalizableStrings.GOOD_ONE));
 			}
 			else if (WrongArtistFlag)
 			{
 				Console.ForegroundColor = ConsoleColor.Yellow;
-				Console.WriteLine("\nAlbum keyed for the wrong artist :/");
+				Console.WriteLine("\n" + langHelper.get(LocalizableStrings.KEYED_WRONG));
 			}
 			else
 			{
 				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine("\nAlbum not keyed :(");
+				Console.WriteLine("\n" + langHelper.get(LocalizableStrings.UNKEYED));
 			}
 
 			Console.ForegroundColor = ConsoleColor.White;
@@ -875,7 +868,7 @@ namespace MDRP
 				Console.Clear();
 #endif
 				DrawPersistentHeader();
-				Console.Write("Nothing Playing (probably paused)\r");
+				Console.Write(langHelper[LocalizableStrings.NOTHING_PLAYING] + "\r");
 			}
 		}
 
@@ -885,7 +878,7 @@ namespace MDRP
 			Console.WriteLine(Title);
 
 			Console.ForegroundColor = ConsoleColor.White;
-			Console.Write("Version: ");
+			Console.Write(langHelper.get(LocalizableStrings.VERSION) + ": ");
 
 			Console.ForegroundColor = ConsoleColor.Gray;
 			Console.Write(Version);
@@ -893,7 +886,7 @@ namespace MDRP
 			if (UpdateAvailibleFlag)
 			{
 				Console.ForegroundColor = ConsoleColor.Green;
-				Console.Write(" NEW UPDATE " + UpdateVersion + " (goto github to download)");
+				Console.Write(string.Format(" " + langHelper[LocalizableStrings.NEW_UPDATE], UpdateVersion));
 			}
 
 			Console.WriteLine();
@@ -918,8 +911,7 @@ namespace MDRP
 				Console.Clear();
 #endif
 				DrawPersistentHeader();
-				Console.Write(
-					"Detected volume in something but not showing as it is not currently supported or is disabled");
+				Console.Write(langHelper[LocalizableStrings.NO_VALID_MEDIA]);
 			}
 		}
 
@@ -1063,25 +1055,24 @@ namespace MDRP
 						foundSecond = true;
 						lineData = lineData + "\n" + String.Join("=", line.Split('=').Skip(1));
 					}
-					/*else if (line.Split('=')[0].Trim().ToLower() == "artist label")
-					{
-						ArtistLabel = line.Split('=')[1];
-					}
-					else if (line.Split('=')[0].Trim().ToLower() == "title label")
-					{
-						TitleLabel = line.Split('=')[1];
-					}*/
+				/*else if (line.Split('=')[0].Trim().ToLower() == "artist label")
+				{
+					ArtistLabel = line.Split('=')[1];
+				}
+				else if (line.Split('=')[0].Trim().ToLower() == "title label")
+				{
+					TitleLabel = line.Split('=')[1];
+				}*/
 			}
 			catch (Exception e)
 			{
 				SendToDebugServer(e);
-				SendToDebugServer(
-					"DiscordPresenceConfig.ini not found! this is the settings file to enable or disable certain features");
+				SendToDebugServer(langHelper[LocalizableStrings.NO_SETTINGS]);
 			}
 
 			if (!foundFirst && !foundSecond)
 			{
-				lineData = "Title: ${title}\nArtist: ${artist}";
+				lineData = langHelper.get(LocalizableStrings.TITLE) + ": ${title}\n" + langHelper.get(LocalizableStrings.ARTIST) + ": ${artist}";
 			}
 
 			try
@@ -1117,9 +1108,9 @@ namespace MDRP
 
 					if (!lines[1].ToLower().Contains("id="))
 					{
-						Console.Error.WriteLine("Error in file " + file.Name + " no id found on the second line");
-						SendNotification("\"MDRP settings issue\"",
-							"\"Error in file " + file.Name + " no id found on the second line\"");
+						Console.Error.WriteLine(string.Format(langHelper[LocalizableStrings.NOTIF_SETERR_NO_ID_HEADER], file.Name));
+						SendNotification(langHelper[LocalizableStrings.NOTIF_SETERR_NO_ID_HEADER],
+							string.Format(langHelper[LocalizableStrings.NOTIF_SETERR_NO_ID_HEADER], file.Name));
 						Thread.Sleep(5000);
 						continue;
 					}
@@ -1155,8 +1146,8 @@ namespace MDRP
 							if (lines[i].Trim() != "" && !warnedFile)
 							{
 								warnedFile = true;
-								SendNotification("Deprecation Notice",
-									$"{file.Name} uses a deprecated keying format. Albums sould go in form Name==key==Artist");
+								SendNotification(langHelper[LocalizableStrings.NOTIF_SETERR_DEPREC_HEADER],
+									string.Format(langHelper[LocalizableStrings.NOTIF_SETERR_DEPREC_BODY], file.Name));
 							}
 
 							continue;
@@ -1221,8 +1212,8 @@ namespace MDRP
 						UpdateVersion = str.Replace("\"tag_name\":\"", "").Replace("\"", "");
 						if (ScreamAtUser && !UpdateAvailibleFlag)
 							if (str.Replace("\"tag_name\":\"", "").Replace("\"", "") != Version)
-								SendNotification("Update Available",
-									UpdateVersion + " is published on github. Go there for the latest version");
+								SendNotification(langHelper[LocalizableStrings.NOTIF_UPDATE_HEADER],
+									string.Format(langHelper[LocalizableStrings.NOTIF_UPDATE_BODY], UpdateVersion));
 						UpdateAvailibleFlag = UpdateVersion != Version;
 					}
 			});

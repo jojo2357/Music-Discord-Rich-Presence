@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')"/>
+    <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
     <PropertyGroup>
         <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
         <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -13,7 +13,7 @@
         <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
         <Deterministic>true</Deterministic>
         <IsWebBootstrapper>false</IsWebBootstrapper>
-        <TargetFrameworkProfile/>
+        <TargetFrameworkProfile />
         <NuGetPackageImportStamp>
         </NuGetPackageImportStamp>
         <PublishUrl>publish\</PublishUrl>
@@ -54,7 +54,7 @@
         <WarningLevel>4</WarningLevel>
         <DebugSymbols>false</DebugSymbols>
     </PropertyGroup>
-    <PropertyGroup/>
+    <PropertyGroup />
     <PropertyGroup>
         <ApplicationManifest>app.manifest</ApplicationManifest>
     </PropertyGroup>
@@ -71,14 +71,15 @@
         <RunPostBuildEvent>Always</RunPostBuildEvent>
     </PropertyGroup>
     <ItemGroup>
-        <Compile Include="Program.cs"/>
-        <Compile Include="Properties\AssemblyInfo.cs"/>
-        <Compile Include="util\Album.cs"/>
-        <Compile Include="util\JsonResponse.cs"/>
+        <Compile Include="Program.cs" />
+        <Compile Include="Properties\AssemblyInfo.cs" />
+        <Compile Include="util\Album.cs" />
+        <Compile Include="util\JsonResponse.cs" />
+        <Compile Include="util\LangHelper.cs" />
     </ItemGroup>
     <ItemGroup>
-        <None Include="App.config"/>
-        <None Include="app.manifest"/>
+        <None Include="App.config" />
+        <None Include="app.manifest" />
     </ItemGroup>
     <ItemGroup>
         <BootstrapperPackage Include=".NETFramework,Version=v4.6">
@@ -93,7 +94,7 @@
         </BootstrapperPackage>
     </ItemGroup>
     <ItemGroup>
-        <Content Include="discordapp.ico"/>
+        <Content Include="discordapp.ico" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="CSCore">
@@ -107,11 +108,11 @@
         </PackageReference>
     </ItemGroup>
     <ItemGroup>
-        <WCFMetadata Include="Connected Services\"/>
+        <WCFMetadata Include="Connected Services\" />
     </ItemGroup>
     <ItemGroup>
-        <Reference Include="Microsoft.CSharp"/>
-        <Reference Include="System"/>
+        <Reference Include="Microsoft.CSharp" />
+        <Reference Include="System" />
     </ItemGroup>
     <ItemGroup>
         <COMReference Include="IWshRuntimeLibrary">
@@ -124,7 +125,7 @@
             <EmbedInteropTypes>True</EmbedInteropTypes>
         </COMReference>
     </ItemGroup>
-    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
+    <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
     <PropertyGroup>
         <PreBuildEvent>rem taskkill /im MDRP.exe</PreBuildEvent>
     </PropertyGroup>
