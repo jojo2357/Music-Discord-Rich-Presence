@@ -1,5 +1,5 @@
 |Lang (# files)|Lines (% total)|Code Lines|% Code|Comment Lines|% Comments|Blank Lines|% Blank|
 | --- | --- | --- | --- | --- | --- | --- | --- |
-|[c#](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/statistics/c%23/lines_descending.md) (4)|1496 (81.0%)|1238|82.8%|89|5.9%|169|11.3%|
-|[batch](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/statistics/batch/lines_descending.md) (9)|340 (18.4%)|218|64.1%|25|7.4%|97|28.5%|
-|[javascript](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/statistics/javascript/lines_descending.md) (1)|11 (0.6%)|9|81.8%|0|0.0%|2|18.2%|
+|[c#](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/statistics/c%23/lines_descending.md) (5)|1655 (75.8%)|1392|84.1%|86|5.2%|177|10.7%|
+|[batch](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/statistics/batch/lines_descending.md) (15)|516 (23.6%)|333|64.5%|30|5.8%|153|29.7%|
+|[javascript](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/statistics/javascript/lines_descending.md) (1)|11 (0.5%)|9|81.8%|0|0.0%|2|18.2%|
