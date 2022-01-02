@@ -64,11 +64,24 @@ If you really want to, you can go into the ini config and swap the application i
 - Groove Music (music.ui)
 - Spotify
 - MusicBee
+- Tidal Music
+- Wave Link
 (More can be added, I just dunno if it's needed)
 
 ## Music Bee
-- In order to be compatible with music bee, you have to add [my new plugin](https://github.com/jojo2357/MDRP-MusicBee-Bridge). The WMC plugin required before is no longer needed.
+In order to be compatible with music bee, you have to add [my new plugin](https://github.com/jojo2357/MDRP-MusicBee-Bridge). The WMC plugin required before is no longer needed.
 
+## Languages
+To change the language, move the default `english-us.lang` back to the `languages` folder and then move the `.lang` file you need from the languages folder to the same directory as the readme and launcher.
+  
+Feel free to contribute a new language, it is recommended to join [my discord](https://discord.gg/qVbY2ygeGy) so we can make sure we get the translations right.
+  
+### Supported Langs
+- English
+- Spanish
+- German
+- Dutch
+  
 The new icon is thanks to [Ghoelian](https://github.com/Ghoelian) so thanks for that!
 
 ### Licence

@@ -1,0 +1,1 @@
+del LinkWithGrooveClose.xml LinkWithGrooveOpen.xml filelocation.dat spotifylocation.dat LinkWithSpotifyClose.xml LinkWithSpotifyOpen.xml wmplocation.dat LinkWithWMPClose.xml LinkWithWMPOpen.xml

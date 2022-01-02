@@ -1,0 +1,41 @@
+MDRP_FULL==Music Discord Rich Presence
+MDRP_SHORT==MDRP
+DRP_FULL==Discord Rich Presence
+DRP_SHORT==DRP
+ARTIST==Artiest
+ALBUM==Album
+TITLE==Titel
+PLAYER==Speler
+VERSION==Versie
+DETAILS==Muziek details
+GOOD_ONE==Dit is een goeie, check je DRP ;)
+KEYED_WRONG==Album ingetoetst voor de verkeerde artiest :/
+UNKEYED==Album niet ingetoetst :(
+UNKNOWN_ARTIST==Onbekende Artiest
+CONSOLE_NAME==Discord Rich Presence voor Groove
+NO_VALID_MEDIA==Er wordt volume in iets gedetecteerd, maar dit wordt niet getoond omdat dit helaas niet ondersteund of geactiveerd is.
+REQUIRE_PIPELINE==Er wordt volume in {0} gedetecteerd, maar er wordt geen data van ontvangen. Wellicht heeft de speler een update nodig, of moet er een plugin geïnstalleerd worden, of de muziek moet simpelweg gepauzeerd en hervat worden. Voor meer info:
+AND==en
+FAILED_TO_GET_INFO==Niet gelukt om informatie over track te vinden
+UNKNOWN_ALBUM==Onbekend Album
+ERROR_OCCURRED==Er is een fout opgetreden. Als dit ernstig is, of wanneer je meer informatie wilt, gebruik dan de debug tool en gebruik de printouts daar. Als dit probleem je MDRP ervaring ernstig ondermijnt, rapporteer het dan door een issue to openen op GitHub.
+REQUEST_DEBUG_TOOL==Er is een fout opgetreden. Gebruik de debug tool A.U.B. om een diepere foutmelding te krijgen en open dan een issue op Github over deze foutmelding.
+SPECIAL_INTEGRATION==gebruikt speciale integratie!
+NOTHING_PLAYING==Niks wordt afgespeeld (waarschijnlijk gepauzeerd)
+NEW_UPDATE==NIEUWE UPDATE {0} (ga naar Github om het te krijgen!)
+NO_SETTINGS==DiscordPresenceConfig.ini is niet gevonden! Dit is het configuratiebestand waarin bepaalde functionaliteit in- en uitgeschakeld kan worden.
+NOTIF_KEYED_WRONG_HEADER==Album verkeerd ingetoetst
+NOTIF_KEYED_WRONG_BODY==is ingetoetst voor een andere artiest (check hoofdletters). Om deze meldingen uit te schakelen dien je "verbose" op "false" te zetten in  DiscordPresenceConfig.ini
+NOTIF_UNKEYED_HEADER==Album niet ingetoetst
+NOTIF_UNKEYED_BODY==is not ingetoetst. Om deze meldingen uit te schakelen dien je "verbose" op "false" te zetten in  DiscordPresenceConfig.ini
+NOTIF_KEY_TOO_LONG_HEADER==Album sleutel in discord is te lang
+NOTIF_KEY_TOO_LONG_BODY==De sleutel voor {0} ({1}) is langer dan het {2} maximaal aantal karakters.
+NOTIF_SETERR_NO_ID_HEADER==MDRP instellingsfout
+NOTIF_SETERR_NO_ID_BODY==Fout in het bestand {0} geen id gevonden op de tweede regel
+NOTIF_SETERR_DEPREC_HEADER==Afschrijvingsbericht
+NOTIF_SETERR_DEPREC_BODY=={0} gebruikt een verlopen sleutelformaat. Albums moeten in het formaat Naam==Sleutel==Artiest ingetoetst zijn
+NOTIF_UPDATE_HEADER==Update Beschikbaar
+NOTIF_UPDATE_BODY=={0} is gepubliceerd op Github. Ga daarnaartoe voor de meest recente versie
+USING==In gebruik
+PAUSED==Gepauzeerd
+KEY_TOO_LONG==De sleutel voor dit album is te lang. Het moet {0} of minder karakters zijn
