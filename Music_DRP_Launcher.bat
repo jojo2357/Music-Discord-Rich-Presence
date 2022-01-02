@@ -13,9 +13,11 @@
 ::: [2] Launch DRP
 ::: [3] Kill Hidden DRP
 ::: [4] Link Rich Presence with Groove
-::: [5] Link with MusicBee (deprecated)
-::: [6] Unlink Rich Presence with Groove
-::: [7] Unlink from MusicBee (deprecated)
+::: [5] Link Rich Presence with Windows Media Player (Windows 11)
+::: [6] Link Rich Presence with System Start
+::: [7] Unlink Rich Presence with Groove
+::: [8] Unkink Rich Presence with Windows Media Player (Windows 11)
+::: [9] Unkink Rich Presence with System Start
 :::
 
 @echo off
@@ -32,9 +34,11 @@ IF %O%==1 GOTO LAUNCHDRPHIDDEN
 IF %O%==2 GOTO LAUNCHDRP
 IF %O%==3 GOTO KILLHIDDENDRP
 IF %O%==4 GOTO LINKDRPGROOVE
-REM IF %O%==5 GOTO LINKDRPMUSICBEE
-IF %O%==6 GOTO UNLINKDRPGROOVE
-REM IF %O%==7 GOTO UNLINKDRPMUSICBEE
+IF %O%==5 GOTO LINKDRPWMP
+IF %O%==6 GOTO LINKDRPSYSSTART
+IF %O%==7 GOTO UNLINKDRPGROOVE
+IF %O%==8 GOTO UNLINKDRPWMP
+IF %O%==9 GOTO UNLINKDRPSYSSTART
 GOTO MENU
 :LAUNCHDRPHIDDEN
 "%mypath%\MDRP\bin\Release\MDRP.exe" Shortcuts_Only
@@ -50,12 +54,18 @@ GOTO MENU
 :LINKDRPGROOVE
 call "%mypath%\MDRP\bin\Release\LinkWithGroove.bat"
 GOTO MENU
-:LINKDRPMUSICBEE
-call "%mypath%\MDRP\bin\Release\LinkWithMusicBee.bat"
+:LINKDRPWMP
+call "%mypath%\MDRP\bin\Release\LinkWithWMP.bat"
+GOTO MENU
+:LINKDRPSYSSTART
+call "%mypath%\MDRP\bin\Release\LinkSystemStartAndMDRP.bat"
 GOTO MENU
 :UNLINKDRPGROOVE
 call "%mypath%\MDRP\bin\Release\UnlinkFromGroove.bat"
 GOTO MENU
-:UNLINKDRPMUSICBEE
-call "%mypath%\MDRP\bin\Release\UnlinkFromMusicBee.bat"
+:UNLINKDRPWMP
+call "%mypath%\MDRP\bin\Release\UnlinkFromWMP.bat"
+GOTO MENU
+:UNLINKDRPSYSSTART
+call "%mypath%\MDRP\bin\Release\UnlinkFromSystemStart.bat"
 GOTO MENU

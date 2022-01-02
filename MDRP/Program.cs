@@ -42,6 +42,8 @@ namespace MDRP
 				{ "musicbee", new DiscordRpcClient("820837854385012766", autoEvents: false) },
 				{ "apple music", new DiscordRpcClient("870047192889577544", autoEvents: false) },
 				{ "spotify", new DiscordRpcClient("802222525110812725", autoEvents: false) },
+				{ "tidalplayer", new DiscordRpcClient("922625678271197215", autoEvents: false) },
+				{ "wavelink", new DiscordRpcClient("927328178618376212", autoEvents: false) },
 				{ "", new DiscordRpcClient("821398156905283585", autoEvents: false) }
 			};
 
@@ -72,13 +74,15 @@ namespace MDRP
 			{ "microsoft.media.player", ConsoleColor.Blue},
 			{ "apple music", ConsoleColor.DarkRed },
 			{ "spotify", ConsoleColor.DarkGreen },
-			{ "musicbee", ConsoleColor.Yellow }
+			{ "musicbee", ConsoleColor.Yellow },
+			{ "tidalplayer", ConsoleColor.Gray},
+			{ "wavelink", ConsoleColor.DarkBlue},
 		};
 
 		private static string _presenceDetails = string.Empty;
 
 		private static readonly string[] ValidPlayers = 
-			{ "apple music", "music.ui", "spotify", "musicbee", "microsoft.media.player" };
+			{ "apple music", "music.ui", "spotify", "musicbee", "microsoft.media.player", "tidalplayer", "wavelink" };
 
 		private static readonly string[] RequiresPipeline = { "musicbee" };
 
@@ -90,7 +94,9 @@ namespace MDRP
 			{ "apple music", "Apple Music" },
 			{ "groove", "Groove Music Player" },
 			{ "microsoft.media.player", "Windows Media Player" },
-			{ "music.ui", "Groove Music Player" }
+			{ "music.ui", "Groove Music Player" },
+			{ "tidalplayer", "Tidal Music"},
+			{ "wavelink", "Wave Link"}
 		};
 
 		private static readonly Dictionary<string, string> BigAssets = new Dictionary<string, string>
@@ -99,7 +105,9 @@ namespace MDRP
 			{ "music.ui", "groove" },
 			{ "microsoft.media.player", "groove"},
 			{ "spotify", "spotify" },
-			{ "apple music", "applemusic" }
+			{ "apple music", "applemusic" },
+			{ "tidalplayer", "tidalplayer"},
+			{ "wavelink", "wavelink"},
 		};
 
 		//might just combine these later
@@ -109,7 +117,9 @@ namespace MDRP
 			{ "music.ui", "groove_small" },
 			{ "microsoft.media.player", "groove_small"},
 			{ "spotify", "spotify_small" },
-			{ "apple music", "applemusic_small" }
+			{ "apple music", "applemusic_small" },
+			{ "tidalplayer", "tidal_small"},
+			{ "wavelink", "wavelink_small"},
 		};
 
 		private static readonly Dictionary<string, string> Whatpeoplecallthisplayer = new Dictionary<string, string>
@@ -118,7 +128,9 @@ namespace MDRP
 			{ "music.ui", "Groove Music" },
 			{ "microsoft.media.player", "Windows Media Player"},
 			{ "spotify", "Spotify" },
-			{ "apple music", "Apple Music" }
+			{ "apple music", "Apple Music" },
+			{ "tidalplayer", "Tidal Music"},
+			{ "wavelink", "Wave Link"}
 		};
 		
 		private static readonly Dictionary<string, string> InverseWhatpeoplecallthisplayer =
@@ -128,7 +140,9 @@ namespace MDRP
 				{ "groove", "music.ui" },
 				{ "Microsoft.Media.Player", "microsoft.media.player"},
 				{ "spotify", "spotify" },
-				{ "Apple Music", "apple music" }
+				{ "Apple Music", "apple music" },
+				{ "Tidal Music", "tidalplayer"},
+				{ "Wave Link", "wavelink"}
 			};
 		
 		private static readonly string defaultPlayer = "groove";
