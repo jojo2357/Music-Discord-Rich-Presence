@@ -10,7 +10,7 @@ VERSION==Versión
 DETAILS==Detalles
 GOOD_ONE==Buena selección, revisa tu DRP ;)
 KEYED_WRONG==Álbum metido para artista equivocado :/
-UNKEYED==Álbum no metido :("
+UNKEYED==Álbum no metido :(
 UNKNOWN_ARTIST==Artista desconocido
 CONSOLE_NAME==Discord Rich Presence para Groove
 NO_VALID_MEDIA==Volumen detectado pero no se muestra porque actualmente no es compatible o está deshabilitado

@@ -23,7 +23,7 @@ namespace MDRP
 	internal partial class Program
 	{
 		public static LangHelper langHelper = new LangHelper();
-		private const string Version = "1.6.2";
+		private const string Version = "1.6.3";
 		private const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
 		private static readonly string Title = langHelper.get(LocalizableStrings.MDRP_FULL);
 		private const int titleLength = 64;
@@ -38,7 +38,7 @@ namespace MDRP
 			new Dictionary<string, DiscordRpcClient>
 			{
 				{ "music.ui", new DiscordRpcClient("807774172574253056", autoEvents: false) },
-				{ "microsoft.media.player", new DiscordRpcClient("807774172574253056", autoEvents: false)},
+				{ "microsoft.media.player", new DiscordRpcClient("807774172574253056", autoEvents: false) },
 				{ "musicbee", new DiscordRpcClient("820837854385012766", autoEvents: false) },
 				{ "apple music", new DiscordRpcClient("870047192889577544", autoEvents: false) },
 				{ "spotify", new DiscordRpcClient("802222525110812725", autoEvents: false) },
@@ -71,17 +71,17 @@ namespace MDRP
 		private static readonly Dictionary<string, ConsoleColor> PlayerColors = new Dictionary<string, ConsoleColor>
 		{
 			{ "music.ui", ConsoleColor.Blue },
-			{ "microsoft.media.player", ConsoleColor.Blue},
+			{ "microsoft.media.player", ConsoleColor.Blue },
 			{ "apple music", ConsoleColor.DarkRed },
 			{ "spotify", ConsoleColor.DarkGreen },
 			{ "musicbee", ConsoleColor.Yellow },
-			{ "tidalplayer", ConsoleColor.Gray},
-			{ "wavelink", ConsoleColor.DarkBlue},
+			{ "tidalplayer", ConsoleColor.Gray },
+			{ "wavelink", ConsoleColor.DarkBlue },
 		};
 
 		private static string _presenceDetails = string.Empty;
 
-		private static readonly string[] ValidPlayers = 
+		private static readonly string[] ValidPlayers =
 			{ "apple music", "music.ui", "spotify", "musicbee", "microsoft.media.player", "tidalplayer", "wavelink" };
 
 		private static readonly string[] RequiresPipeline = { "musicbee" };
@@ -95,19 +95,19 @@ namespace MDRP
 			{ "groove", "Groove Music Player" },
 			{ "microsoft.media.player", "Windows Media Player" },
 			{ "music.ui", "Groove Music Player" },
-			{ "tidalplayer", "Tidal Music"},
-			{ "wavelink", "Wave Link"}
+			{ "tidalplayer", "Tidal Music" },
+			{ "wavelink", "Wave Link" }
 		};
 
 		private static readonly Dictionary<string, string> BigAssets = new Dictionary<string, string>
 		{
 			{ "musicbee", "musicbee" },
 			{ "music.ui", "groove" },
-			{ "microsoft.media.player", "groove"},
+			{ "microsoft.media.player", "groove" },
 			{ "spotify", "spotify" },
 			{ "apple music", "applemusic" },
-			{ "tidalplayer", "tidalplayer"},
-			{ "wavelink", "wavelink"},
+			{ "tidalplayer", "tidalplayer" },
+			{ "wavelink", "wavelink" },
 		};
 
 		//might just combine these later
@@ -115,36 +115,36 @@ namespace MDRP
 		{
 			{ "musicbee", "musicbee_small" },
 			{ "music.ui", "groove_small" },
-			{ "microsoft.media.player", "groove_small"},
+			{ "microsoft.media.player", "groove_small" },
 			{ "spotify", "spotify_small" },
 			{ "apple music", "applemusic_small" },
-			{ "tidalplayer", "tidal_small"},
-			{ "wavelink", "wavelink_small"},
+			{ "tidalplayer", "tidal_small" },
+			{ "wavelink", "wavelink_small" },
 		};
 
 		private static readonly Dictionary<string, string> Whatpeoplecallthisplayer = new Dictionary<string, string>
 		{
 			{ "musicbee", "Music Bee" },
 			{ "music.ui", "Groove Music" },
-			{ "microsoft.media.player", "Windows Media Player"},
+			{ "microsoft.media.player", "Windows Media Player" },
 			{ "spotify", "Spotify" },
 			{ "apple music", "Apple Music" },
-			{ "tidalplayer", "Tidal Music"},
-			{ "wavelink", "Wave Link"}
+			{ "tidalplayer", "Tidal Music" },
+			{ "wavelink", "Wave Link" }
 		};
-		
+
 		private static readonly Dictionary<string, string> InverseWhatpeoplecallthisplayer =
 			new Dictionary<string, string>
 			{
 				{ "musicbee", "musicbee" },
 				{ "groove", "music.ui" },
-				{ "Microsoft.Media.Player", "microsoft.media.player"},
+				{ "Microsoft.Media.Player", "microsoft.media.player" },
 				{ "spotify", "spotify" },
 				{ "Apple Music", "apple music" },
-				{ "Tidal Music", "tidalplayer"},
-				{ "Wave Link", "wavelink"}
+				{ "Tidal Music", "tidalplayer" },
+				{ "Wave Link", "wavelink" }
 			};
-		
+
 		private static readonly string defaultPlayer = "groove";
 		private static readonly int timeout_seconds = 60;
 
@@ -211,6 +211,15 @@ namespace MDRP
 				}
 
 				string decodedText = Uri.UnescapeDataString(text);
+
+				if (decodedText == "{message:\"please die\"}")
+				{
+					byte[] deathdata = Encoding.UTF8.GetBytes("{message:\"i die now\"");
+					resp.OutputStream.Write(deathdata, 0, deathdata.Length);
+					resp.Close();
+					listener.Close();
+					Environment.Exit(0);
+				}
 
 				string response;
 				try
@@ -284,7 +293,18 @@ namespace MDRP
 		{
 			listener = new HttpListener();
 			listener.Prefixes.Add(url);
-			listener.Start();
+			try
+			{
+				listener.Start();
+			}
+			catch (Exception)
+			{
+				if (!AttemptToCloseConflict())
+					return;
+				listener = new HttpListener();
+				listener.Prefixes.Add(url);
+				listener.Start();
+			}
 			//Console.WriteLine("Listening for connections on {0}", url);
 
 			// Handle requests
@@ -293,6 +313,39 @@ namespace MDRP
 
 			// Close the listener
 			listener.Close();
+		}
+
+		private static bool AttemptToCloseConflict()
+		{
+			Uri conflictedURI = new Uri("http://localhost:2357/");
+			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(conflictedURI);
+			request.Method = "POST";
+			request.ContentType = "text/json";
+			string urlEncoded = Uri.EscapeUriString("{message:\"please die\"}");
+			byte[] arr = Encoding.UTF8.GetBytes(urlEncoded);
+			try
+			{
+				Stream rs = request.GetRequestStream();
+				rs.Write(arr, 0, arr.Length);
+				WebResponse res = request.GetResponse();
+				string text = "";
+				using (StreamReader reader = new StreamReader(res.GetResponseStream(), Encoding.UTF8))
+				{
+					text = reader.ReadToEnd();
+				}
+
+				res.Close();
+
+				if (text.ToLower() == "{message:\"i die now\"")
+					return true;
+				return false;
+			}
+			catch (Exception)
+			{
+				return true;
+			}
+
+			return false;
 		}
 
 
@@ -333,7 +386,7 @@ namespace MDRP
 
 			foreach (DiscordRpcClient client in AllClients.Values)
 			{
-				client.Initialize();
+				if (!client.Initialize()) Console.WriteLine("Could not init client with id: " + client.ApplicationID);
 				client.OnError += _client_OnError;
 			}
 
@@ -421,7 +474,7 @@ namespace MDRP
 							_currentTrack.Artist,
 							_currentTrack.AlbumArtist));
 						activeClient.UpdateSmallAsset("paused", "paused");
-						activeClient.Invoke();
+						InvokeActiveClient();
 						SetConsole(_lastTrack.Title, _lastTrack.Artist, _lastTrack.AlbumTitle,
 							currentAlbum);
 					}
@@ -485,7 +538,7 @@ namespace MDRP
 							});
 							SetConsole(_currentTrack.Title, _currentTrack.Artist, _currentTrack.AlbumTitle,
 								currentAlbum);
-							activeClient.Invoke();
+							InvokeActiveClient();
 						}
 					}
 
@@ -515,6 +568,12 @@ namespace MDRP
 					SetClear();
 				UnsetAllPresences();
 			}
+		}
+
+		private static void InvokeActiveClient()
+		{
+			if (!activeClient.IsInitialized) activeClient.Initialize();
+			activeClient.Invoke();
 		}
 
 		private static void HandleRemoteRequests()
@@ -617,7 +676,7 @@ namespace MDRP
 						SmallImageText = GetSmallImageText()
 					}
 				});
-				activeClient.Invoke();
+				InvokeActiveClient();
 
 				if (ScreamAtUser && !presenceIsRich && !NotifiedAlbums.Contains(currentAlbum) &&
 				    currentAlbum.Name != "")
@@ -859,7 +918,7 @@ namespace MDRP
 			else if (WrongArtistFlag)
 			{
 				Console.ForegroundColor = ConsoleColor.Yellow;
-				Console.WriteLine("\n" + langHelper.get(LocalizableStrings.KEYED_WRONG));
+				Console.WriteLine("\n" + langHelper.get(LocalizableStrings.KEYED_WRONG) + " Got \"" + album.GetArtistString() + "\" but expected \"" + Program.GetNameNotQuite(album).GetArtistString() + "\"");
 			}
 			else
 			{
@@ -1301,6 +1360,14 @@ namespace MDRP
 				if (alboom.Name == query.Name)
 					return true;
 			return false;
+		}
+
+		private static Album GetNameNotQuite(Album query)
+		{
+			foreach (Album alboom in AlbumKeyMapping.Keys)
+				if (alboom.Name == query.Name)
+					return alboom;
+			return null;
 		}
 	}
 }

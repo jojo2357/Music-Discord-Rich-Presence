@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 
 namespace MDRP
 {
@@ -6,6 +7,15 @@ namespace MDRP
 	{
 		private readonly string[] Artists;
 		public readonly string Name;
+
+		public string GetArtistString()
+		{
+			if (Artists.Length == 0)
+				return "";
+			if (Artists.Length == 1)
+				return Artists[0];
+			return String.Join(", ", Artists);
+		}
 
 		public Album(string name) : this(name, "*")
 		{

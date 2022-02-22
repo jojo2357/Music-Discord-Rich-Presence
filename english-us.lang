@@ -10,7 +10,7 @@ VERSION==Version
 DETAILS==Music details
 GOOD_ONE==This is a good one, check your DRP ;)
 KEYED_WRONG==Album keyed for the wrong artist :/
-UNKEYED==Album not keyed :("
+UNKEYED==Album not keyed :(
 UNKNOWN_ARTIST==Unknown Artist
 CONSOLE_NAME==Discord Rich Presence for Groove
 NO_VALID_MEDIA==Detected volume in something but not showing as it is not currently supported or is disabled
