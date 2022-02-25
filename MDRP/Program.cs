@@ -23,7 +23,7 @@ namespace MDRP
 	internal partial class Program
 	{
 		public static LangHelper langHelper = new LangHelper();
-		private const string Version = "1.6.3";
+		private const string Version = "1.6.4";
 		private const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
 		private static readonly string Title = langHelper.get(LocalizableStrings.MDRP_FULL);
 		private const int titleLength = 64;
@@ -238,7 +238,7 @@ namespace MDRP
 						                 AlbumKeyMapping[parsedJason.Album]
 							                 .ContainsKey(activeClient.ApplicationID);
 
-						WrongArtistFlag = HasNameNotQuite(new Album(parsedJason.Album.Name));
+						WrongArtistFlag = HasNameNotQuite(new Album(parsedJason.Album.Name), parsedJason.Player);
 						if (!presenceIsRich)
 						{
 							if (WrongArtistFlag)
@@ -509,7 +509,7 @@ namespace MDRP
 							                 AlbumKeyMapping[currentAlbum]
 								                 .ContainsKey(activeClient.ApplicationID);
 
-							WrongArtistFlag = HasNameNotQuite(new Album(_currentTrack.AlbumTitle));
+							WrongArtistFlag = HasNameNotQuite(new Album(_currentTrack.AlbumTitle), _playerName);
 
 							if (ScreamAtUser && !presenceIsRich && !NotifiedAlbums.Contains(currentAlbum) &&
 							    currentAlbum.Name != "")
@@ -637,7 +637,7 @@ namespace MDRP
 				presenceIsRich = AlbumKeyMapping.ContainsKey(currentAlbum) &&
 				                 AlbumKeyMapping[currentAlbum].ContainsKey(activeClient.ApplicationID);
 
-				WrongArtistFlag = HasNameNotQuite(new Album(lastMessage.Album.Name));
+				WrongArtistFlag = HasNameNotQuite(new Album(lastMessage.Album.Name), _playerName);
 
 				Console.WriteLine(CapLength($"{langHelper[LocalizableStrings.TITLE]}: {lastMessage.Title}", titleLength));
 				Console.WriteLine(CapLength($"{langHelper[LocalizableStrings.ARTIST]}: {(lastMessage.Artist == "" ? langHelper[LocalizableStrings.UNKNOWN_ARTIST] : lastMessage.Artist)}", artistLength));
@@ -821,10 +821,13 @@ namespace MDRP
 
 		private static DiscordRpcClient GetBestClient(Dictionary<string, string> album)
 		{
+			string playerName = _playerName;
+			if (playerName.ToLower() == "microsoft.media.player")
+				playerName = "music.ui";
 			try
 			{
-				if (PlayersClients.ContainsKey(_playerName))
-					foreach (DiscordRpcClient klient in PlayersClients[_playerName])
+				if (PlayersClients.ContainsKey(playerName))
+					foreach (DiscordRpcClient klient in PlayersClients[playerName])
 						if (album.ContainsKey(klient.ApplicationID))
 							return klient;
 			}
@@ -833,7 +836,7 @@ namespace MDRP
 				SendToDebugServer(e);
 			}
 
-			return DefaultClients[_playerName];
+			return DefaultClients[playerName];
 		}
 
 		public static string CapLength(string instring, int capLength)
@@ -918,7 +921,13 @@ namespace MDRP
 			else if (WrongArtistFlag)
 			{
 				Console.ForegroundColor = ConsoleColor.Yellow;
-				Console.WriteLine("\n" + langHelper.get(LocalizableStrings.KEYED_WRONG) + " Got \"" + album.GetArtistString() + "\" but expected \"" + Program.GetNameNotQuite(album).GetArtistString() + "\"");
+				Console.WriteLine("\n" + langHelper.get(LocalizableStrings.KEYED_WRONG) + " Got \"" + album.GetArtistString() + "\" but expected \"" + Program.GetNameNotQuite(album, _playerName).GetArtistString() + "\"");
+				/*foreach (string str in Program.GetNameNotQuite(album, _playerName).Artists)
+				{
+					Console.Write(album.GetArtistString() + ", " + str + "\t");
+					Console.Write(album.GetArtistString().Zip(str, (c1, c2) => c1 == c2).TakeWhile(b => b).Count() + " != " + album.GetArtistString().Zip(str, (c1, c2) => c1 == c2).TakeWhile(b => b).Count());
+					Console.WriteLine(" " + album.GetArtistString().ToCharArray()[album.GetArtistString().Zip(str, (c1, c2) => c1 == c2).TakeWhile(b => b).Count()] + " != " + str.ToCharArray()[album.GetArtistString().Zip(str, (c1, c2) => c1 == c2).TakeWhile(b => b).Count()]);
+				}*/
 			}
 			else
 			{
@@ -1354,19 +1363,31 @@ namespace MDRP
 		/**
 		 * Returns true if the loaded albums contain the title of the passed album, disregarding the artists
 		 */
-		private static bool HasNameNotQuite(Album query)
+		private static bool HasNameNotQuite(Album query, string player)
 		{
-			foreach (Album alboom in AlbumKeyMapping.Keys)
-				if (alboom.Name == query.Name)
-					return true;
+			if (PlayersClients.ContainsKey(player))
+				foreach (Album alboom in AlbumKeyMapping.Keys)
+					if (alboom.Name.Equals(query.Name))
+						foreach (DiscordRpcClient klient in PlayersClients[player])
+							if (AlbumKeyMapping[alboom].ContainsKey(klient.ApplicationID))
+								return true;
+			/*foreach (Album alboom in AlbumKeyMapping.Keys)
+				if (alboom.Name.Equals(query.Name))
+					return true;*/
 			return false;
 		}
 
-		private static Album GetNameNotQuite(Album query)
+		private static Album GetNameNotQuite(Album query, string player)
 		{
-			foreach (Album alboom in AlbumKeyMapping.Keys)
-				if (alboom.Name == query.Name)
-					return alboom;
+			if (PlayersClients.ContainsKey(player))
+				foreach (Album alboom in AlbumKeyMapping.Keys)
+					if (alboom.Name.Equals(query.Name))
+						foreach (DiscordRpcClient klient in PlayersClients[player])
+							if (AlbumKeyMapping[alboom].ContainsKey(klient.ApplicationID))
+								return alboom;
+			/*foreach (Album alboom in AlbumKeyMapping.Keys)
+				if (alboom.Name.Equals(query.Name))
+					return alboom;*/
 			return null;
 		}
 	}
