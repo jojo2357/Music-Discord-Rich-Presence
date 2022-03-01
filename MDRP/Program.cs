@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -23,7 +23,7 @@ namespace MDRP
 	internal partial class Program
 	{
 		public static LangHelper langHelper = new LangHelper();
-		private const string Version = "1.6.4";
+		private const string Version = "1.6.5";
 		private const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
 		private static readonly string Title = langHelper.get(LocalizableStrings.MDRP_FULL);
 		private const int titleLength = 64;
@@ -718,12 +718,21 @@ namespace MDRP
 		private static string GetLargeImageKey()
 		{
 			if (AlbumKeyMapping.ContainsKey(currentAlbum) &&
-			    AlbumKeyMapping[currentAlbum].ContainsKey(activeClient.ApplicationID) &&
-			    //make sure it is not too long, this will be warned about
-			    AlbumKeyMapping[currentAlbum][activeClient.ApplicationID].Length <= keyLength)
-				return AlbumKeyMapping[currentAlbum][activeClient.ApplicationID];
-			else
-				return BigAssets[_playerName];
+			    AlbumKeyMapping[currentAlbum].ContainsKey(activeClient.ApplicationID))
+			{
+				//make sure it is not too long, this will be warned about
+				if (AlbumKeyMapping[currentAlbum][activeClient.ApplicationID].StartsWith("https://") ||
+				    AlbumKeyMapping[currentAlbum][activeClient.ApplicationID].StartsWith("http://"))
+				{
+					return AlbumKeyMapping[currentAlbum][activeClient.ApplicationID];
+				}
+				if (AlbumKeyMapping[currentAlbum][activeClient.ApplicationID].Length <= keyLength)
+				{
+					return AlbumKeyMapping[currentAlbum][activeClient.ApplicationID];
+				}
+			}
+
+			return BigAssets[_playerName];
 		}
 
 		private static string GetLargeImageText(string albumName)
@@ -854,7 +863,10 @@ namespace MDRP
 
 		private static void SetConsole(string title, string artist, string albumName, Album album)
 		{
-			int totalBufLen = Math.Max(langHelper.get(LocalizableStrings.ALBUM).Length, Math.Max(langHelper.get(LocalizableStrings.PLAYER).Length, Math.Max(langHelper[LocalizableStrings.TITLE].Length, langHelper[LocalizableStrings.ARTIST].Length)));
+			int totalBufLen = Math.Max(langHelper.get(LocalizableStrings.ALBUM).Length,
+				Math.Max(langHelper.get(LocalizableStrings.PLAYER).Length,
+					Math.Max(langHelper[LocalizableStrings.TITLE].Length,
+						langHelper[LocalizableStrings.ARTIST].Length)));
 #if DEBUG
 #else
 			Console.Clear();
@@ -866,13 +878,15 @@ namespace MDRP
 			Console.WriteLine(langHelper.get(LocalizableStrings.DETAILS) + ":");
 
 			Console.ForegroundColor = ConsoleColor.White;
-			Console.Write(new string(' ', totalBufLen - langHelper.get(LocalizableStrings.TITLE).Length + 1) + langHelper.get(LocalizableStrings.TITLE) + ": ");
+			Console.Write(new string(' ', totalBufLen - langHelper.get(LocalizableStrings.TITLE).Length + 1) +
+			              langHelper.get(LocalizableStrings.TITLE) + ": ");
 
 			Console.ForegroundColor = ConsoleColor.Gray;
 			Console.WriteLine(title);
 
 			Console.ForegroundColor = ConsoleColor.White;
-			Console.Write(new string(' ', totalBufLen - langHelper.get(LocalizableStrings.ARTIST).Length + 1) + langHelper.get(LocalizableStrings.ARTIST) + ": ");
+			Console.Write(new string(' ', totalBufLen - langHelper.get(LocalizableStrings.ARTIST).Length + 1) +
+			              langHelper.get(LocalizableStrings.ARTIST) + ": ");
 
 			Console.ForegroundColor = ConsoleColor.Gray;
 			Console.WriteLine(artist == "" ? langHelper.get(LocalizableStrings.UNKNOWN_ARTIST) : artist);
@@ -880,7 +894,8 @@ namespace MDRP
 			if (!albumName.Equals(string.Empty))
 			{
 				Console.ForegroundColor = ConsoleColor.White;
-				Console.Write(new string(' ', totalBufLen - langHelper.get(LocalizableStrings.ALBUM).Length + 1) + langHelper.get(LocalizableStrings.ALBUM) + ": ");
+				Console.Write(new string(' ', totalBufLen - langHelper.get(LocalizableStrings.ALBUM).Length + 1) +
+				              langHelper.get(LocalizableStrings.ALBUM) + ": ");
 
 				Console.ForegroundColor = ConsoleColor.Gray;
 				Console.WriteLine(albumName);
@@ -891,13 +906,18 @@ namespace MDRP
 					: BigAssets[_playerName];
 				if (albumKey.Length > keyLength)
 				{
-					Console.ForegroundColor = ConsoleColor.Red;
-					Console.WriteLine(string.Format("         " + langHelper[LocalizableStrings.KEY_TOO_LONG], keyLength));
-					if (ScreamAtUser && !NotifiedAlbums.ToArray().Contains(currentAlbum))
+					if (!albumKey.StartsWith("https://") && !albumKey.StartsWith("http://"))
 					{
-						NotifiedAlbums.Add(currentAlbum);
-						SendNotification(langHelper[LocalizableStrings.NOTIF_KEY_TOO_LONG_HEADER],
-							string.Format(langHelper[LocalizableStrings.NOTIF_KEY_TOO_LONG_BODY], currentAlbum.Name, albumKey, keyLength));
+						Console.ForegroundColor = ConsoleColor.Red;
+						Console.WriteLine(string.Format("         " + langHelper[LocalizableStrings.KEY_TOO_LONG],
+							keyLength));
+						if (ScreamAtUser && !NotifiedAlbums.ToArray().Contains(currentAlbum))
+						{
+							NotifiedAlbums.Add(currentAlbum);
+							SendNotification(langHelper[LocalizableStrings.NOTIF_KEY_TOO_LONG_HEADER],
+								string.Format(langHelper[LocalizableStrings.NOTIF_KEY_TOO_LONG_BODY], currentAlbum.Name,
+									albumKey, keyLength));
+						}
 					}
 				}
 			}
