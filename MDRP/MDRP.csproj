@@ -112,7 +112,7 @@
   </ItemGroup>
   <ItemGroup>
     <Reference Include="DiscordRPC, Version=1.0.203.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>..\..\Downloads\DiscordRPC.dll</HintPath>
+      <HintPath>libs\DiscordRPC.dll</HintPath>
     </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
