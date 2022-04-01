@@ -721,8 +721,7 @@ namespace MDRP
 			    AlbumKeyMapping[currentAlbum].ContainsKey(activeClient.ApplicationID))
 			{
 				//make sure it is not too long, this will be warned about
-				if (AlbumKeyMapping[currentAlbum][activeClient.ApplicationID].StartsWith("https://") ||
-				    AlbumKeyMapping[currentAlbum][activeClient.ApplicationID].StartsWith("http://"))
+				if (Uri.IsWellFormedUriString(AlbumKeyMapping[currentAlbum][activeClient.ApplicationID], UriKind.Absolute))
 				{
 					return AlbumKeyMapping[currentAlbum][activeClient.ApplicationID];
 				}
