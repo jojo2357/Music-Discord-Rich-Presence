@@ -5,7 +5,7 @@ namespace MDRP
 {
 	public class Album
 	{
-		private readonly string[] Artists;
+		public readonly string[] Artists;
 		public readonly string Name;
 
 		public string GetArtistString()

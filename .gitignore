@@ -280,10 +280,10 @@ paket-files/
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
 *.pyc
-GroovyRP/bin/Release/other.xml
-GroovyRP/bin/Release/filelocation2.dat
-GroovyRP/bin/Release/filelocation.dat
-GroovyRP/bin/Release/openedfiles.dat
+MDRP/bin/Release/other.xml
+MDRP/bin/Release/filelocation2.dat
+MDRP/bin/Release/filelocation.dat
+MDRP/bin/Release/openedfiles.dat
 ArchivedReleases/1.1.1_Release(OVERWRITTEN 1-31).zip
 DebugTool/export.bat
 export.bat

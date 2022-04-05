@@ -199,7 +199,6 @@ namespace MDRP
 				// Peel out the requests and response objects
 				HttpListenerRequest req = ctx.Request;
 				HttpListenerResponse resp = ctx.Response;
-
 				// Print out some info about the request
 #if DEBUG
 				Console.WriteLine(req.Url.ToString());
