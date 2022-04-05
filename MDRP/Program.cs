@@ -184,7 +184,7 @@ namespace MDRP
 		private static GlobalSystemMediaTransportControlsSessionMediaProperties _currentTrack = null;
 		private static GlobalSystemMediaTransportControlsSessionMediaProperties _lastTrack = null;
 
-		private static string lineData = "";
+		private static string lineData = "", currentTitle = "";
 		private static bool foundFirst = false, foundSecond = false;
 		private static bool foundImageRemotely = false;
 
@@ -487,6 +487,7 @@ namespace MDRP
 					{
 						currentAlbum = new Album(_currentTrack.AlbumTitle, _currentTrack.Artist,
 							_currentTrack.AlbumArtist);
+						currentTitle = _currentTrack.Title;
 						GetClient();
 
 						foreach (DiscordRpcClient client in AllClients.Values)
@@ -638,6 +639,7 @@ namespace MDRP
 				presenceIsRich = AlbumKeyMapping.ContainsKey(currentAlbum) &&
 				                 AlbumKeyMapping[currentAlbum].ContainsKey(activeClient.ApplicationID);
 
+				currentTitle = lastMessage.Title;
 				WrongArtistFlag = HasNameNotQuite(new Album(lastMessage.Album.Name), _playerName);
 
 				/*Console.WriteLine(CapLength($"{langHelper[LocalizableStrings.TITLE]}: {lastMessage.Title}", titleLength));
@@ -735,7 +737,7 @@ namespace MDRP
 
 			if (useRemoteArt)
 			{
-				string res = mngr.AlbumLookup(currentAlbum).Result;
+				string res = mngr.AlbumLookup(currentAlbum, currentTitle).Result;
 				if (res != String.Empty)
 				{
 					foundImageRemotely = true;

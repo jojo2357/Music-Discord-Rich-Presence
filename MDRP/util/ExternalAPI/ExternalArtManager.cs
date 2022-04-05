@@ -32,7 +32,7 @@ namespace MDRP
 			}
 		}
 		
-		public async Task<String> AlbumLookup(Album album)
+		public async Task<String> AlbumLookup(Album album, string backupTitle)
 		{
 			if (cache.ContainsKey(album))
 				return cache[album];
@@ -107,6 +107,16 @@ namespace MDRP
 						return cache[album] = bestNotPerfectResult;
 					}
 				}
+			}
+			
+			queryString = new Uri(default_endpoint + "term=" + backupTitle + "&media=music&entity=album");
+			result = await myClient.GetAsync(queryString);
+
+			jObject = JObject.Parse(result.Content.ToString());
+
+			if (jObject["resultCount"] != null && jObject["resultCount"].ToString() == "1")
+			{
+				return cache[album] = jObject["results"].First["artworkUrl100"].ToString().Replace("100x100", "512x512");
 			}
 
 			return cache[album] = "";
