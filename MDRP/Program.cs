@@ -471,9 +471,9 @@ namespace MDRP
 						return;
 					if (_wasPlaying && !_isPlaying)
 					{
-						Console.WriteLine(currentAlbum + " " + langHelper[LocalizableStrings.AND] + " " + new Album(_currentTrack.AlbumTitle,
+						/*Console.WriteLine(currentAlbum + " " + langHelper[LocalizableStrings.AND] + " " + new Album(_currentTrack.AlbumTitle,
 							_currentTrack.Artist,
-							_currentTrack.AlbumArtist));
+							_currentTrack.AlbumArtist));*/
 						activeClient.UpdateSmallAsset("paused", "paused");
 						InvokeActiveClient();
 						SetConsole(_lastTrack.Title, _lastTrack.Artist, _lastTrack.AlbumTitle,
@@ -517,13 +517,22 @@ namespace MDRP
 							    currentAlbum.Name != "")
 							{
 								NotifiedAlbums.Add(currentAlbum);
-								if (WrongArtistFlag)
-									SendNotification(langHelper[LocalizableStrings.NOTIF_KEYED_WRONG_HEADER],
-										currentAlbum.Name +
-										" " + langHelper[LocalizableStrings.NOTIF_KEYED_WRONG_BODY]);
+								if (useRemoteArt) {
+									if (mngr.AlbumLookup(currentAlbum, currentTitle).Result == "")
+									{
+										SendNotification(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_HEADER], string.Format(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_BODY], currentAlbum));
+									}
+								}
 								else
-									SendNotification(langHelper[LocalizableStrings.NOTIF_UNKEYED_HEADER],
-										currentAlbum.Name + " " + langHelper[LocalizableStrings.NOTIF_UNKEYED_BODY]);
+								{
+									if (WrongArtistFlag)
+										SendNotification(langHelper[LocalizableStrings.NOTIF_KEYED_WRONG_HEADER],
+											currentAlbum.Name +
+											" " + langHelper[LocalizableStrings.NOTIF_KEYED_WRONG_BODY]);
+									else
+										SendNotification(langHelper[LocalizableStrings.NOTIF_UNKEYED_HEADER],
+											currentAlbum.Name + " " + langHelper[LocalizableStrings.NOTIF_UNKEYED_BODY]);
+								}
 							}
 
 							activeClient.SetPresence(new RichPresence
@@ -684,12 +693,21 @@ namespace MDRP
 				    currentAlbum.Name != "")
 				{
 					NotifiedAlbums.Add(currentAlbum);
-					if (WrongArtistFlag)
-						SendNotification(langHelper[LocalizableStrings.NOTIF_KEYED_WRONG_HEADER],
-							currentAlbum.Name + " " + langHelper[LocalizableStrings.NOTIF_KEYED_WRONG_BODY]);
+					if (useRemoteArt) {
+						if (mngr.AlbumLookup(currentAlbum, currentTitle).Result == "")
+						{
+							SendNotification(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_HEADER], string.Format(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_BODY], currentAlbum));
+						}
+					}
 					else
-						SendNotification(langHelper[LocalizableStrings.NOTIF_UNKEYED_HEADER],
-							currentAlbum.Name + " " + langHelper[LocalizableStrings.NOTIF_UNKEYED_BODY]);
+					{
+						if (WrongArtistFlag)
+							SendNotification(langHelper[LocalizableStrings.NOTIF_KEYED_WRONG_HEADER],
+								currentAlbum.Name + " " + langHelper[LocalizableStrings.NOTIF_KEYED_WRONG_BODY]);
+						else
+							SendNotification(langHelper[LocalizableStrings.NOTIF_UNKEYED_HEADER],
+								currentAlbum.Name + " " + langHelper[LocalizableStrings.NOTIF_UNKEYED_BODY]);
+					}
 				}
 
 				SetConsole(lastMessage.Title, lastMessage.Artist, lastMessage.Album.Name,
@@ -742,6 +760,17 @@ namespace MDRP
 				{
 					foundImageRemotely = true;
 					return res;
+				}
+				else
+				{
+					if (ScreamAtUser)
+					{
+						if (!NotifiedAlbums.Contains(currentAlbum))
+						{
+							SendNotification(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_HEADER], string.Format(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_BODY], currentAlbum));
+							NotifiedAlbums.Add(currentAlbum);
+						}
+					}
 				}
 			}
 
@@ -967,11 +996,11 @@ namespace MDRP
 				if (foundImageRemotely)
 				{
 					Console.ForegroundColor = ConsoleColor.Green;
-					Console.WriteLine("\n" + "Image found remotely!");
+					Console.WriteLine("\n" + langHelper[LocalizableStrings.FOUND_REMOTELY]);
 				} else if (!foundImageRemotely && useRemoteArt)
 				{
 					Console.ForegroundColor = ConsoleColor.Red;
-					Console.WriteLine("\n" + "Image could not be found remotely");
+					Console.WriteLine("\n" + langHelper[LocalizableStrings.NOT_FOUND_REMOTELY]);
 				}
 				else
 				{

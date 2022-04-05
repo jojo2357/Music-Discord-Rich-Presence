@@ -30,6 +30,8 @@ namespace MDRP
 				{ LocalizableStrings.GOOD_ONE, "This is a good one, check your DRP ;)" },
 				{ LocalizableStrings.KEYED_WRONG, "Album keyed for the wrong artist :/" },
 				{ LocalizableStrings.UNKEYED, "Album not keyed :(" },
+				{ LocalizableStrings.FOUND_REMOTELY, "Image found remotely!" },
+				{ LocalizableStrings.NOT_FOUND_REMOTELY, "Image could not be found remotely" },
 				{ LocalizableStrings.UNKNOWN_ARTIST, "Unknown Artist" },
 				{ LocalizableStrings.CONSOLE_NAME, "Discord Rich Presence for Groove" },
 				{ LocalizableStrings.NO_VALID_MEDIA, "Detected volume in something but not showing as it is not currently supported or is disabled" },
@@ -58,6 +60,8 @@ namespace MDRP
 				{ LocalizableStrings.NOTIF_SETERR_DEPREC_BODY, "{0} uses a deprecated keying format. Albums sould go in form Name==key==Artist"},
 				{ LocalizableStrings.NOTIF_UPDATE_HEADER, "Update Available"},
 				{ LocalizableStrings.NOTIF_UPDATE_BODY, "{0} is published on github. Go there for the latest version"},
+				{ LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_BODY, "{0} could not be found on the ITunes API, please key this album manually."},
+				{ LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_HEADER, "Album Art Not Found Remotely"},
 			};
 		}
 
@@ -115,6 +119,8 @@ namespace MDRP
 		GOOD_ONE,
 		KEYED_WRONG,
 		UNKEYED,
+		FOUND_REMOTELY,
+		NOT_FOUND_REMOTELY,
 		UNKNOWN_ARTIST,
 		CONSOLE_NAME,
 		NO_VALID_MEDIA,
@@ -140,6 +146,8 @@ namespace MDRP
 		NOTIF_SETERR_DEPREC_BODY,
 		NOTIF_UPDATE_HEADER,
 		NOTIF_UPDATE_BODY,
+		NOTIF_NOT_FOUND_REMOTELY_HEADER,
+		NOTIF_NOT_FOUND_REMOTELY_BODY,
 		USING,
 		PAUSED,
 		KEY_TOO_LONG

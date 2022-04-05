@@ -31,7 +31,7 @@ namespace MDRP
 				return "";
 			}
 		}
-		
+
 		public async Task<String> AlbumLookup(Album album, string backupTitle)
 		{
 			if (cache.ContainsKey(album))
@@ -39,7 +39,7 @@ namespace MDRP
 
 			if (album.Name == "")
 				return cache[album] = "";
-			
+
 			/*Console.WriteLine(album.ToString());
 			
 			Thread.Sleep(2000);*/
@@ -74,7 +74,7 @@ namespace MDRP
 					return cache[album] = bestNotPerfectResult;
 				}
 			}
-			
+
 			if (Int16.Parse(jObject["resultCount"].ToString()) == 50)
 			{
 				queryString = new Uri(default_endpoint + "term=" + album + "&media=music&entity=album");
@@ -108,15 +108,31 @@ namespace MDRP
 					}
 				}
 			}
-			
-			queryString = new Uri(default_endpoint + "term=" + backupTitle + "&media=music&entity=album");
+
+			queryString = new Uri(default_endpoint + "term=" + backupTitle + "&media=music&entity=song");
 			result = await myClient.GetAsync(queryString);
 
 			jObject = JObject.Parse(result.Content.ToString());
-
-			if (jObject["resultCount"] != null && jObject["resultCount"].ToString() == "1")
+			if (jObject["resultCount"] != null)
 			{
-				return cache[album] = jObject["results"].First["artworkUrl100"].ToString().Replace("100x100", "512x512");
+				if (jObject["resultCount"].ToString() == "1")
+				{
+					return cache[album] = jObject["results"].First["artworkUrl100"].ToString().Replace("100x100", "512x512");
+				}
+				else if (Int16.Parse(jObject["resultCount"].ToString()) > 0)
+				{
+					foreach (JToken albumObject in jObject["results"])
+					{
+						Console.WriteLine(albumObject["artistName"]);
+						if (albumObject["artworkUrl100"] != null && albumObject["artistName"] != null)
+						{
+							if (album.Artists.Contains(albumObject["artistName"].ToString().ToLower()))
+							{
+								return cache[album] = albumObject["artworkUrl100"].ToString().Replace("100x100", "512x512");
+							}
+						}
+					}
+				}
 			}
 
 			return cache[album] = "";
