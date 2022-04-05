@@ -348,8 +348,6 @@ namespace MDRP
 			{
 				return true;
 			}
-
-			return false;
 		}
 
 
@@ -969,6 +967,10 @@ namespace MDRP
 				{
 					Console.ForegroundColor = ConsoleColor.Green;
 					Console.WriteLine("\n" + "Image found remotely!");
+				} else if (!foundImageRemotely && useRemoteArt)
+				{
+					Console.ForegroundColor = ConsoleColor.Red;
+					Console.WriteLine("\n" + "Image could not be found remotely");
 				}
 				else
 				{
@@ -1180,7 +1182,7 @@ namespace MDRP
 						lineData = lineData + "\n" + String.Join("=", line.Split('=').Skip(1));
 					} else if (line.Split('=')[0].Trim().ToLower() == "get remote artwork")
 					{
-						useRemoteArt = line.Split('=')[0].Trim().ToLower() == "true";
+						useRemoteArt = line.Split('=')[1].Trim().ToLower() == "true";
 					}
 				/*else if (line.Split('=')[0].Trim().ToLower() == "artist label")
 				{
