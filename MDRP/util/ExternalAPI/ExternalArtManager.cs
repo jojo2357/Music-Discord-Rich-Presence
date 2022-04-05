@@ -74,6 +74,40 @@ namespace MDRP
 					return cache[album] = bestNotPerfectResult;
 				}
 			}
+			
+			if (Int16.Parse(jObject["resultCount"].ToString()) == 50)
+			{
+				queryString = new Uri(default_endpoint + "term=" + album + "&media=music&entity=album");
+				result = await myClient.GetAsync(queryString);
+
+				jObject = JObject.Parse(result.Content.ToString());
+
+				if (jObject["resultCount"] != null && Int16.Parse(jObject["resultCount"].ToString()) > 0)
+				{
+					string bestNotPerfectResult = "";
+					bool hasNearPerfectResult = false;
+					foreach (JToken albumObject in jObject["results"])
+					{
+						if (albumObject["artworkUrl100"] != null && albumObject["artistName"] != null)
+						{
+							if (album.Artists.Contains(albumObject["artistName"].ToString().ToLower()))
+							{
+								return cache[album] = albumObject["artworkUrl100"].ToString().Replace("100x100", "512x512");
+							}
+							else if (albumObject["artistName"].ToString().Trim().ToLower() == "various artists" && !hasNearPerfectResult)
+							{
+								hasNearPerfectResult = true;
+								bestNotPerfectResult = albumObject["artworkUrl100"].ToString().Replace("100x100", "512x512");
+							}
+						}
+					}
+
+					if (hasNearPerfectResult)
+					{
+						return cache[album] = bestNotPerfectResult;
+					}
+				}
+			}
 
 			return cache[album] = "";
 		}
