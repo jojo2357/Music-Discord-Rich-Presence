@@ -61,6 +61,8 @@ namespace MDRP
 		private static readonly Dictionary<Album, Dictionary<string, string>> AlbumKeyMapping =
 			new Dictionary<Album, Dictionary<string, string>>();
 
+		public static readonly ExternalArtManager mngr = new ExternalArtManager();
+
 		//ID, process name
 		//process name, enabled y/n
 		private static readonly Dictionary<string, bool> EnabledClients = new Dictionary<string, bool>
@@ -171,6 +173,7 @@ namespace MDRP
 		public static HttpListener listener;
 		public static string url = "http://localhost:2357/";
 
+		private static bool useRemoteArt = false;
 		public static bool remoteControl;
 		public static long resignRemoteControlAt;
 
@@ -183,6 +186,7 @@ namespace MDRP
 
 		private static string lineData = "";
 		private static bool foundFirst = false, foundSecond = false;
+		private static bool foundImageRemotely = false;
 
 		public static async Task HandleIncomingConnections()
 		{
@@ -205,7 +209,7 @@ namespace MDRP
 #endif
 				string text;
 				using (StreamReader reader = new StreamReader(req.InputStream,
-					req.ContentEncoding))
+					       req.ContentEncoding))
 				{
 					text = reader.ReadToEnd();
 				}
@@ -414,7 +418,7 @@ namespace MDRP
 					if (!remoteControl) HandleLocalRequests();
 
 					if (remoteControl && (long)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds >
-						resignRemoteControlAt)
+					    resignRemoteControlAt)
 					{
 						UnsetAllPresences();
 						SetClear();
@@ -479,10 +483,10 @@ namespace MDRP
 							currentAlbum);
 					}
 					else if
-					( /*(!currentAlbum.Equals(new Album(currentTrack.AlbumTitle, currentTrack.Artist,
+						( /*(!currentAlbum.Equals(new Album(currentTrack.AlbumTitle, currentTrack.Artist,
 								          currentTrack.AlbumArtist))
 							          || playerName != lastPlayer || currentTrack.Title != lastTrack.Title) &&*/
-						_isPlaying)
+						 _isPlaying)
 					{
 						currentAlbum = new Album(_currentTrack.AlbumTitle, _currentTrack.Artist,
 							_currentTrack.AlbumArtist);
@@ -639,7 +643,7 @@ namespace MDRP
 
 				WrongArtistFlag = HasNameNotQuite(new Album(lastMessage.Album.Name), _playerName);
 
-				Console.WriteLine(CapLength($"{langHelper[LocalizableStrings.TITLE]}: {lastMessage.Title}", titleLength));
+				/*Console.WriteLine(CapLength($"{langHelper[LocalizableStrings.TITLE]}: {lastMessage.Title}", titleLength));
 				Console.WriteLine(CapLength($"{langHelper[LocalizableStrings.ARTIST]}: {(lastMessage.Artist == "" ? langHelper[LocalizableStrings.UNKNOWN_ARTIST] : lastMessage.Artist)}", artistLength));
 				Console.WriteLine(_isPlaying
 					? new Timestamps
@@ -651,8 +655,7 @@ namespace MDRP
 				Console.WriteLine(GetLargeImageKey());
 				Console.WriteLine(GetLargeImageText(lastMessage.Album.Name));
 				Console.WriteLine(GetSmallImageKey());
-				Console.WriteLine(GetSmallImageText());
-
+				Console.WriteLine(GetSmallImageText());*/
 
 				activeClient.SetPresence(new RichPresence
 				{
@@ -717,6 +720,7 @@ namespace MDRP
 
 		private static string GetLargeImageKey()
 		{
+			foundImageRemotely = false;
 			if (AlbumKeyMapping.ContainsKey(currentAlbum) &&
 			    AlbumKeyMapping[currentAlbum].ContainsKey(activeClient.ApplicationID))
 			{
@@ -725,9 +729,20 @@ namespace MDRP
 				{
 					return AlbumKeyMapping[currentAlbum][activeClient.ApplicationID];
 				}
+
 				if (AlbumKeyMapping[currentAlbum][activeClient.ApplicationID].Length <= keyLength)
 				{
 					return AlbumKeyMapping[currentAlbum][activeClient.ApplicationID];
+				}
+			}
+
+			if (useRemoteArt)
+			{
+				string res = mngr.AlbumLookup(currentAlbum).Result;
+				if (res != String.Empty)
+				{
+					foundImageRemotely = true;
+					return res;
 				}
 			}
 
@@ -905,7 +920,7 @@ namespace MDRP
 					: BigAssets[_playerName];
 				if (albumKey.Length > keyLength)
 				{
-					if (!albumKey.StartsWith("https://") && !albumKey.StartsWith("http://"))
+					if (!Uri.IsWellFormedUriString(albumKey, UriKind.Absolute))
 					{
 						Console.ForegroundColor = ConsoleColor.Red;
 						Console.WriteLine(string.Format("         " + langHelper[LocalizableStrings.KEY_TOO_LONG],
@@ -950,8 +965,16 @@ namespace MDRP
 			}
 			else
 			{
-				Console.ForegroundColor = ConsoleColor.Red;
-				Console.WriteLine("\n" + langHelper.get(LocalizableStrings.UNKEYED));
+				if (foundImageRemotely)
+				{
+					Console.ForegroundColor = ConsoleColor.Green;
+					Console.WriteLine("\n" + "Image found remotely!");
+				}
+				else
+				{
+					Console.ForegroundColor = ConsoleColor.Red;
+					Console.WriteLine("\n" + langHelper.get(LocalizableStrings.UNKEYED));
+				}
 			}
 
 			Console.ForegroundColor = ConsoleColor.White;
@@ -1135,7 +1158,7 @@ namespace MDRP
 					}
 					else if (InverseWhatpeoplecallthisplayer.ContainsKey(line.Split('=')[0].Trim().ToLower()) &&
 					         ValidPlayers.Contains(InverseWhatpeoplecallthisplayer[line.Split('=')[0].Trim().ToLower()])
-					)
+					        )
 					{
 						EnabledClients.Add(line.Split('=')[0], line.Split('=')[1].Trim().ToLower() == "true");
 						if (line.Split('=').Length > 2)
@@ -1155,6 +1178,9 @@ namespace MDRP
 					{
 						foundSecond = true;
 						lineData = lineData + "\n" + String.Join("=", line.Split('=').Skip(1));
+					} else if (line.Split('=')[0].Trim().ToLower() == "get remote artwork")
+					{
+						useRemoteArt = line.Split('=')[0].Trim().ToLower() == "true";
 					}
 				/*else if (line.Split('=')[0].Trim().ToLower() == "artist label")
 				{
@@ -1274,7 +1300,7 @@ namespace MDRP
 								continue;
 						}
 
-						if (!AlbumKeyMapping.ContainsKey(album)) Console.WriteLine("Uh oh");
+						//if (!AlbumKeyMapping.ContainsKey(album)) ;//Console.WriteLine("Uh oh");
 
 						if (!AlbumKeyMapping[album].ContainsKey(id))
 							AlbumKeyMapping[album].Add(id, parsedLine[1]);

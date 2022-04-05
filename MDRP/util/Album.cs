@@ -3,7 +3,7 @@ using System.Linq;
 
 namespace MDRP
 {
-	internal class Album
+	public class Album
 	{
 		private readonly string[] Artists;
 		public readonly string Name;
@@ -37,7 +37,7 @@ namespace MDRP
 
 		public override string ToString()
 		{
-			return Name + " by " + string.Join(",", Artists);
+			return Name + (Artists.Length > 0 ? " by " + string.Join(",", Artists.Distinct().ToArray()) : "");
 		}
 
 		/**
