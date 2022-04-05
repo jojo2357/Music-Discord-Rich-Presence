@@ -39,3 +39,7 @@ NOTIF_UPDATE_BODY=={0} is published on github. Go there for the latest version
 USING==Using
 PAUSED==paused
 KEY_TOO_LONG==The key for this album is too long. It must be {0} characters or less
+NOT_FOUND_REMOTELY==Image could not be found remotely
+FOUND_REMOTELY==Image found remotely!
+NOTIF_NOT_FOUND_REMOTELY_BODY=={0} could not be found on the ITunes API, please key this album manually.
+NOTIF_NOT_FOUND_REMOTELY_HEADER==Album Art Not Found Remotely
