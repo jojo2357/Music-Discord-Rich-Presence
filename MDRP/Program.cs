@@ -23,9 +23,9 @@ namespace MDRP
 	internal partial class Program
 	{
 		public static LangHelper langHelper = new LangHelper();
-		private const string Version = "1.7.0";
-		private const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
-		private static readonly string Title = langHelper.get(LocalizableStrings.MDRP_FULL);
+		public const string Version = "1.7.0";
+		public const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
+		public static readonly string Title = langHelper.get(LocalizableStrings.MDRP_FULL);
 		private const int titleLength = 64;
 		private const int artistLength = 64;
 		private const int keyLength = 32;
@@ -160,25 +160,27 @@ namespace MDRP
 			_justUnknowned,
 			ScreamAtUser,
 			presenceIsRich,
-			WrongArtistFlag,
-			UpdateAvailibleFlag,
-			NotifiedRequiredPipeline;
+			WrongArtistFlag;
+
+		public static bool UpdateAvailibleFlag;
+
+		private static bool NotifiedRequiredPipeline;
 
 		private static DiscordRpcClient activeClient;
 		private static Album currentAlbum = new Album("");
 		private static readonly HttpClient Client = new HttpClient();
 		private const long updateCheckInterval = 36000000;
-		private static string UpdateVersion;
+		public static string UpdateVersion;
 
 		public static HttpListener listener;
 		public static string url = "http://localhost:2357/";
 
-		private static bool useRemoteArt = false;
+		public static bool useRemoteArt = false, needsExactMatch = true, createCacheFile = true;
 		public static bool remoteControl;
 		public static long resignRemoteControlAt;
 
 		private static readonly Queue<JsonResponse> _PendingMessages = new Queue<JsonResponse>();
-		private static bool spawnedFromApplication;
+		public static bool spawnedFromApplication;
 		private static bool _isPlaying;
 		private static bool _wasPlaying;
 		private static GlobalSystemMediaTransportControlsSessionMediaProperties _currentTrack = null;
@@ -268,8 +270,8 @@ namespace MDRP
 				}
 				catch (Exception e)
 				{
-					SendToDebugServer(e);
-					SendToDebugServer("failure to parse incoming json: \n" + text + " (" + decodedText + ")");
+					Functions.SendToDebugServer(e);
+					Functions.SendToDebugServer("failure to parse incoming json: \n" + text + " (" + decodedText + ")");
 					response = "{response:\"failure to parse json\"}";
 #if DEBUG
 					Console.WriteLine(response);
@@ -361,7 +363,7 @@ namespace MDRP
 			//Console.WriteLine(AppDomain.CurrentDomain.BaseDirectory);
 			Directory.SetCurrentDirectory(AppDomain.CurrentDomain.BaseDirectory);
 
-			GenerateShortcuts();
+			Functions.GenerateShortcuts();
 
 			if (args.Length > 0)
 				if (args[0] == "Shortcuts_Only")
@@ -393,12 +395,12 @@ namespace MDRP
 
 			try
 			{
-				_currentTrack = GetStuff();
+				_currentTrack = Functions.GetPlayingDetails();
 				_lastTrack = _currentTrack;
 			}
 			catch (Exception e)
 			{
-				SendToDebugServer(e);
+				Functions.SendToDebugServer(e);
 			}
 
 			_isPlaying = IsUsingAudio();
@@ -424,7 +426,7 @@ namespace MDRP
 				}
 				catch (Exception e)
 				{
-					SendToDebugServer(e);
+					Functions.SendToDebugServer(e);
 				}
 		}
 
@@ -437,7 +439,7 @@ namespace MDRP
 			}
 			catch (Exception e)
 			{
-				SendToDebugServer(e);
+				Functions.SendToDebugServer(e);
 				_isPlaying = false;
 			}
 
@@ -451,7 +453,7 @@ namespace MDRP
 #else
 					Console.Clear();
 #endif
-					DrawPersistentHeader();
+					Functions.DrawPersistentHeader();
 					Console.ForegroundColor = ConsoleColor.DarkRed;
 					Console.WriteLine(string.Format(langHelper[LocalizableStrings.REQUIRE_PIPELINE], _playerName) +
 					                  " " + Github);
@@ -466,7 +468,7 @@ namespace MDRP
 				{
 					if (_isPlaying)
 						_lastTrack = _currentTrack;
-					_currentTrack = GetStuff();
+					_currentTrack = Functions.GetPlayingDetails();
 					if (_currentTrack == null)
 						return;
 					if (_wasPlaying && !_isPlaying)
@@ -495,15 +497,15 @@ namespace MDRP
 							    client.ApplicationID != activeClient.ApplicationID)
 								try
 								{
-									ClearAPresence(client);
+									Functions.ClearAPresence(client);
 								}
 								catch (Exception e)
 								{
-									SendToDebugServer(e);
+									Functions.SendToDebugServer(e);
 								}
 
-						string newDetailsWithTitle = CapLength(lineData.Split('\n')[0].Replace("${artist}", (_currentTrack.Artist == "" ? langHelper[LocalizableStrings.UNKNOWN_ARTIST] : _currentTrack.Artist)).Replace("${title}", _currentTrack.Title).Replace("${album}", _currentTrack.AlbumTitle), titleLength);
-						string newStateWithArtist = CapLength(lineData.Split('\n')[1].Replace("${artist}", (_currentTrack.Artist == "" ? langHelper[LocalizableStrings.UNKNOWN_ARTIST] : _currentTrack.Artist)).Replace("${title}", _currentTrack.Title).Replace("${album}", _currentTrack.AlbumTitle), artistLength);
+						string newDetailsWithTitle = Functions.CapLength(lineData.Split('\n')[0].Replace("${artist}", (_currentTrack.Artist == "" ? langHelper[LocalizableStrings.UNKNOWN_ARTIST] : _currentTrack.Artist)).Replace("${title}", _currentTrack.Title).Replace("${album}", _currentTrack.AlbumTitle), titleLength);
+						string newStateWithArtist = Functions.CapLength(lineData.Split('\n')[1].Replace("${artist}", (_currentTrack.Artist == "" ? langHelper[LocalizableStrings.UNKNOWN_ARTIST] : _currentTrack.Artist)).Replace("${title}", _currentTrack.Title).Replace("${album}", _currentTrack.AlbumTitle), artistLength);
 						if (activeClient.CurrentPresence == null || activeClient.CurrentPresence.Details != newDetailsWithTitle ||
 						    activeClient.CurrentPresence.State != newStateWithArtist || _wasPlaying != _isPlaying)
 						{
@@ -519,19 +521,19 @@ namespace MDRP
 								NotifiedAlbums.Add(currentAlbum);
 								if (useRemoteArt)
 								{
-									if (mngr.AlbumLookup(currentAlbum, currentTitle).Result == "")
+									if (mngr.AlbumLookup(currentAlbum, currentTitle) == "")
 									{
-										SendNotification(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_HEADER], string.Format(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_BODY], currentAlbum));
+										Functions.SendNotification(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_HEADER], string.Format(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_BODY], currentAlbum));
 									}
 								}
 								else
 								{
 									if (WrongArtistFlag)
-										SendNotification(langHelper[LocalizableStrings.NOTIF_KEYED_WRONG_HEADER],
+										Functions.SendNotification(langHelper[LocalizableStrings.NOTIF_KEYED_WRONG_HEADER],
 											currentAlbum.Name +
 											" " + langHelper[LocalizableStrings.NOTIF_KEYED_WRONG_BODY]);
 									else
-										SendNotification(langHelper[LocalizableStrings.NOTIF_UNKEYED_HEADER],
+										Functions.SendNotification(langHelper[LocalizableStrings.NOTIF_UNKEYED_HEADER],
 											currentAlbum.Name + " " + langHelper[LocalizableStrings.NOTIF_UNKEYED_BODY]);
 								}
 							}
@@ -543,7 +545,7 @@ namespace MDRP
 								Assets = new Assets
 								{
 									LargeImageKey = GetLargeImageKey(),
-									LargeImageText = GetLargeImageText(_currentTrack.AlbumTitle),
+									LargeImageText = Functions.GetLargeImageText(_currentTrack.AlbumTitle),
 									SmallImageKey = GetSmallImageKey(),
 									SmallImageText = GetSmallImageText()
 								}
@@ -563,7 +565,7 @@ namespace MDRP
 				}
 				catch (Exception e)
 				{
-					SendToDebugServer(e);
+					Functions.SendToDebugServer(e);
 					if (activeClient != null)
 						activeClient.SetPresence(new RichPresence
 						{
@@ -612,13 +614,11 @@ namespace MDRP
 					{
 						try
 						{
-							ClearAPresence(client);
-							/*client.ClearPresence();
-							client.Invoke();*/
+							Functions.ClearAPresence(client);
 						}
 						catch (Exception e)
 						{
-							SendToDebugServer(e);
+							Functions.SendToDebugServer(e);
 						}
 					}
 					else
@@ -629,7 +629,7 @@ namespace MDRP
 						}
 						catch (Exception e)
 						{
-							SendToDebugServer(e);
+							Functions.SendToDebugServer(e);
 						}
 					}
 
@@ -652,27 +652,11 @@ namespace MDRP
 				currentTitle = lastMessage.Title;
 				WrongArtistFlag = HasNameNotQuite(new Album(lastMessage.Album.Name), _playerName);
 
-				/*Console.WriteLine(CapLength($"{langHelper[LocalizableStrings.TITLE]}: {lastMessage.Title}", titleLength));
-				Console.WriteLine(CapLength($"{langHelper[LocalizableStrings.ARTIST]}: {(lastMessage.Artist == "" ? langHelper[LocalizableStrings.UNKNOWN_ARTIST] : lastMessage.Artist)}", artistLength));
-				Console.WriteLine(_isPlaying
-					? new Timestamps
-					{
-						End = DateTimeOffset.FromUnixTimeMilliseconds(long.Parse(lastMessage.TimeStamp))
-							.DateTime
-					}
-					: null);
-				Console.WriteLine(GetLargeImageKey());
-				Console.WriteLine(GetLargeImageText(lastMessage.Album.Name));
-				Console.WriteLine(GetSmallImageKey());
-				Console.WriteLine(GetSmallImageText());*/
-
 				activeClient.SetPresence(new RichPresence
 				{
-					Details = CapLength(lineData.Split('\n')[0].Replace("${artist}", (lastMessage.Artist == "" ? langHelper[LocalizableStrings.UNKNOWN_ARTIST] : lastMessage.Artist)).Replace("${title}", lastMessage.Title).Replace("${album}", lastMessage.Album.Name), titleLength),
-					State = CapLength(lineData.Split('\n')[1].Replace("${artist}", (lastMessage.Artist == "" ? langHelper[LocalizableStrings.UNKNOWN_ARTIST] : lastMessage.Artist)).Replace("${title}", lastMessage.Title).Replace("${album}", lastMessage.Album.Name), artistLength),
+					Details = Functions.CapLength(lineData.Split('\n')[0].Replace("${artist}", (lastMessage.Artist == "" ? langHelper[LocalizableStrings.UNKNOWN_ARTIST] : lastMessage.Artist)).Replace("${title}", lastMessage.Title).Replace("${album}", lastMessage.Album.Name), titleLength),
+					State = Functions.CapLength(lineData.Split('\n')[1].Replace("${artist}", (lastMessage.Artist == "" ? langHelper[LocalizableStrings.UNKNOWN_ARTIST] : lastMessage.Artist)).Replace("${title}", lastMessage.Title).Replace("${album}", lastMessage.Album.Name), artistLength),
 
-					//Details = CapLength($"{TitleLabel}{(TitleLabel.Length > 0 ? ": " : "")}{lastMessage.Title}", titleLength),
-					//State = CapLength($"{ArtistLabel}{(ArtistLabel.Length > 0 ? ": " : "")}{(lastMessage.Artist == "" ? "Unkown Artist" : lastMessage.Artist)}", artistLength),
 					Timestamps = _isPlaying
 						? new Timestamps
 						{
@@ -683,7 +667,7 @@ namespace MDRP
 					Assets = new Assets
 					{
 						LargeImageKey = GetLargeImageKey(),
-						LargeImageText = GetLargeImageText(lastMessage.Album.Name),
+						LargeImageText = Functions.GetLargeImageText(lastMessage.Album.Name),
 						SmallImageKey = GetSmallImageKey(),
 						SmallImageText = GetSmallImageText()
 					}
@@ -696,18 +680,18 @@ namespace MDRP
 					NotifiedAlbums.Add(currentAlbum);
 					if (useRemoteArt)
 					{
-						if (mngr.AlbumLookup(currentAlbum, currentTitle).Result == "")
+						if (mngr.AlbumLookup(currentAlbum, currentTitle) == "")
 						{
-							SendNotification(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_HEADER], string.Format(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_BODY], currentAlbum));
+							Functions.SendNotification(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_HEADER], string.Format(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_BODY], currentAlbum));
 						}
 					}
 					else
 					{
 						if (WrongArtistFlag)
-							SendNotification(langHelper[LocalizableStrings.NOTIF_KEYED_WRONG_HEADER],
+							Functions.SendNotification(langHelper[LocalizableStrings.NOTIF_KEYED_WRONG_HEADER],
 								currentAlbum.Name + " " + langHelper[LocalizableStrings.NOTIF_KEYED_WRONG_BODY]);
 						else
-							SendNotification(langHelper[LocalizableStrings.NOTIF_UNKEYED_HEADER],
+							Functions.SendNotification(langHelper[LocalizableStrings.NOTIF_UNKEYED_HEADER],
 								currentAlbum.Name + " " + langHelper[LocalizableStrings.NOTIF_UNKEYED_BODY]);
 					}
 				}
@@ -757,7 +741,7 @@ namespace MDRP
 
 			if (useRemoteArt)
 			{
-				string res = mngr.AlbumLookup(currentAlbum, currentTitle).Result;
+				string res = mngr.AlbumLookup(currentAlbum, currentTitle);
 				if (res != String.Empty)
 				{
 					foundImageRemotely = true;
@@ -769,7 +753,7 @@ namespace MDRP
 					{
 						if (!NotifiedAlbums.Contains(currentAlbum))
 						{
-							SendNotification(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_HEADER], string.Format(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_BODY], currentAlbum));
+							Functions.SendNotification(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_HEADER], string.Format(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_BODY], currentAlbum));
 							NotifiedAlbums.Add(currentAlbum);
 						}
 					}
@@ -779,76 +763,11 @@ namespace MDRP
 			return BigAssets[_playerName];
 		}
 
-		private static string GetLargeImageText(string albumName)
-		{
-			if (albumName.Length > 0)
-				if (albumName.Length <= 2)
-					return "_" + albumName + "_";
-				else
-					return CapLength(albumName, 128);
-			else
-				return langHelper[LocalizableStrings.UNKNOWN_ALBUM];
-		}
-
 		private static void UnsetAllPresences()
 		{
 			foreach (DiscordRpcClient client in AllClients.Values)
 				if (client.CurrentPresence != null)
-					ClearAPresence(client);
-		}
-
-		private static void SendToDebugServer(Exception exception)
-		{
-#if DEBUG
-			Console.WriteLine(exception.Message);
-			Console.WriteLine(exception.StackTrace);
-			Console.WriteLine("Something unexpected has occured");
-#else
-			Uri debugUri = new Uri("http://localhost:7532/");
-			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(debugUri);
-			request.Method = "POST";
-			request.ContentType = "text/json";
-			string urlEncoded = Uri.EscapeUriString(exception.ToString());
-			byte[] arr = Encoding.UTF8.GetBytes(urlEncoded);
-			try
-			{
-				Stream rs = request.GetRequestStream();
-				rs.Write(arr, 0, arr.Length);
-				request.GetResponse().Close();
-			}
-			catch (Exception)
-			{
-				Console.ForegroundColor = ConsoleColor.DarkRed;
-				Console.WriteLine(langHelper[LocalizableStrings.ERROR_OCCURRED]);
-				Console.ForegroundColor = ConsoleColor.White;
-			}
-#endif
-		}
-
-		private static void SendToDebugServer(string message)
-		{
-#if DEBUG
-			Console.WriteLine(message);
-#else
-			Uri url = new Uri("http://localhost:7532/");
-			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-			request.Method = "POST";
-			request.ContentType = "text/json";
-			string urlEncoded = Uri.EscapeUriString(message);
-			byte[] arr = Encoding.UTF8.GetBytes(urlEncoded);
-			try
-			{
-				Stream rs = request.GetRequestStream();
-				rs.Write(arr, 0, arr.Length);
-				request.GetResponse().Close();
-			}
-			catch (Exception)
-			{
-				Console.ForegroundColor = ConsoleColor.DarkRed;
-				Console.WriteLine(langHelper[LocalizableStrings.REQUEST_DEBUG_TOOL]);
-				Console.ForegroundColor = ConsoleColor.White;
-			}
-#endif
+					Functions.ClearAPresence(client);
 		}
 
 		private static void GetClient(Album album, string playerName)
@@ -886,15 +805,10 @@ namespace MDRP
 			}
 			catch (Exception e)
 			{
-				SendToDebugServer(e);
+				Functions.SendToDebugServer(e);
 			}
 
 			return DefaultClients[playerName];
-		}
-
-		public static string CapLength(string instring, int capLength)
-		{
-			return instring.Substring(0, Math.Min(capLength, instring.Length));
 		}
 
 		private static bool IsInitialized()
@@ -916,7 +830,7 @@ namespace MDRP
 			Console.Clear();
 #endif
 
-			DrawPersistentHeader();
+			Functions.DrawPersistentHeader();
 
 			Console.ForegroundColor = ConsoleColor.White;
 			Console.WriteLine(langHelper.get(LocalizableStrings.DETAILS) + ":");
@@ -958,7 +872,7 @@ namespace MDRP
 						if (ScreamAtUser && !NotifiedAlbums.ToArray().Contains(currentAlbum))
 						{
 							NotifiedAlbums.Add(currentAlbum);
-							SendNotification(langHelper[LocalizableStrings.NOTIF_KEY_TOO_LONG_HEADER],
+							Functions.SendNotification(langHelper[LocalizableStrings.NOTIF_KEY_TOO_LONG_HEADER],
 								string.Format(langHelper[LocalizableStrings.NOTIF_KEY_TOO_LONG_BODY], currentAlbum.Name,
 									albumKey, keyLength));
 						}
@@ -1026,38 +940,9 @@ namespace MDRP
 #else
 				Console.Clear();
 #endif
-				DrawPersistentHeader();
+				Functions.DrawPersistentHeader();
 				Console.Write(langHelper[LocalizableStrings.NOTHING_PLAYING] + "\r");
 			}
-		}
-
-		private static void DrawPersistentHeader()
-		{
-			Console.ForegroundColor = ConsoleColor.White;
-			Console.WriteLine(Title);
-
-			Console.ForegroundColor = ConsoleColor.White;
-			Console.Write(langHelper.get(LocalizableStrings.VERSION) + ": ");
-
-			Console.ForegroundColor = ConsoleColor.Gray;
-			Console.Write(Version);
-
-			if (UpdateAvailibleFlag)
-			{
-				Console.ForegroundColor = ConsoleColor.Green;
-				Console.Write(string.Format(" " + langHelper[LocalizableStrings.NEW_UPDATE], UpdateVersion));
-			}
-
-			Console.WriteLine();
-
-			Console.ForegroundColor = ConsoleColor.White;
-			Console.Write("Github: ");
-
-			Console.ForegroundColor = ConsoleColor.Cyan;
-			Console.WriteLine(Github);
-
-			Console.WriteLine();
-			Console.ForegroundColor = ConsoleColor.White;
 		}
 
 		private static void SetUnknown()
@@ -1069,7 +954,7 @@ namespace MDRP
 #else
 				Console.Clear();
 #endif
-				DrawPersistentHeader();
+				Functions.DrawPersistentHeader();
 				Console.Write(langHelper[LocalizableStrings.NO_VALID_MEDIA]);
 			}
 		}
@@ -1090,27 +975,11 @@ namespace MDRP
 
 		private static void _client_OnError(object sender, ErrorMessage args)
 		{
-			SendToDebugServer(args.ToString());
+			Functions.SendToDebugServer(args.ToString());
 			Console.WriteLine(args.Message);
 		}
 
 		//Get palying details
-		private static GlobalSystemMediaTransportControlsSessionMediaProperties GetStuff()
-		{
-			try
-			{
-				GlobalSystemMediaTransportControlsSession gsmtcsm = GlobalSystemMediaTransportControlsSessionManager
-					.RequestAsync().GetAwaiter().GetResult()
-					.GetCurrentSession();
-				return gsmtcsm.TryGetMediaPropertiesAsync().GetAwaiter().GetResult();
-			}
-			catch (Exception)
-			{
-				//happens all the time but trying again works so dw ab it
-				//SendToDebugServer("Something went wrong getting playing stuff.");
-				return null;
-			}
-		}
 
 		private static bool IsUsingAudio()
 		{
@@ -1150,32 +1019,13 @@ namespace MDRP
 						}
 						catch (Exception e)
 						{
-							SendToDebugServer(e);
+							Functions.SendToDebugServer(e);
 						}
 					}
 				}
 			}
 
 			return false;
-		}
-
-		private static void SendNotification(string message)
-		{
-			SendNotification("MDRP message", message);
-		}
-
-		private static void SendNotification(string messageTitle, string message)
-		{
-			//todo make a notif system for mb
-			if (!spawnedFromApplication)
-				new ToastContentBuilder()
-					.AddText(messageTitle)
-					.AddText(message)
-					.Show();
-			/*ProcessStartInfo errornotif =
-				new ProcessStartInfo("sendNotification.bat", "\"" + messageTitle + "\" \"" + message + "\"");
-			errornotif.WindowStyle = ProcessWindowStyle.Hidden;
-			Process.Start(errornotif);*/
 		}
 
 		private static void LoadSettings()
@@ -1218,19 +1068,19 @@ namespace MDRP
 					{
 						useRemoteArt = line.Split('=')[1].Trim().ToLower() == "true";
 					}
-				/*else if (line.Split('=')[0].Trim().ToLower() == "artist label")
-				{
-					ArtistLabel = line.Split('=')[1];
-				}
-				else if (line.Split('=')[0].Trim().ToLower() == "title label")
-				{
-					TitleLabel = line.Split('=')[1];
-				}*/
+					else if (line.Split('=')[0].Trim().ToLower() == "remote needs exact match")
+					{
+						needsExactMatch = line.Split('=')[1].Trim().ToLower() == "true";
+					}
+					else if (line.Split('=')[0].Trim().ToLower() == "create cache file")
+					{
+						createCacheFile = line.Split('=')[1].Trim().ToLower() == "true";
+					}
 			}
 			catch (Exception e)
 			{
-				SendToDebugServer(e);
-				SendToDebugServer(langHelper[LocalizableStrings.NO_SETTINGS]);
+				Functions.SendToDebugServer(e);
+				Functions.SendToDebugServer(langHelper[LocalizableStrings.NO_SETTINGS]);
 			}
 
 			if (!foundFirst && !foundSecond)
@@ -1244,7 +1094,7 @@ namespace MDRP
 			}
 			catch (Exception e)
 			{
-				SendToDebugServer(e);
+				Functions.SendToDebugServer(e);
 			}
 		}
 
@@ -1268,7 +1118,7 @@ namespace MDRP
 						else
 						{
 							Console.Error.WriteLine("Error in file " + file.Name + " not a valid player name");
-							SendNotification("Error in clientdata",
+							Functions.SendNotification("Error in clientdata",
 								"Error in file " + file.Name + ": " + lines[0].Split('=')[0] +
 								" is not a valid player name");
 							Thread.Sleep(5000);
@@ -1279,7 +1129,7 @@ namespace MDRP
 					if (!lines[1].ToLower().Contains("id="))
 					{
 						Console.Error.WriteLine(string.Format(langHelper[LocalizableStrings.NOTIF_SETERR_NO_ID_HEADER], file.Name));
-						SendNotification(langHelper[LocalizableStrings.NOTIF_SETERR_NO_ID_HEADER],
+						Functions.SendNotification(langHelper[LocalizableStrings.NOTIF_SETERR_NO_ID_HEADER],
 							string.Format(langHelper[LocalizableStrings.NOTIF_SETERR_NO_ID_HEADER], file.Name));
 						Thread.Sleep(5000);
 						continue;
@@ -1316,7 +1166,7 @@ namespace MDRP
 							if (lines[i].Trim() != "" && !warnedFile)
 							{
 								warnedFile = true;
-								SendNotification(langHelper[LocalizableStrings.NOTIF_SETERR_DEPREC_HEADER],
+								Functions.SendNotification(langHelper[LocalizableStrings.NOTIF_SETERR_DEPREC_HEADER],
 									string.Format(langHelper[LocalizableStrings.NOTIF_SETERR_DEPREC_BODY], file.Name));
 							}
 
@@ -1351,7 +1201,7 @@ namespace MDRP
 				}
 				catch (Exception e)
 				{
-					SendToDebugServer(e);
+					Functions.SendToDebugServer(e);
 				}
 			}
 		}
@@ -1444,20 +1294,6 @@ namespace MDRP
 			}
 		}
 
-		private static void ClearAPresence(DiscordRpcClient client)
-		{
-			try
-			{
-				client.ClearPresence();
-			}
-			catch (NullReferenceException e)
-			{
-				Console.WriteLine("Excepted " + e);
-				client.SetPresence(null);
-				client.Invoke();
-			}
-		}
-
 		private static void CheckForUpdate()
 		{
 			UpdateTimer.Restart();
@@ -1470,70 +1306,11 @@ namespace MDRP
 						UpdateVersion = str.Replace("\"tag_name\":\"", "").Replace("\"", "");
 						if (ScreamAtUser && !UpdateAvailibleFlag)
 							if (str.Replace("\"tag_name\":\"", "").Replace("\"", "") != Version)
-								SendNotification(langHelper[LocalizableStrings.NOTIF_UPDATE_HEADER],
+								Functions.SendNotification(langHelper[LocalizableStrings.NOTIF_UPDATE_HEADER],
 									string.Format(langHelper[LocalizableStrings.NOTIF_UPDATE_BODY], UpdateVersion));
 						UpdateAvailibleFlag = UpdateVersion != Version;
 					}
 			});
-		}
-
-		private static void GenerateShortcuts()
-		{
-			WshShell shell;
-			IWshShortcut shortcut;
-			string rootFolder;
-			rootFolder = Directory.GetParent(
-				Directory.GetParent(Directory.GetParent(Directory.GetCurrentDirectory()).FullName).FullName).FullName;
-			shell = new WshShell();
-
-			Directory.CreateDirectory(rootFolder + "\\Shortcuts");
-
-			shortcut = (IWshShortcut)shell.CreateShortcut(rootFolder + "\\Shortcuts\\Run MDRP Windowed.lnk");
-			shortcut.Description = "Run MDRP";
-			shortcut.IconLocation = Directory.GetCurrentDirectory() + "\\MDRP.exe";
-			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\RunHidden.bat";
-			shortcut.Save();
-
-			shortcut = (IWshShortcut)shell.CreateShortcut(rootFolder + "\\Shortcuts\\Run MDRP Background.lnk");
-			shortcut.Description = "Run MDRP";
-			shortcut.IconLocation = Directory.GetCurrentDirectory() + "\\MDRP.exe";
-			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\RunHidden.vbs";
-			shortcut.Save();
-
-			shortcut = (IWshShortcut)shell.CreateShortcut(rootFolder + "\\Shortcuts\\Link With MusicBee.lnk");
-			shortcut.Description = "Link With MusicBee";
-			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\LinkWithMusicBee.bat";
-			shortcut.Save();
-
-			shortcut = (IWshShortcut)shell.CreateShortcut(rootFolder + "\\Shortcuts\\Link With Groove.lnk");
-			shortcut.Description = "Link With Groove";
-			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\LinkWithGroove.bat";
-			shortcut.Save();
-
-			shortcut = (IWshShortcut)shell.CreateShortcut(rootFolder + "\\Shortcuts\\Link With Spotify.lnk");
-			shortcut.Description = "Link With Spotify";
-			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\LinkWithSpotify.bat";
-			shortcut.Save();
-
-			shortcut = (IWshShortcut)shell.CreateShortcut(rootFolder + "\\Shortcuts\\Unlink MusicBee.lnk");
-			shortcut.Description = "Unlink With MusicBee";
-			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\UnlinkFromMusicBee.bat";
-			shortcut.Save();
-
-			shortcut = (IWshShortcut)shell.CreateShortcut(rootFolder + "\\Shortcuts\\Unlink Spotify.lnk");
-			shortcut.Description = "Unlink With Spotify";
-			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\UnlinkFromSpotify.bat";
-			shortcut.Save();
-
-			shortcut = (IWshShortcut)shell.CreateShortcut(rootFolder + "\\Shortcuts\\Unlink Groove.lnk");
-			shortcut.Description = "Unlink With Groove";
-			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\UnlinkFromGroove.bat";
-			shortcut.Save();
-
-			shortcut = (IWshShortcut)shell.CreateShortcut(rootFolder + "\\Shortcuts\\Kill Hidden.lnk");
-			shortcut.Description = "Kills MDRP";
-			shortcut.TargetPath = Directory.GetCurrentDirectory() + "\\KillHidden.vbs";
-			shortcut.Save();
 		}
 
 		/**
@@ -1547,9 +1324,6 @@ namespace MDRP
 						foreach (DiscordRpcClient klient in PlayersClients[player])
 							if (AlbumKeyMapping[alboom].ContainsKey(klient.ApplicationID))
 								return true;
-			/*foreach (Album alboom in AlbumKeyMapping.Keys)
-				if (alboom.Name.Equals(query.Name))
-					return true;*/
 			return false;
 		}
 
@@ -1561,9 +1335,6 @@ namespace MDRP
 						foreach (DiscordRpcClient klient in PlayersClients[player])
 							if (AlbumKeyMapping[alboom].ContainsKey(klient.ApplicationID))
 								return alboom;
-			/*foreach (Album alboom in AlbumKeyMapping.Keys)
-				if (alboom.Name.Equals(query.Name))
-					return alboom;*/
 			return null;
 		}
 	}

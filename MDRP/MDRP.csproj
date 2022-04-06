@@ -75,6 +75,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="util\Album.cs" />
     <Compile Include="util\ExternalAPI\ExternalArtManager.cs" />
+    <Compile Include="util\Functions.cs" />
     <Compile Include="util\JsonResponse.cs" />
     <Compile Include="util\LangHelper.cs" />
   </ItemGroup>

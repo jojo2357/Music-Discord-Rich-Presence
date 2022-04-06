@@ -68,6 +68,11 @@ namespace MDRP
 			return false;
 		}
 
+		public string ExportStringWithKey(string key)
+		{
+			return Name + "==" + key + (AcceptsAnyArtist() ? "" : "==" + String.Join("==", Artists));
+		}
+
 		private bool AcceptsAnyArtist()
 		{
 			return Artists.Length == 0 || Artists[0] == "*";
