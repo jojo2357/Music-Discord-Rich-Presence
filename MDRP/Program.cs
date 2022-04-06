@@ -517,7 +517,8 @@ namespace MDRP
 							    currentAlbum.Name != "")
 							{
 								NotifiedAlbums.Add(currentAlbum);
-								if (useRemoteArt) {
+								if (useRemoteArt)
+								{
 									if (mngr.AlbumLookup(currentAlbum, currentTitle).Result == "")
 									{
 										SendNotification(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_HEADER], string.Format(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_BODY], currentAlbum));
@@ -693,7 +694,8 @@ namespace MDRP
 				    currentAlbum.Name != "")
 				{
 					NotifiedAlbums.Add(currentAlbum);
-					if (useRemoteArt) {
+					if (useRemoteArt)
+					{
 						if (mngr.AlbumLookup(currentAlbum, currentTitle).Result == "")
 						{
 							SendNotification(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_HEADER], string.Format(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_BODY], currentAlbum));
@@ -997,7 +999,8 @@ namespace MDRP
 				{
 					Console.ForegroundColor = ConsoleColor.Green;
 					Console.WriteLine("\n" + langHelper[LocalizableStrings.FOUND_REMOTELY]);
-				} else if (!foundImageRemotely && useRemoteArt)
+				}
+				else if (!foundImageRemotely && useRemoteArt)
 				{
 					Console.ForegroundColor = ConsoleColor.Red;
 					Console.WriteLine("\n" + langHelper[LocalizableStrings.NOT_FOUND_REMOTELY]);
@@ -1210,7 +1213,8 @@ namespace MDRP
 					{
 						foundSecond = true;
 						lineData = lineData + "\n" + String.Join("=", line.Split('=').Skip(1));
-					} else if (line.Split('=')[0].Trim().ToLower() == "get remote artwork")
+					}
+					else if (line.Split('=')[0].Trim().ToLower() == "get remote artwork")
 					{
 						useRemoteArt = line.Split('=')[1].Trim().ToLower() == "true";
 					}
@@ -1257,12 +1261,19 @@ namespace MDRP
 					string[] lines = File.ReadAllLines(file.FullName);
 					if (!ValidPlayers.Contains(lines[0].Split('=')[0]))
 					{
-						Console.Error.WriteLine("Error in file " + file.Name + " not a valid player name");
-						SendNotification("Error in clientdata",
-							"Error in file " + file.Name + ": " + lines[0].Split('=')[0] +
-							" is not a valid player name");
-						Thread.Sleep(5000);
-						continue;
+						if (lines[0].Split('=')[0] == "*")
+						{
+							parseWildcardKeying(lines);
+						}
+						else
+						{
+							Console.Error.WriteLine("Error in file " + file.Name + " not a valid player name");
+							SendNotification("Error in clientdata",
+								"Error in file " + file.Name + ": " + lines[0].Split('=')[0] +
+								" is not a valid player name");
+							Thread.Sleep(5000);
+							continue;
+						}
 					}
 
 					if (!lines[1].ToLower().Contains("id="))
@@ -1341,6 +1352,94 @@ namespace MDRP
 				catch (Exception e)
 				{
 					SendToDebugServer(e);
+				}
+			}
+		}
+
+		private static void parseWildcardKeying(string[] lines)
+		{
+			bool useDefaults = lines[1] == "id=default";
+			Dictionary<string, string> idPlayerDict = new Dictionary<string, string>();
+			string id = lines[1].Split('=')[1];
+
+			if (!useDefaults)
+			{
+				if (!AllClients.ContainsKey(id))
+				{
+					AllClients.Add(id, new DiscordRpcClient(id, autoEvents: false));
+				}
+			}
+			
+			foreach (string playerCandidate in lines[0].Split('=')[1] == "*" ? ValidPlayers : lines[0].Split('=')[1].ToLower().Split(','))
+			{
+				if (PlayersClients.ContainsKey(playerCandidate))
+				{
+					if (useDefaults)
+					{
+						idPlayerDict[playerCandidate] = DefaultClients[playerCandidate].ApplicationID;
+					}
+					else
+					{
+						PlayersClients[playerCandidate] = PlayersClients[playerCandidate].Append(AllClients[id]).ToArray();
+						idPlayerDict[playerCandidate] = id;
+					}
+				}
+			}
+
+			for (int i = 2; i < lines.Length; i++)
+			{
+				bool foundDupe = false;
+				Album album;
+				string[] parsedLine;
+				if (lines[i].Contains("=="))
+				{
+					parsedLine = Regex.Split(lines[i], @"==");
+				}
+				else if (lines[i].Contains('='))
+				{
+					parsedLine = Regex.Split(lines[i], @"=");
+				}
+				else
+				{
+					/*if (lines[i].Trim() != "" && !warnedFile)
+					{
+						warnedFile = true;
+						SendNotification(langHelper[LocalizableStrings.NOTIF_SETERR_DEPREC_HEADER],
+							string.Format(langHelper[LocalizableStrings.NOTIF_SETERR_DEPREC_BODY], file.Name));
+					}*/
+
+					continue;
+				}
+
+				if (parsedLine.Length == 2)
+					album = new Album(parsedLine[0]);
+				else
+					album = new Album(parsedLine[0],
+						parsedLine.Skip(2).Take(parsedLine.Length - 2).ToArray());
+
+				if (!AlbumKeyMapping.ContainsKey(album))
+				{
+					AlbumKeyMapping.Add(album, new Dictionary<string, string>());
+				}
+
+				//if (!AlbumKeyMapping.ContainsKey(album)) ;//Console.WriteLine("Uh oh");
+
+				foreach (string player in idPlayerDict.Keys)
+				{
+					foreach (DiscordRpcClient otherKlient in PlayersClients[player])
+						if (otherKlient.ApplicationID != id && AlbumKeyMapping.ContainsKey(album))
+						{
+							if (AlbumKeyMapping[album].ContainsKey(otherKlient.ApplicationID))
+							{
+								foundDupe = true;
+								break;
+							}
+						}
+					if (foundDupe)
+						continue;
+					
+					if (!AlbumKeyMapping[album].ContainsKey(idPlayerDict[player]))
+						AlbumKeyMapping[album].Add(idPlayerDict[player], parsedLine[1]);
 				}
 			}
 		}

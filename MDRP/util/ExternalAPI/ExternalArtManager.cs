@@ -9,7 +9,7 @@ namespace MDRP
 {
 	public class ExternalArtManager
 	{
-		private const string default_endpoint = "https://itunes.apple.com/search?";
+		private const string default_endpoint = "https://itunes.apple.com/search?limit=200&";
 
 		private HttpClient myClient = new HttpClient();
 
@@ -37,12 +37,13 @@ namespace MDRP
 			if (cache.ContainsKey(album))
 				return cache[album];
 
-			if (album.Name == "")
+			if (album.Name == "" || album.Name == "Unknown Album" || album.Artists.Length == 0 || (album.Artists.Length == 1 && album.Artists[0] == "Unknown Artist"))
 				return cache[album] = "";
 
-			/*Console.WriteLine(album.ToString());
-			
-			Thread.Sleep(2000);*/
+			if (album.Artists[0] == "jojo2357" && album.Name.ToLower() == "king and lionheart")
+			{
+				return cache[album] = "https://jojo2357.github.io/Album-Arts/MHIA_my_watermark.png";
+			}
 
 			Uri queryString = new Uri(default_endpoint + "term=" + album.Name + "&media=music&entity=album");
 			HttpResponseMessage result = await myClient.GetAsync(queryString);
@@ -75,7 +76,7 @@ namespace MDRP
 				}
 			}
 
-			if (Int16.Parse(jObject["resultCount"].ToString()) == 50)
+			if (Int16.Parse(jObject["resultCount"].ToString()) == 200)
 			{
 				queryString = new Uri(default_endpoint + "term=" + album + "&media=music&entity=album");
 				result = await myClient.GetAsync(queryString);
@@ -123,7 +124,6 @@ namespace MDRP
 				{
 					foreach (JToken albumObject in jObject["results"])
 					{
-						Console.WriteLine(albumObject["artistName"]);
 						if (albumObject["artworkUrl100"] != null && albumObject["artistName"] != null)
 						{
 							if (album.Artists.Contains(albumObject["artistName"].ToString().ToLower()))
