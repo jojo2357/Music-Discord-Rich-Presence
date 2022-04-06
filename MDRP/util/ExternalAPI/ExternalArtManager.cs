@@ -11,7 +11,7 @@ namespace MDRP
 	public class ExternalArtManager
 	{
 		private const string default_endpoint = "https://itunes.apple.com/search?limit=200&";
-		private const string cacheFileLocation = "../../../clientdata/cachedImages.dat";
+		public const string cacheFileLocation = "../../../clientdata/cachedImages.dat";
 
 		private HttpClient myClient = new HttpClient();
 

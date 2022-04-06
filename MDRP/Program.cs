@@ -1088,6 +1088,8 @@ namespace MDRP
 			try
 			{
 				ReadKeyingFromFile(new DirectoryInfo("../../../clientdata"));
+				if (File.Exists(ExternalArtManager.cacheFileLocation))
+					ReadKeyingFromFile(new FileInfo(ExternalArtManager.cacheFileLocation));
 			}
 			catch (Exception e)
 			{
@@ -1101,105 +1103,110 @@ namespace MDRP
 				ReadKeyingFromFile(dir);
 			foreach (FileInfo file in files.GetFiles())
 			{
-				if (file.Name == "demo.dat")
+				if (file.Name == "demo.dat" || file.Name == "cachedImages.dat")
 					continue;
-				try
-				{
-					string[] lines = File.ReadAllLines(file.FullName);
-					if (!ValidPlayers.Contains(lines[0].Split('=')[0]))
-					{
-						if (lines[0].Split('=')[0] == "*")
-						{
-							parseWildcardKeying(lines);
-						}
-						else
-						{
-							Console.Error.WriteLine("Error in file " + file.Name + " not a valid player name");
-							Functions.SendNotification("Error in clientdata",
-								"Error in file " + file.Name + ": " + lines[0].Split('=')[0] +
-								" is not a valid player name");
-							Thread.Sleep(5000);
-							continue;
-						}
-					}
+				ReadKeyingFromFile(file);
+			}
+		}
 
-					if (!lines[1].ToLower().Contains("id="))
+		private static void ReadKeyingFromFile(FileInfo file)
+		{
+			try
+			{
+				string[] lines = File.ReadAllLines(file.FullName);
+				if (!ValidPlayers.Contains(lines[0].Split('=')[0]))
+				{
+					if (lines[0].Split('=')[0] == "*")
 					{
-						Console.Error.WriteLine(string.Format(langHelper[LocalizableStrings.NOTIF_SETERR_NO_ID_HEADER], file.Name));
-						Functions.SendNotification(langHelper[LocalizableStrings.NOTIF_SETERR_NO_ID_HEADER],
-							string.Format(langHelper[LocalizableStrings.NOTIF_SETERR_NO_ID_HEADER], file.Name));
+						parseWildcardKeying(lines);
+					}
+					else
+					{
+						Console.Error.WriteLine("Error in file " + file.Name + " not a valid player name");
+						Functions.SendNotification("Error in clientdata",
+							"Error in file " + file.Name + ": " + lines[0].Split('=')[0] +
+							" is not a valid player name");
 						Thread.Sleep(5000);
+						return;
+					}
+				}
+
+				if (!lines[1].ToLower().Contains("id="))
+				{
+					Console.Error.WriteLine(string.Format(langHelper[LocalizableStrings.NOTIF_SETERR_NO_ID_HEADER], file.Name));
+					Functions.SendNotification(langHelper[LocalizableStrings.NOTIF_SETERR_NO_ID_HEADER],
+						string.Format(langHelper[LocalizableStrings.NOTIF_SETERR_NO_ID_HEADER], file.Name));
+					Thread.Sleep(5000);
+					return;
+				}
+
+				string id = lines[1].Split('=')[1].Trim();
+				if (!AllClients.ContainsKey(id))
+				{
+					AllClients.Add(id, new DiscordRpcClient(id, autoEvents: false));
+					if (!PlayersClients.ContainsKey(lines[0].Split('=')[0]))
+						PlayersClients.Add(lines[0].Split('=')[0], new DiscordRpcClient[0]);
+					PlayersClients[lines[0].Split('=')[0]] =
+						PlayersClients[lines[0].Split('=')[0]].Append(AllClients[id]).ToArray();
+					if (!DefaultClients.ContainsKey(lines[0].Split('=')[0]))
+						DefaultClients.Add(lines[0].Split('=')[0], AllClients[id]);
+				}
+
+				bool warnedFile = false;
+				for (int i = 2; i < lines.Length; i++)
+				{
+					bool foundDupe = false;
+					Album album;
+					string[] parsedLine;
+					if (lines[i].Contains("=="))
+					{
+						parsedLine = Regex.Split(lines[i], @"==");
+					}
+					else if (lines[i].Contains('='))
+					{
+						parsedLine = Regex.Split(lines[i], @"=");
+					}
+					else
+					{
+						if (lines[i].Trim() != "" && !warnedFile)
+						{
+							warnedFile = true;
+							Functions.SendNotification(langHelper[LocalizableStrings.NOTIF_SETERR_DEPREC_HEADER],
+								string.Format(langHelper[LocalizableStrings.NOTIF_SETERR_DEPREC_BODY], file.Name));
+						}
+
 						continue;
 					}
 
-					string id = lines[1].Split('=')[1].Trim();
-					if (!AllClients.ContainsKey(id))
+					if (parsedLine.Length == 2)
+						album = new Album(parsedLine[0]);
+					else
+						album = new Album(parsedLine[0],
+							parsedLine.Skip(2).Take(parsedLine.Length - 2).ToArray());
+
+					if (!AlbumKeyMapping.ContainsKey(album))
 					{
-						AllClients.Add(id, new DiscordRpcClient(id, autoEvents: false));
-						if (!PlayersClients.ContainsKey(lines[0].Split('=')[0]))
-							PlayersClients.Add(lines[0].Split('=')[0], new DiscordRpcClient[0]);
-						PlayersClients[lines[0].Split('=')[0]] =
-							PlayersClients[lines[0].Split('=')[0]].Append(AllClients[id]).ToArray();
-						if (!DefaultClients.ContainsKey(lines[0].Split('=')[0]))
-							DefaultClients.Add(lines[0].Split('=')[0], AllClients[id]);
+						AlbumKeyMapping.Add(album, new Dictionary<string, string>());
 					}
-
-					bool warnedFile = false;
-					for (int i = 2; i < lines.Length; i++)
+					else
 					{
-						bool foundDupe = false;
-						Album album;
-						string[] parsedLine;
-						if (lines[i].Contains("=="))
-						{
-							parsedLine = Regex.Split(lines[i], @"==");
-						}
-						else if (lines[i].Contains('='))
-						{
-							parsedLine = Regex.Split(lines[i], @"=");
-						}
-						else
-						{
-							if (lines[i].Trim() != "" && !warnedFile)
-							{
-								warnedFile = true;
-								Functions.SendNotification(langHelper[LocalizableStrings.NOTIF_SETERR_DEPREC_HEADER],
-									string.Format(langHelper[LocalizableStrings.NOTIF_SETERR_DEPREC_BODY], file.Name));
-							}
+						foreach (DiscordRpcClient otherKlient in PlayersClients[lines[0].Split('=')[0]])
+							if (otherKlient.ApplicationID != id && AlbumKeyMapping.ContainsKey(album))
+								foundDupe |= AlbumKeyMapping[album].ContainsKey(otherKlient.ApplicationID);
 
+						if (foundDupe)
 							continue;
-						}
-
-						if (parsedLine.Length == 2)
-							album = new Album(parsedLine[0]);
-						else
-							album = new Album(parsedLine[0],
-								parsedLine.Skip(2).Take(parsedLine.Length - 2).ToArray());
-
-						if (!AlbumKeyMapping.ContainsKey(album))
-						{
-							AlbumKeyMapping.Add(album, new Dictionary<string, string>());
-						}
-						else
-						{
-							foreach (DiscordRpcClient otherKlient in PlayersClients[lines[0].Split('=')[0]])
-								if (otherKlient.ApplicationID != id && AlbumKeyMapping.ContainsKey(album))
-									foundDupe |= AlbumKeyMapping[album].ContainsKey(otherKlient.ApplicationID);
-
-							if (foundDupe)
-								continue;
-						}
-
-						//if (!AlbumKeyMapping.ContainsKey(album)) ;//Console.WriteLine("Uh oh");
-
-						if (!AlbumKeyMapping[album].ContainsKey(id))
-							AlbumKeyMapping[album].Add(id, parsedLine[1]);
 					}
+
+					//if (!AlbumKeyMapping.ContainsKey(album)) ;//Console.WriteLine("Uh oh");
+
+					if (!AlbumKeyMapping[album].ContainsKey(id))
+						AlbumKeyMapping[album].Add(id, parsedLine[1]);
 				}
-				catch (Exception e)
-				{
-					Functions.SendToDebugServer(e);
-				}
+			}
+			catch (Exception e)
+			{
+				Functions.SendToDebugServer(e);
 			}
 		}
 
