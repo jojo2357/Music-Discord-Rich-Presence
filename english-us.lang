@@ -14,12 +14,12 @@ UNKEYED==Album not keyed :(
 UNKNOWN_ARTIST==Unknown Artist
 CONSOLE_NAME==Music Discord Rich Presence
 NO_VALID_MEDIA==Detected volume in something but not showing as it is not currently supported or is disabled
-REQUIRE_PIPELINE==Detected volume in {0} but no data has been recieved from it. You may need to update the player, install a plugin, or just pause and resume the music. See more at
+REQUIRE_PIPELINE==Detected volume in {0} but no data has been received from it. You may need to update the player, install a plugin, or just pause and resume the music. See more at
 AND==and
 FAILED_TO_GET_INFO==Failed to get track info
 UNKNOWN_ALBUM==Unknown Album
-ERROR_OCCURRED==An error has occured. If the issue is severe, or you would like to know more, run the debug tool and use the printouts there. If this is severely hindering your MDRP experience, please open an issue on GitHub.
-REQUEST_DEBUG_TOOL==An error has occured. Please run the debug tool to get a better readout and then open an issue on github with that printout.
+ERROR_OCCURRED==An error has occurred. If the issue is severe, or you would like to know more, run the debug tool and use the printouts there. If this is severely hindering your MDRP experience, please open an issue on GitHub.
+REQUEST_DEBUG_TOOL==An error has occurred. Please run the debug tool to get a better readout and then open an issue on github with that printout.
 SPECIAL_INTEGRATION==using special integration!
 NOTHING_PLAYING==Nothing Playing (probably paused)
 NEW_UPDATE==NEW UPDATE {0} (goto github to download)
