@@ -473,9 +473,6 @@ namespace MDRP
 						return;
 					if (_wasPlaying && !_isPlaying)
 					{
-						/*Console.WriteLine(currentAlbum + " " + langHelper[LocalizableStrings.AND] + " " + new Album(_currentTrack.AlbumTitle,
-							_currentTrack.Artist,
-							_currentTrack.AlbumArtist));*/
 						activeClient.UpdateSmallAsset("paused", "paused");
 						InvokeActiveClient();
 						SetConsole(_lastTrack.Title, _lastTrack.Artist, _lastTrack.AlbumTitle,
@@ -1219,20 +1216,24 @@ namespace MDRP
 					AllClients.Add(id, new DiscordRpcClient(id, autoEvents: false));
 				}
 			}
-			
+
 			foreach (string playerCandidate in lines[0].Split('=')[1] == "*" ? ValidPlayers : lines[0].Split('=')[1].ToLower().Split(','))
 			{
-				if (PlayersClients.ContainsKey(playerCandidate))
+				if (useDefaults)
 				{
-					if (useDefaults)
+					idPlayerDict[playerCandidate] = DefaultClients[playerCandidate].ApplicationID;
+					if (!PlayersClients.ContainsKey(playerCandidate))
 					{
-						idPlayerDict[playerCandidate] = DefaultClients[playerCandidate].ApplicationID;
+						PlayersClients[playerCandidate] = new[]
+							{
+								DefaultClients[playerCandidate]
+							};
 					}
-					else
-					{
-						PlayersClients[playerCandidate] = PlayersClients[playerCandidate].Append(AllClients[id]).ToArray();
-						idPlayerDict[playerCandidate] = id;
-					}
+				}
+				else
+				{
+					PlayersClients[playerCandidate] = PlayersClients[playerCandidate].Append(AllClients[id]).ToArray();
+					idPlayerDict[playerCandidate] = id;
 				}
 			}
 
@@ -1285,9 +1286,10 @@ namespace MDRP
 								break;
 							}
 						}
+
 					if (foundDupe)
 						continue;
-					
+
 					if (!AlbumKeyMapping[album].ContainsKey(idPlayerDict[player]))
 						AlbumKeyMapping[album].Add(idPlayerDict[player], parsedLine[1]);
 				}
