@@ -7,7 +7,11 @@ assignees: ''
 
 ---
 
-IF YOUR ISSUE HAS TO DO WITH ALBUM ART GO TO https://github.com/jojo2357/MDRP-Validation-Tool FIRST
+## IF YOUR ISSUE...
+
+...is about MDRP getting your album art wrong, make a comment [here](https://github.com/jojo2357/Music-Discord-Rich-Presence/discussions/59)
+
+...IF YOUR ISSUE HAS TO DO WITH ALBUM ART GO TO https://github.com/jojo2357/MDRP-Validation-Tool FIRST
 
 **Version**
 The version the bug was found on: 1.[].[]

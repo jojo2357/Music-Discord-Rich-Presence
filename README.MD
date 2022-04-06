@@ -91,7 +91,7 @@ line 2: `Artist: Of Monsters and Men`
 The tooltip on the large image will always have the album name, and the tooltip on the small icon will have one of `Listening to <Music Player>` or `paused` (when appropriate).
 
 ### Automatic Album Art Settings
-Automatic Album Art or Remote Artowork as it is sometimes referred to, is the process by which MDRP will look on the internet for the album art that corresponds to your currently playing media.
+Automatic Album Art or Remote Artowork as it is sometimes referred to, is the process by which MDRP will look on the internet for the album art that corresponds to your currently playing media. **If MDRP gets the album art wrong, please comment on [this discussion](https://github.com/jojo2357/Music-Discord-Rich-Presence/discussions/59)
 
 | Setting | When It applies | Behavior when true | Behavior when false | Recommendation |
 |---------|-----------------|--------------------|---------------------|----------|
