@@ -26,6 +26,7 @@ namespace MDRP
 			Name = name;
 			Artists = artists.Where(artist => artist != "").ToArray();
 			for (int i = 0; i < Artists.Length; i++) Artists[i] = Artists[i].ToLower();
+			Artists = Artists.Distinct().ToArray();
 		}
 
 		//dont hash the artists, we are interested in dict#contains to return true for the same name, we will sort out
