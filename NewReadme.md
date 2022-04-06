@@ -1,5 +1,5 @@
 # Music Discord Rich Presence
-TL;DR: Run this by navigating to the [latest release](/releases/latest) and downloading the release zip. unzip the contents and use the bat to run. The settings are in the `DiscordPresenceConfig.ini` file
+TL;DR: Run this by navigating to the [latest release](https://github.com/jojo2357/Music-Discord-Rich-Presence/releases/latest) and downloading the release zip. unzip the contents and use the bat to run. The settings are in the `DiscordPresenceConfig.ini` file
 
 This program has been designed to work with many music players in the windows environment, including:
 - Groove Music (Win 10)
@@ -12,7 +12,7 @@ This program has been designed to work with many music players in the windows en
 
 There may be more to come, time will tell.
 
-### If you have a version below 1.7, please refer to the [old readme](/blob/1.6.4/README.MD) or update your entire MDRP installation from scratch
+### If you have a version below 1.7, please refer to the [old readme](https://github.com/jojo2357/Music-Discord-Rich-Presence/blob/1.6.4/README.MD) or update your entire MDRP installation from scratch
 
 ## Features
 - Can pull your album art from ITunes and display it just like Spotify!
@@ -23,7 +23,7 @@ There may be more to come, time will tell.
 - Can change the default name of the application in Discord, so you could have `Playing Music` instead of `Playing Groove Music`
 
 ## Setup
-0. Download the [latest release](/releases/latest)
+0. Download the [latest release](https://github.com/jojo2357/Music-Discord-Rich-Presence/releases/latest)
 1. Unzip the zip file
 2. Navigate to the unzipped contents
 3. Run `Music_DRP_Launcher.bat`. Your antivirus may flag it as potentially dangerous, so optionally run a scan first, or live on the edge and select "Run Anyway" (you may need to google how to do so)
@@ -63,8 +63,7 @@ Right now you can only use the old library, so don't use this for now.
 If you would like to key all of your Spotify playlists, go to the [MDRP website](https://mdrp.tech/fetchalbumart) (under construction, please be patient) and click `Regenerate Token`, then select either `Include Artists` (recommended) or `Exclude Artists` and then download the dat (may take up to 5 minutes if you have a ton of songs) and place it in your clientdata folder.
 
 ## Changing MDRP Settings
-To change any MDRP settings, they will all be located in your `DiscordPresenceConfig.ini` file. 
-
+To change any MDRP settings, they will all be located in your `DiscordPresenceConfig.ini` file.\
 Data in this file is in `key=value` pairs so any line that does not have a `=` will be ignored.
 
 ### Changing default background
