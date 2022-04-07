@@ -1,0 +1,45 @@
+MDRP_FULL==Music Discord Rich Presence
+MDRP_SHORT==MDRP
+DRP_FULL==Discord Rich Presence
+DRP_SHORT==DRP
+ARTIST==Künstler
+ALBUM==Album
+TITLE==Titel
+PLAYER==Player
+VERSION==Version
+DETAILS==Musik Details
+GOOD_ONE==Sieht gut aus, schau mal auf dein DRP ;)
+KEYED_WRONG==Album wurde für den falschen Künstler eingetragen :/
+UNKEYED==Album wurde nicht eingetragen :(
+UNKNOWN_ARTIST==Unbekannter Künstler
+CONSOLE_NAME==Discord Rich Presence für Groove
+NO_VALID_MEDIA==Volumen erkannt welches derzeit nicht unterstützt oder deaktiviert wurde.
+REQUIRE_PIPELINE==Erkanntes Volume in {0}, aber es wurden keine Daten davon empfangen. Möglicherweise müssen Sie den Player aktualisieren, ein Plugin installieren oder die Musik einfach anhalten und fortsetzen. Siehe mehr unter
+AND==und
+FAILED_TO_GET_INFO==Track Info konnte nicht abgerufen werden
+UNKNOWN_ALBUM==Unbekanntes Album
+ERROR_OCCURRED==Ein Fehler ist aufgetreten. Wenn du mehr wissen willst oder das Problem schwerwiegend ist, führe das Debug Tool aus. Wenn der Fehler dich hindert MDRP zu nutzen, öffne bitte ein "Issue" auf GitHub mit den Ausgaben des Debug Tools.
+REQUEST_DEBUG_TOOL==Ein Fehler ist aufgetreten. Führe das Debug Tool aus um mehr Infos zu bekommen. Bei Bedarf öffne ein "Issue" auf Github mit der Ausgabe des Debug Tools.
+SPECIAL_INTEGRATION==mit spezieller Integration!
+NOTHING_PLAYING==Momentan wird nichts gespielt (wahrscheinlich pausiert)
+NEW_UPDATE==NEUES UPDATE {0} (zum Herunterladen auf GitHub gehen)
+NO_SETTINGS==DiscordPresenceConfig.ini wurde nicht gefunden! Es ist die Einstellungsdatei zum Aktivieren und Deaktivieren bestimmter Funktionen.
+NOTIF_KEYED_WRONG_HEADER==Album wurde falsch eingetragen
+NOTIF_KEYED_WRONG_BODY==ist für einen falschen Künstler eingetragen (Überprüfen Sie die Groß- und Kleinschreibung). Zum Deaktivieren von Benachrichtigung, setze verbose zu false in DiscordPresenceConfig.ini
+NOTIF_UNKEYED_HEADER==Album nicht eingetragen
+NOTIF_UNKEYED_BODY==wurde nicht eingetragen. Zum Deaktivieren von Benachrichtigung, setze verbose zu false in DiscordPresenceConfig.ini
+NOTIF_KEY_TOO_LONG_HEADER==Album Eintrag in Discord zu lang!
+NOTIF_KEY_TOO_LONG_BODY==Der Eintrag für {0} ({1}) ist länger als das {2} Zeichen maximum
+NOTIF_SETERR_NO_ID_HEADER==MDRP Einstellungsproblem
+NOTIF_SETERR_NO_ID_BODY==Fehler in Datei {0} Keine ID in der zweiten Zeile gefunden
+NOTIF_SETERR_DEPREC_HEADER==Hinweis zur Einstellung
+NOTIF_SETERR_DEPREC_BODY=={0} verwendet ein anderes Format. Alben sollten so aussehen: Name==Key==Künstler
+NOTIF_UPDATE_HEADER==Update verfügbar!
+NOTIF_UPDATE_BODY=={0} ist auf GitHub! Für die aktuelle Version gehe dort hin
+USING==Verwenden von
+PAUSED==Pausiert
+KEY_TOO_LONG==Der Eintrag des Albums ist zu lang. Es muss unter {0} Zeichen sein!
+FOUND_REMOTELY==Image found remotely!
+NOT_FOUND_REMOTELY==Image could not be found remotely
+NOTIF_NOT_FOUND_REMOTELY_HEADER==Album Art Not Found Remotely
+NOTIF_NOT_FOUND_REMOTELY_BODY=={0} could not be found on the ITunes API, please key this manually.

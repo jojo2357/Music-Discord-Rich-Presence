@@ -1,0 +1,45 @@
+MDRP_FULL==Music Discord Rich Presence
+MDRP_SHORT==MDRP
+DRP_FULL==Discord Rich Presence
+DRP_SHORT==DRP
+ARTIST==Artist
+ALBUM==Album
+TITLE==Title
+PLAYER==Player
+VERSION==Version
+DETAILS==Music details
+GOOD_ONE==This is a good one, check your DRP ;)
+KEYED_WRONG==Album keyed for the wrong artist :/
+UNKEYED==Album not keyed :(
+UNKNOWN_ARTIST==Unknown Artist
+CONSOLE_NAME==Music Discord Rich Presence
+NO_VALID_MEDIA==Detected volume in something but not showing as it is not currently supported or is disabled
+REQUIRE_PIPELINE==Detected volume in {0} but no data has been received from it. You may need to update the player, install a plugin, or just pause and resume the music. See more at
+AND==and
+FAILED_TO_GET_INFO==Failed to get track info
+UNKNOWN_ALBUM==Unknown Album
+ERROR_OCCURRED==An error has occurred. If the issue is severe, or you would like to know more, run the debug tool and use the printouts there. If this is severely hindering your MDRP experience, please open an issue on GitHub.
+REQUEST_DEBUG_TOOL==An error has occurred. Please run the debug tool to get a better readout and then open an issue on github with that printout.
+SPECIAL_INTEGRATION==using special integration!
+NOTHING_PLAYING==Nothing Playing (probably paused)
+NEW_UPDATE==NEW UPDATE {0} (goto github to download)
+NO_SETTINGS==DiscordPresenceConfig.ini not found! this is the settings file to enable or disable certain features
+NOTIF_KEYED_WRONG_HEADER==Album keyed wrong
+NOTIF_KEYED_WRONG_BODY==is keyed for a different artist (check caps). To disable these notifications, set verbose to false in DiscordPresenceConfig.ini
+NOTIF_UNKEYED_HEADER==Album not keyed
+NOTIF_UNKEYED_BODY==is not keyed. To disable these notifications, set verbose to false in DiscordPresenceConfig.ini
+NOTIF_KEY_TOO_LONG_HEADER==Album key in discord too long
+NOTIF_KEY_TOO_LONG_BODY==The key for {0} ({1}) is longer than the {2} character maximum
+NOTIF_SETERR_NO_ID_HEADER==MDRP settings issue
+NOTIF_SETERR_NO_ID_BODY==Error in file {0} no id found on the second line
+NOTIF_SETERR_DEPREC_HEADER==Deprecation Notice
+NOTIF_SETERR_DEPREC_BODY=={0} uses a deprecated keying format. Albums should go in form Name==key==Artist
+NOTIF_UPDATE_HEADER==Update Available
+NOTIF_UPDATE_BODY=={0} is published on github. Go there for the latest version
+USING==Using
+PAUSED==paused
+KEY_TOO_LONG==The key for this album is too long. It must be {0} characters or less
+FOUND_REMOTELY==Image found remotely!
+NOT_FOUND_REMOTELY==Image could not be found remotely
+NOTIF_NOT_FOUND_REMOTELY_HEADER==Album Art Not Found Remotely
+NOTIF_NOT_FOUND_REMOTELY_BODY=={0} could not be found on the ITunes API, please key this manually.

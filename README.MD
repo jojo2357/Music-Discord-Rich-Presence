@@ -1,68 +1,117 @@
-# Discord Rich Presence For Groove (windows only)
-To run, use the included launcher. After you run it once, you can rerun it from a shortcut in the generated shortcuts folder.
-Works with Groove, Spotify, and MusicBee
+# Music Discord Rich Presence
+TL;DR: Run this by navigating to the [latest release](https://github.com/jojo2357/Music-Discord-Rich-Presence/releases/latest) and downloading the release zip. unzip the contents and use the bat to run. The settings are in the `DiscordPresenceConfig.ini` file
+
+This program has been designed to work with many music players in the windows environment, including:
+- Groove Music (Win 10)
+- Windows Media Player (Win 11)
+- Spotify
+- Music Bee ([Special Plugin](https://github.com/jojo2357/MDRP-MusicBee-Bridge) Required, but has bonus features)
+- Apple Music
+- Wavelink
+- Tidal Player
+
+There may be more to come, time will tell.
+
+### If you have a version below 1.7, please refer to the [old readme](https://github.com/jojo2357/Music-Discord-Rich-Presence/blob/1.6.4/README.MD) or update your entire MDRP installation from scratch
 
 ## Features
-* Allows uploading album art to custom applications to display and exceed the ~~150~~ 300 (got changed recently) asset maximum (see [uploading custom album art](https://github.com/jojo2357/Music-Discord-Rich-Presence#custom-album-art) for instructions) 
-* Shows song title, artist, and album on any song.
-* Includes batch scripts to enable rich presence to launch when groove is opened
-* Ability to toggle media players showing up in rich presence.
-* Can run in the background or with a pretty terminal
+- Can pull your album art from ITunes and display it just like Spotify!
+- Allows you to provide your own album art to display instead.
+- Shows the title, album, and artist in your Discord Rich Presence for any supported player, with configurable style
+- Includes batch scripts to run MDRP when your music player is started, and will close MDRP when your player closes
+- Can toggle on or off certain music players
+- Can change the default name of the application in Discord, so you could have `Playing Music` instead of `Playing Groove Music`
 
-## Music Library Repo
-[@Smaltin](https://github.com/Smaltin) and I are maintaining a [library repo](https://github.com/jojo2357/Music-Discord-Rich-Presence-Library) that allows you to find and download album art packs and contribute your own album arts for others to use. You can read more [here.](https://github.com/jojo2357/Music-Discord-Rich-Presence-Library)
+## Setup
+0. Download the [latest release](https://github.com/jojo2357/Music-Discord-Rich-Presence/releases/latest)
+1. Unzip the zip file
+2. Navigate to the unzipped contents
+3. Run `Music_DRP_Launcher.bat`. Your antivirus may flag it as potentially dangerous, so optionally run a scan first, or live on the edge and select "Run Anyway" (you may need to google how to do so)
+4. Select the option you would like, and play some tunes. It is recommended that you do *not* run hidden on win 11 or until you are confortable using MDRP
+5. Profit
 
-## About linking Groove and DRP
-In order to have rich presence every time you open groovy, run the shortcut `Link Rich Presence With Groove`. If at any time you wish to disable this feature, simply run `Unlink Rich Presence With Groove`. See [Linking Groove](https://github.com/jojo2357/Music-Discord-Rich-Presence#linking-groove) for more 
+# Extended Setup
+This is probably what you are here for :)
 
-## Instructions
-Uh, download and unzip (of course), then run the `Launch DRP` shortcut from the shortcuts folder
-Do **NOT** move the exe. Instead, move the provided shortcut(s)
-To prevent a player from showing up in the rich presence, open `DiscordPresenceConfig.ini` and change true to false or false to true as you desire.
+Once you have completed the initial setup, you may want to get adventurous, maybe even try out all that MDRP has to offer. Here is a step-by-step guide on how to do that.
 
-## Linking Groove 
-close Groove
-run `Locate Groove`
-run `Link Rich Presence With Groove`
-restart groove (it should have been opened by `Locate groove`)
-if the DRP doesnt show up within 5 seconds, run `Unlink Rich Presence With Groove` and try steps 1-4 again.
-If it still doesn't work, open up an issue and let me know whats going on.
+## Linking Music Players and MDRP
+If you are updating from an older version, run the associated unlinker first.
+
+Q: What is linking?\
+A: Linking is the process of telling Windows to run/close MDRP when your music player is opened/closed. **THIS HAS NO IMPACT ON *HOW* MDRP RUNS, ONLY *WHEN* IT GETS AUTOMATICALLY STARTED**
+
+Q: Why doesn't it work for me?\
+A: There is no easy way to get this feature, and it is known to be finicky. It works well for some and poorly for others, so if it doesn't work for you, please understand that it is not your fault.
+
+To link a player to MDRP, close your music player, run the associated linker option from the main runner menu and follow instructions there.
 
 ## Custom Album Art
-* In the `clientdata` folder you will find 6 text files by default. `chrome.dat` `groove.dat` and `spotify.dat` are required only to provide a default if there is no provided album art.
-* Since the provided files correlate to my own applications, you may create your own instead in order to upload art.
-* [Create a discord application](https://discord.com/developers/applications) and set the name to be what you want displayed under your avatar (as in `playing <name>`)
-* Grab the client ID. We will use this later.
-* Navigate to the rich presence tab and select art assets.
-* Add an image (note that the MINIMUM size is 512x512 so you may need to open the image in mspaint to resize)
-* Set the name to be the album name with no spaces, all lower case, and remove any special characters the regex rejects (i dont know what will pass and what wont so if it doesnt work later, lmk what special characters you had and I'll add them to my filter)
-* Once you save, it may take up to 10 minutes for discord to show your pictures. Don't worry though, if you did everything right it will show.
-* Create a file in the `clientdata` directory and follow the model in `demo.dat`
-* The file is in the general format (REMOVE < and > AND FILL IN THE BLANK):
-```
-<executeable playing music name>=<player name>
-id=<client ID from earlier>
-Album Name 1==albumname1==Artist Name 1
-Album Name 2==albumname2==Artist Name 2==Artist Name 3
-Album Name 3==albumname3
-```
-* For non latin albums, latinize it however you want and put a line in the format `<Album In Japanese/Emoji/Cyrillic/Chinese/non latin alphabet>==albumkey`
-* For now, the executeable playing music must be a [supported player](https://github.com/jojo2357/Music-Discord-Rich-Presence#supported-players) and the part after the = is ignored. In the future I do think it will have a use tho.
+My now outdated tutorials can be found here:
+- [1.5](https://www.youtube.com/watch?v=_qkxjf3T8Pw) Demos how to make a Discord app
+- [1.6](https://youtu.be/GucN2WiteOM) Covers up-to-date Musicbee plugin setup
 
-## Changing default background
+To get your album art to show up, there are one of two ways to do so. The old way is still supported, where you upload album arts to discord and then put those in a file, but there is a new, op way.
+
+### The Lazy Way
+You can set in the settings file `get remote artwork` and `create cache file`. This will key all your songs when you play them, but be warned, there is a chance these arts may be wrong.
+
+### The Library Tool Way
+Right now you can only use the old library, so don't use this for now.
+
+### The Spotify Way
+If you would like to key all of your Spotify playlists, go to the [MDRP website](https://mdrp.tech/fetchalbumart) (under construction, please be patient) and click `Regenerate Token`, then select either `Include Artists` (recommended) or `Exclude Artists` and then download the dat (may take up to 5 minutes if you have a ton of songs) and place it in your clientdata folder.
+
+## Changing MDRP Settings
+To change any MDRP settings, they will all be located in your `DiscordPresenceConfig.ini` file.\
+Data in this file is in `key=value` pairs so any line that does not have a `=` will be ignored.
+
+### Changing default background
 If you really want to, you can go into the ini config and swap the application id's with your own app to get your own defaults. The three images that will be pulled from this default app are `<playername>` `<playername>_small` and `paused` (replace <playername> with groove, spotify, etc.)
 
-### Supported Players
-- Groove Music (music.ui)
-- Spotify
-- Chrome (Possible removal soon)
-- MusicBee
-(More can be added, I just dunno if it's needed)
+### Get Desktop Notifications
+The `verbose` setting enables desktop notifications about the following:
 
-## Music Bee
-- In order to be compatible with music bee, you have to add [this plugin](https://getmusicbee.com/forum/index.php?topic=21240.0).
+- Incorrectly keyed data file
+- Unkeyed/Incorrectly keyed album art
+- New update available
+- Depreciated settings/key style
 
-The new icon is thanks to [Ghoelian](https://github.com/Ghoelian) so thanks for that!
+### Changing Rich Presence Format
+If you would like, you can change how your Rich Presence is shown in Discord. You are limited to two lines (by discord, not MDRP) and these can be changed in the ini. The two examples will render the song King And Lionheard by Of Monsters And Men on the ablum My Head is An Animal as
+
+Spotify-style:
+line 1: `King And Lionheart by Of Monsters And Men`
+line 2: `on My Head is An Animal`
+
+MDRP-Style:
+line 1: `Title: King And Lionheart`
+line 2: `Artist: Of Monsters and Men`
+
+The tooltip on the large image will always have the album name, and the tooltip on the small icon will have one of `Listening to <Music Player>` or `paused` (when appropriate).
+
+### Automatic Album Art Settings
+Automatic Album Art or Remote Artowork as it is sometimes referred to, is the process by which MDRP will look on the internet for the album art that corresponds to your currently playing media. **If MDRP gets the album art wrong, please comment on [this discussion](https://github.com/jojo2357/Music-Discord-Rich-Presence/discussions/59)
+
+| Setting | When It applies | Behavior when true | Behavior when false | Recommendation |
+|---------|-----------------|--------------------|---------------------|----------|
+| `get remote artwork` | The current album is unkeyed for the current Media Player |MDRP will attempt to get the artowork for the currently playing media online and display it on the default application for the current Media Player | MDRP will simply show the default background on the default application | Set this to true if you haven't keyed you albums and would like to have arts in your rich Presence |
+| `remote needs exact match` | `get remote artwork` is true, The current album is unkeyed, and MDRP could not find an identical match either because there were too many results or the artist name was slightly off | MDRP will search again with more restrictive terms, and choose an exact match, or the only match, or the best non perfect artist match | ditto ^ | Set to false if your arts are frequently incorrect, true if your arts are frequently not found |
+| `create cache file` | `get remote artwork` is true, and MDRP had to search for an artwork | after a successful search, MDRP will key this album to a file in your clientdata folder. This key file will apply to all players, and will use the default app for those players | The cache will not be saved, and lost on restart | Not a lot of reasons to set this to false, MDRP is basically keying all your music for you, and if MDRP gets it wrong, you can correct it yourself |
+
+
+## Languages
+To change the language, move the default `english-us.lang` back to the `languages` folder and then move the `.lang` file you need from the languages folder to the same directory as the readme and launcher.
+  
+Feel free to contribute a new language, it is recommended to join [my discord](https://discord.gg/qVbY2ygeGy) so we can make sure we get the translations right.
+  
+### Supported Langs
+- English
+- Spanish
+- German
+- Dutch
+  
+Icon is thanks to [Ghoelian](https://github.com/Ghoelian) so thanks for that!
 
 ### Licence
-Since I have added more features that allow the user to do more and more, I must add that while licenced under an MIT licence, I am not responsible for any damages caused by the use or abuse of the tools that I have provided. Use for good, not evil.
+Since I have added more features that allow the user to do more and more, I must add that while licensed under an MIT license, I am not responsible for any damages caused by the use or abuse of the tools that I have provided. Use for good, not evil.

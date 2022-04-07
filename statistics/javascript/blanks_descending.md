@@ -1,0 +1,6 @@
+
+|[File](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/statistics%2Fjavascript%2Fname_ascending.md%2F)|[Lines (% total)](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/statistics%2Fjavascript%2Flines_descending.md%2F)|[Code Lines](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/statistics%2Fjavascript%2Fcode_descending.md%2F)|[% Code](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/statistics%2Fjavascript%2Fproportion_code_descending.md%2F)|[Comment Lines](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/statistics%2Fjavascript%2Fcomments_descending.md%2F)|[% Comment](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/statistics%2Fjavascript%2Fproportion_comments_descending.md%2F)|[Blank Lines](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/statistics%2Fjavascript%2Fblanks_ascending.md%2F)|[% Blank](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/statistics%2Fjavascript%2Fproportion_blanks_descending.md%2F)|
+| --- | --- | --- | --- | --- | --- | --- | --- |
+|[MDRPDebugTool.js](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/master/DebugTool%2FMDRPDebugTool.js)|11 (100.0%)|9|81.8%|0|0.0%|2|18.2%|
+|Average |11.0|9.0|X|0.0|X|2.0|X|
+|Total (1)|11|9|81.8%|0| 0.0%|2|18.2%|

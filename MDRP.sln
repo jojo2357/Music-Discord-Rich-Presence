@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30320.27
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MDRP", "MDRP\MDRP.csproj", "{45926D2D-EEDD-488A-B2F6-3C93A87A0BC2}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7CEE00F7-E2BB-4A97-9C6A-B9AD04933D1A}"
+	ProjectSection(SolutionItems) = preProject
+		discordapp.ico = discordapp.ico
+		RunHidden.bat = RunHidden.bat
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{45926D2D-EEDD-488A-B2F6-3C93A87A0BC2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{45926D2D-EEDD-488A-B2F6-3C93A87A0BC2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{45926D2D-EEDD-488A-B2F6-3C93A87A0BC2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{45926D2D-EEDD-488A-B2F6-3C93A87A0BC2}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BABA2F4E-8D73-4E82-8942-BECDC3351982}
+	EndGlobalSection
+EndGlobal

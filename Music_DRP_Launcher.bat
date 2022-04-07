@@ -13,9 +13,11 @@
 ::: [2] Launch DRP
 ::: [3] Kill Hidden DRP
 ::: [4] Link Rich Presence with Groove
-::: [5] Link with MusicBee
-::: [6] Unlink Rich Presence with Groove
-::: [7] Unlink from MusicBee
+::: [5] Link Rich Presence with Windows Media Player (Windows 11)
+::: [6] Link Rich Presence with System Start
+::: [7] Unlink Rich Presence with Groove
+::: [8] Unkink Rich Presence with Windows Media Player (Windows 11)
+::: [9] Unkink Rich Presence with System Start
 :::
 
 @echo off
@@ -32,30 +34,38 @@ IF %O%==1 GOTO LAUNCHDRPHIDDEN
 IF %O%==2 GOTO LAUNCHDRP
 IF %O%==3 GOTO KILLHIDDENDRP
 IF %O%==4 GOTO LINKDRPGROOVE
-IF %O%==5 GOTO LINKDRPMUSICBEE
-IF %O%==6 GOTO UNLINKDRPGROOVE
-IF %O%==7 GOTO UNLINKDRPMUSICBEE
+IF %O%==5 GOTO LINKDRPWMP
+IF %O%==6 GOTO LINKDRPSYSSTART
+IF %O%==7 GOTO UNLINKDRPGROOVE
+IF %O%==8 GOTO UNLINKDRPWMP
+IF %O%==9 GOTO UNLINKDRPSYSSTART
 GOTO MENU
 :LAUNCHDRPHIDDEN
-"%mypath%\GroovyRP\bin\Release\GroovyRP.exe" Shortcuts_Only
+"%mypath%\MDRP\bin\Release\MDRP.exe" Shortcuts_Only
 start "" "%mypath%\Shortcuts\Run MDRP Background.lnk"
 exit
 GOTO MENU
 :LAUNCHDRP
-call "%mypath%\GroovyRP\bin\Release\RunHidden.bat"
+call "%mypath%\MDRP\bin\Release\RunHidden.bat"
 GOTO MENU
 :KILLHIDDENDRP
 call "%mypath%\KillHidden.bat"
 GOTO MENU
 :LINKDRPGROOVE
-call "%mypath%\GroovyRP\bin\Release\LinkWithGroove.bat"
+call "%mypath%\MDRP\bin\Release\LinkWithGroove.bat"
 GOTO MENU
-:LINKDRPMUSICBEE
-call "%mypath%\GroovyRP\bin\Release\LinkWithMusicBee.bat"
+:LINKDRPWMP
+call "%mypath%\MDRP\bin\Release\LinkWithWMP.bat"
+GOTO MENU
+:LINKDRPSYSSTART
+call "%mypath%\MDRP\bin\Release\LinkSystemStartAndMDRP.bat"
 GOTO MENU
 :UNLINKDRPGROOVE
-call "%mypath%\GroovyRP\bin\Release\UnlinkFromGroove.bat"
+call "%mypath%\MDRP\bin\Release\UnlinkFromGroove.bat"
 GOTO MENU
-:UNLINKDRPMUSICBEE
-call "%mypath%\GroovyRP\bin\Release\UnlinkFromMusicBee.bat"
+:UNLINKDRPWMP
+call "%mypath%\MDRP\bin\Release\UnlinkFromWMP.bat"
+GOTO MENU
+:UNLINKDRPSYSSTART
+call "%mypath%\MDRP\bin\Release\UnlinkFromSystemStart.bat"
 GOTO MENU
