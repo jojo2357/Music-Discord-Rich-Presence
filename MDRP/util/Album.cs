@@ -3,9 +3,9 @@ using System.Linq;
 
 namespace MDRP
 {
-	internal class Album
+	public class Album
 	{
-		private readonly string[] Artists;
+		public readonly string[] Artists;
 		public readonly string Name;
 
 		public string GetArtistString()
@@ -26,6 +26,7 @@ namespace MDRP
 			Name = name;
 			Artists = artists.Where(artist => artist != "").ToArray();
 			for (int i = 0; i < Artists.Length; i++) Artists[i] = Artists[i].ToLower();
+			Artists = Artists.Distinct().ToArray();
 		}
 
 		//dont hash the artists, we are interested in dict#contains to return true for the same name, we will sort out
@@ -37,7 +38,7 @@ namespace MDRP
 
 		public override string ToString()
 		{
-			return Name + " by " + string.Join(",", Artists);
+			return Name + (Artists.Length > 0 ? " by " + string.Join(",", Artists.Distinct().ToArray()) : "");
 		}
 
 		/**
@@ -66,6 +67,11 @@ namespace MDRP
 			}
 
 			return false;
+		}
+
+		public string ExportStringWithKey(string key)
+		{
+			return Name + "==" + key + (AcceptsAnyArtist() ? "" : "==" + String.Join("==", Artists));
 		}
 
 		private bool AcceptsAnyArtist()

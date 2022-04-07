@@ -12,7 +12,7 @@ GOOD_ONE==Buena selección, revisa tu DRP ;)
 KEYED_WRONG==Álbum metido para artista equivocado :/
 UNKEYED==Álbum no metido :(
 UNKNOWN_ARTIST==Artista desconocido
-CONSOLE_NAME==Discord Rich Presence para Groove
+CONSOLE_NAME==Music Discord Rich Presence
 NO_VALID_MEDIA==Volumen detectado pero no se muestra porque actualmente no es compatible o está deshabilitado
 REQUIRE_PIPELINE==Volumen detectado en {0} pero no se han recibido datos. Posiblemente debas actualizar el reproductor, instalar un plugin, o simplement epausar y reanudar la música. Lee más en
 AND==y
@@ -39,3 +39,7 @@ NOTIF_UPDATE_BODY=={0} está publicado en GitHub. Visita para encontrar la últi
 USING==Usando
 PAUSED==pausado
 KEY_TOO_LONG==La llave para este álbum es muy larga. Debe ser {0} caracteres o menos
+FOUND_REMOTELY==Image found remotely!
+NOT_FOUND_REMOTELY==Image could not be found remotely
+NOTIF_NOT_FOUND_REMOTELY_HEADER==Album Art Not Found Remotely
+NOTIF_NOT_FOUND_REMOTELY_BODY=={0} could not be found on the ITunes API, please key this manually.
