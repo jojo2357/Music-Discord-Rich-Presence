@@ -1,6 +1,8 @@
 # Music Discord Rich Presence
 TL;DR: Run this by navigating to the [latest release](https://github.com/jojo2357/Music-Discord-Rich-Presence/releases/latest) and downloading the release zip. unzip the contents and use the bat to run. The settings are in the `DiscordPresenceConfig.ini` file
 
+### [**Video Tutorial**](https://youtu.be/mhgKXxdhYoA) 
+
 This program has been designed to work with many music players in the windows environment, including:
 - Groove Music (Win 10)
 - Windows Media Player (Win 11)
