@@ -87,6 +87,24 @@ namespace MDRP
 							bestNotPerfectResult = albumObject["artworkUrl100"].ToString().Replace("100x100", "512x512");
 							Functions.SendToDebugServer("Found album " + albumObject["collectionName"] + " by artist " + albumObject["artistName"] + " using lang-tag " + langAddon);
 						}
+						else
+						{
+							bool isFuzzy = false;
+							foreach (String artist in album.Artists)
+							{
+								if (FuzzySharp.Fuzz.TokenSortRatio(artist, albumObject["artistName"].ToString().ToLower()) >= 90)
+								{
+									isFuzzy = true;
+								}
+							}
+
+							if (isFuzzy)
+							{
+								hasNearPerfectResult = true;
+								bestNotPerfectResult = albumObject["artworkUrl100"].ToString().Replace("100x100", "512x512");
+								Functions.SendToDebugServer("[FUZZY] Found album " + albumObject["collectionName"] + " by artist " + albumObject["artistName"] + " using lang-tag " + langAddon);
+							}
+						}
 					}
 				}
 
