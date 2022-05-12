@@ -23,7 +23,7 @@ namespace MDRP
 	internal partial class Program
 	{
 		public static LangHelper langHelper = new LangHelper();
-		public const string Version = "1.7.0";
+		public const string Version = "1.7.1";
 		public const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
 		public static readonly string Title = langHelper.get(LocalizableStrings.MDRP_FULL);
 		private const int titleLength = 64;
@@ -177,6 +177,7 @@ namespace MDRP
 
 		public static bool useRemoteArt = false, needsExactMatch = true, createCacheFile = true;
 		public static bool remoteControl;
+		public static bool translateFromJapanese = true;
 		public static long resignRemoteControlAt;
 
 		private static readonly Queue<JsonResponse> _PendingMessages = new Queue<JsonResponse>();
@@ -744,15 +745,12 @@ namespace MDRP
 					foundImageRemotely = true;
 					return res;
 				}
-				else
+				if (ScreamAtUser)
 				{
-					if (ScreamAtUser)
+					if (!NotifiedAlbums.Contains(currentAlbum))
 					{
-						if (!NotifiedAlbums.Contains(currentAlbum))
-						{
-							Functions.SendNotification(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_HEADER], string.Format(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_BODY], currentAlbum));
-							NotifiedAlbums.Add(currentAlbum);
-						}
+						Functions.SendNotification(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_HEADER], string.Format(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_BODY], currentAlbum));
+						NotifiedAlbums.Add(currentAlbum);
 					}
 				}
 			}
@@ -1072,6 +1070,10 @@ namespace MDRP
 					else if (line.Split('=')[0].Trim().ToLower() == "create cache file")
 					{
 						createCacheFile = line.Split('=')[1].Trim().ToLower() == "true";
+					}
+					else if (line.Split('=')[0].Trim().ToLower() == "translate from japanese")
+					{
+						translateFromJapanese = line.Split('=')[1].Trim().ToLower() == "true";
 					}
 			}
 			catch (Exception e)

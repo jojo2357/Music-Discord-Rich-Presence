@@ -12,6 +12,7 @@ namespace MDRP
 	{
 		private const string default_endpoint = "https://itunes.apple.com/search?limit=200&";
 		public const string cacheFileLocation = "../../../clientdata/cachedImages.dat";
+		public string langAddon = "lang=" + (Program.translateFromJapanese ? "en_us" : "ja_jp");
 
 		private HttpClient myClient = new HttpClient();
 
@@ -62,7 +63,7 @@ namespace MDRP
 				return "https://jojo2357.github.io/Album-Arts/MHIA_my_watermark.png";
 			}
 
-			Uri queryString = new Uri(default_endpoint + "term=" + album.Name + "&media=music&entity=album");
+			Uri queryString = new Uri(default_endpoint + langAddon + "&term=" + album.Name + "&media=music&entity=album");
 			HttpResponseMessage result = await myClient.GetAsync(queryString);
 
 			JObject jObject = JObject.Parse(result.Content.ToString());
@@ -77,12 +78,14 @@ namespace MDRP
 					{
 						if (album.Artists.Contains(albumObject["artistName"].ToString().ToLower()))
 						{
+							Functions.SendToDebugServer("Found album " + albumObject["collectionName"] + " by artist " + albumObject["artistName"] + " using lang-tag " + langAddon);
 							return albumObject["artworkUrl100"].ToString().Replace("100x100", "512x512");
 						}
 						else if (albumObject["artistName"].ToString().Trim().ToLower() == "various artists" && !hasNearPerfectResult)
 						{
 							hasNearPerfectResult = true;
 							bestNotPerfectResult = albumObject["artworkUrl100"].ToString().Replace("100x100", "512x512");
+							Functions.SendToDebugServer("Found album " + albumObject["collectionName"] + " by artist " + albumObject["artistName"] + " using lang-tag " + langAddon);
 						}
 					}
 				}
@@ -98,7 +101,7 @@ namespace MDRP
 
 			if (Int16.Parse(jObject["resultCount"].ToString()) == 200)
 			{
-				queryString = new Uri(default_endpoint + "term=" + album + "&media=music&entity=album");
+				queryString = new Uri(default_endpoint + langAddon +  "&term=" + album + "&media=music&entity=album");
 				result = await myClient.GetAsync(queryString);
 
 				jObject = JObject.Parse(result.Content.ToString());
@@ -113,12 +116,32 @@ namespace MDRP
 						{
 							if (album.Artists.Contains(albumObject["artistName"].ToString().ToLower()))
 							{
+								Functions.SendToDebugServer("Found album " + albumObject["collectionName"] + " by artist " + albumObject["artistName"] + " using lang-tag " + langAddon);
 								return albumObject["artworkUrl100"].ToString().Replace("100x100", "512x512");
 							}
 							else if (albumObject["artistName"].ToString().Trim().ToLower() == "various artists" && !hasNearPerfectResult)
 							{
 								hasNearPerfectResult = true;
 								bestNotPerfectResult = albumObject["artworkUrl100"].ToString().Replace("100x100", "512x512");
+								Functions.SendToDebugServer("Found album " + albumObject["collectionName"] + " by artist " + albumObject["artistName"] + " using lang-tag " + langAddon);
+							}
+							else
+							{
+								bool isFuzzy = false;
+								foreach (String artist in album.Artists)
+								{
+									if (FuzzySharp.Fuzz.TokenSortRatio(artist, albumObject["artistName"].ToString().ToLower()) >= 90)
+									{
+										isFuzzy = true;
+									}
+								}
+
+								if (isFuzzy)
+								{
+									hasNearPerfectResult = true;
+									bestNotPerfectResult = albumObject["artworkUrl100"].ToString().Replace("100x100", "512x512");
+									Functions.SendToDebugServer("[FUZZY] Found album " + albumObject["collectionName"] + " by artist " + albumObject["artistName"] + " using lang-tag " + langAddon);
+								}
 							}
 						}
 					}
@@ -130,7 +153,7 @@ namespace MDRP
 				}
 			}
 
-			queryString = new Uri(default_endpoint + "term=" + backupTitle + "&media=music&entity=song");
+			queryString = new Uri(default_endpoint + langAddon + "&term=" + backupTitle + "&media=music&entity=song");
 			result = await myClient.GetAsync(queryString);
 
 			jObject = JObject.Parse(result.Content.ToString());
@@ -138,6 +161,7 @@ namespace MDRP
 			{
 				if (jObject["resultCount"].ToString() == "1")
 				{
+					Functions.SendToDebugServer("Found album " + jObject["results"].First["collectionName"] + " by artist " + jObject["results"].First["artistName"] + " using lang-tag " + langAddon);
 					return jObject["results"].First["artworkUrl100"].ToString().Replace("100x100", "512x512");
 				}
 				else if (Int16.Parse(jObject["resultCount"].ToString()) > 0)
@@ -148,13 +172,27 @@ namespace MDRP
 						{
 							if (album.Artists.Contains(albumObject["artistName"].ToString().ToLower()))
 							{
+								Functions.SendToDebugServer("Found album " + albumObject["collectionName"] + " by artist " + albumObject["artistName"] + " using lang-tag " + langAddon);
+								return albumObject["artworkUrl100"].ToString().Replace("100x100", "512x512");
+							}
+							bool isFuzzy = false;
+							foreach (String artist in album.Artists)
+							{
+								if (FuzzySharp.Fuzz.TokenSortRatio(artist, albumObject["artistName"].ToString().ToLower()) >= 90)
+								{
+									isFuzzy = true;
+								}
+							}
+							if (isFuzzy)
+							{
+								Functions.SendToDebugServer("[FUZZY] Found album " + albumObject["collectionName"] + " by artist " + albumObject["artistName"] + " using lang-tag " + langAddon);
 								return albumObject["artworkUrl100"].ToString().Replace("100x100", "512x512");
 							}
 						}
 					}
 				}
 			}
-
+			Functions.SendToDebugServer("Unable to find album " + album.Name + " by artist " + album.Artists[0] + " using lang-tag " + langAddon);
 			return "";
 		}
 	}
