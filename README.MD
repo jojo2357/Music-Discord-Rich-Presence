@@ -69,7 +69,15 @@ To change any MDRP settings, they will all be located in your `DiscordPresenceCo
 Data in this file is in `key=value` pairs so any line that does not have a `=` will be ignored.
 
 ### Changing default background
-If you really want to, you can go into the ini config and swap the application id's with your own app to get your own defaults. The three images that will be pulled from this default app are `<playername>` `<playername>_small` and `paused` (replace <playername> with groove, spotify, etc.)
+In the ini config file, there is the option to change the default background on a per-player setting. The schema is `large <player> asset=url/application asset`. For example, to change the default beckground of MusicBee to the album cover of "My Head is an Animal", you would put: 
+
+`large musicbee asset=https://is3-ssl.mzstatic.com/image/thumb/Music125/v4/11/50/a7/1150a7a6-ad88-1985-2869-7ae3d66391d5/12UMGIM10062.rgb.jpg/512x512bb.jpg` 
+
+And to change it for groove, you would change `musicbee` to `music.ui` and for Windows Media Player, this would change to `windows.media.player`
+
+To apply this to the small icon, you should change `large` to `small`
+
+**NOTE:** if you would like a per-application paused icon, background icon, etc, you should change the default to be an asset instead of a link. This will look in that application for that asset instead, and by doing this, you can have different image assets by that name in each app to achieve this behavior.
 
 ### Get Desktop Notifications
 The `verbose` setting enables desktop notifications about the following:
@@ -100,6 +108,7 @@ Automatic Album Art or Remote Artowork as it is sometimes referred to, is the pr
 | `get remote artwork` | The current album is unkeyed for the current Media Player |MDRP will attempt to get the artowork for the currently playing media online and display it on the default application for the current Media Player | MDRP will simply show the default background on the default application | Set this to true if you haven't keyed you albums and would like to have arts in your rich Presence |
 | `remote needs exact match` | `get remote artwork` is true, The current album is unkeyed, and MDRP could not find an identical match either because there were too many results or the artist name was slightly off | MDRP will search again with more restrictive terms, and choose an exact match, or the only match, or the best non perfect artist match | ditto ^ | Set to false if your arts are frequently incorrect, true if your arts are frequently not found |
 | `create cache file` | `get remote artwork` is true, and MDRP had to search for an artwork | after a successful search, MDRP will key this album to a file in your clientdata folder. This key file will apply to all players, and will use the default app for those players | The cache will not be saved, and lost on restart | Not a lot of reasons to set this to false, MDRP is basically keying all your music for you, and if MDRP gets it wrong, you can correct it yourself |
+| `translate from japanese` | `get remote artwork` is true | Searches to ITunes will be done with the language of the search set to Japanese | Searches assume english, and will only directly latinize searches | Set this to true if you have a lot of Japanese music, especially if the searches don't find it often. Searching in JP will provide subtle corrections like reordering first and last names |
 
 
 ## Languages
