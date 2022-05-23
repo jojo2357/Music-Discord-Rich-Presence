@@ -40,7 +40,6 @@ namespace MDRP
 				{ "music.ui", new DiscordRpcClient("807774172574253056", autoEvents: false) },
 				{ "microsoft.media.player", new DiscordRpcClient("807774172574253056", autoEvents: false) },
 				{ "musicbee", new DiscordRpcClient("820837854385012766", autoEvents: false) },
-				{ "apple music", new DiscordRpcClient("870047192889577544", autoEvents: false) },
 				{ "spotify", new DiscordRpcClient("802222525110812725", autoEvents: false) },
 				{ "tidal", new DiscordRpcClient("922625678271197215", autoEvents: false) },
 				{ "wavelink", new DiscordRpcClient("927328178618376212", autoEvents: false) },
@@ -74,7 +73,6 @@ namespace MDRP
 		{
 			{ "music.ui", ConsoleColor.Blue },
 			{ "microsoft.media.player", ConsoleColor.Blue },
-			{ "apple music", ConsoleColor.DarkRed },
 			{ "spotify", ConsoleColor.DarkGreen },
 			{ "musicbee", ConsoleColor.Yellow },
 			{ "tidal", ConsoleColor.Gray },
@@ -84,7 +82,7 @@ namespace MDRP
 		private static string _presenceDetails = string.Empty;
 
 		private static readonly string[] ValidPlayers =
-			{ "apple music", "music.ui", "spotify", "musicbee", "microsoft.media.player", "tidal", "wavelink" };
+			{ "music.ui", "spotify", "musicbee", "microsoft.media.player", "tidal", "wavelink" };
 
 		private static readonly string[] RequiresPipeline = { "musicbee" };
 
@@ -93,7 +91,6 @@ namespace MDRP
 		{
 			{ "musicbee", "Music Bee" },
 			{ "spotify", "Spotify Music" },
-			{ "apple music", "Apple Music" },
 			{ "groove", "Groove Music Player" },
 			{ "microsoft.media.player", "Windows Media Player" },
 			{ "music.ui", "Groove Music Player" },
@@ -107,7 +104,6 @@ namespace MDRP
 			{ "music.ui", "https://cdn.discordapp.com/app-assets/801209905020272681/801224923547959376.png" },
 			{ "microsoft.media.player", "https://cdn.discordapp.com/app-assets/801209905020272681/801224923547959376.png" },
 			{ "spotify", "https://cdn.discordapp.com/app-assets/802222525110812725/802222954821582869.png" },
-			{ "apple music", "https://cdn.discordapp.com/app-assets/870047192889577544/870047846387318794.png" },
 			{ "tidal", "https://cdn.discordapp.com/app-assets/922625678271197215/978018192393920562.png" },
 			{ "wavelink", "https://cdn.discordapp.com/app-assets/927328178618376212/927329727180574760.png" },
 		};
@@ -119,7 +115,6 @@ namespace MDRP
 			{ "music.ui", "https://cdn.discordapp.com/app-assets/801209905020272681/801224923547959376.png" },
 			{ "microsoft.media.player", "https://cdn.discordapp.com/app-assets/801209905020272681/801224923547959376.png" },
 			{ "spotify", "https://cdn.discordapp.com/app-assets/802222525110812725/802222992683827200.png" },
-			{ "apple music", "https://cdn.discordapp.com/app-assets/870047192889577544/870047877278351380.png" },
 			{ "tidal", "https://cdn.discordapp.com/app-assets/922625678271197215/978018192637198406.png" },
 			{ "wavelink", "https://cdn.discordapp.com/app-assets/927328178618376212/927329727218319410.png" },
 		};
@@ -130,7 +125,6 @@ namespace MDRP
 			{ "music.ui", "Groove Music" },
 			{ "microsoft.media.player", "Windows Media Player" },
 			{ "spotify", "Spotify" },
-			{ "apple music", "Apple Music" },
 			{ "tidal", "Tidal Music" },
 			{ "wavelink", "Wave Link" }
 		};
@@ -142,7 +136,6 @@ namespace MDRP
 				{ "groove", "music.ui" },
 				{ "Microsoft.Media.Player", "microsoft.media.player" },
 				{ "spotify", "spotify" },
-				{ "Apple Music", "apple music" },
 				{ "Tidal Music", "tidal" },
 				{ "Wave Link", "wavelink" }
 			};
@@ -193,8 +186,8 @@ namespace MDRP
 		private static string lineData = "", currentTitle = "";
 		private static bool foundFirst = false, foundSecond = false;
 		private static bool foundImageRemotely = false;
-		private static readonly Regex _smallAssetRex = new Regex("(?<=^small\\s?)\\b[\\w\\\\.]+(?:\\s[\\w\\\\.]+)?\\b(?=\\s?asset)", RegexOptions.IgnoreCase);
-		private static readonly Regex _largeAssetReg = new Regex("(?<=^large\\s?)\\b[\\w\\\\.]+(?:\\s[\\w\\\\.]+)?\\b(?=\\s?asset)", RegexOptions.IgnoreCase);
+		private static readonly Regex _smallAssetRex = new Regex("(?<=^small\\s?)\\b[\\w\\\\.]+\\b(?=\\s?asset)", RegexOptions.IgnoreCase);
+		private static readonly Regex _largeAssetReg = new Regex("(?<=^large\\s?)\\b[\\w\\\\.]+\\b(?=\\s?asset)", RegexOptions.IgnoreCase);
 
 		public static async Task HandleIncomingConnections()
 		{

@@ -8,7 +8,6 @@ This program has been designed to work with many music players in the windows en
 - Windows Media Player (Win 11)
 - Spotify
 - Music Bee ([Special Plugin](https://github.com/jojo2357/MDRP-MusicBee-Bridge) Required, but has bonus features)
-- Apple Music
 - Wavelink
 - Tidal Player\*
 
