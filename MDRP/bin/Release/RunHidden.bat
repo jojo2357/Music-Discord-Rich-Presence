@@ -1,7 +1,5 @@
 @echo off
 
-taskkill /im MDRP.exe
-
 set directory=%~dp0
 Pushd %directory%
 

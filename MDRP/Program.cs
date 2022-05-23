@@ -479,9 +479,20 @@ namespace MDRP
 						return;
 					if (_wasPlaying && !_isPlaying)
 					{
-						activeClient.UpdateSmallAsset(pausedAsset, "paused");
+						activeClient.SetPresence(new RichPresence
+						{
+							Details = activeClient.CurrentPresence.Details,
+							State = activeClient.CurrentPresence.State,
+							Assets = new Assets
+							{
+								LargeImageKey = GetLargeImageKey(),
+								LargeImageText = Functions.GetLargeImageText(_currentTrack.AlbumTitle),
+								SmallImageKey = GetSmallImageKey(),
+								SmallImageText = GetSmallImageText()
+							}
+						});
 						InvokeActiveClient();
-						SetConsole(_lastTrack.Title, _lastTrack.Artist, _lastTrack.AlbumTitle,
+						SetConsole(_lastTrack.Title , _lastTrack.Artist, _lastTrack.AlbumTitle,
 							currentAlbum);
 					}
 					else if

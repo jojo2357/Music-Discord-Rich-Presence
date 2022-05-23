@@ -51,7 +51,7 @@ GOTO MENU
 call "%mypath%\MDRP\bin\Release\RunHidden.bat"
 GOTO MENU
 :KILLHIDDENDRP
-call "%mypath%\KillHidden.bat"
+call "%mypath%\MDRP\bin\Release\KillHidden.bat"
 GOTO MENU
 :LINKDRPGROOVE
 call "%mypath%\MDRP\bin\Release\LinkWithGroove.bat"
