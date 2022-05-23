@@ -1,2 +1,2 @@
 Set objShell = WScript.CreateObject("WScript.Shell")
-objShell.Run("taskkill /im MDRP.exe"), 0, True
+objShell.Run("curl -X POST --connect-timeout 0.05 -d ""{message:\""please die\""}"" localhost:2357"), 0, True
