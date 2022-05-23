@@ -10,9 +10,11 @@ This program has been designed to work with many music players in the windows en
 - Music Bee ([Special Plugin](https://github.com/jojo2357/MDRP-MusicBee-Bridge) Required, but has bonus features)
 - Apple Music
 - Wavelink
-- Tidal Player
+- Tidal Player\*
 
 There may be more to come, time will tell.
+
+\* Note for Tidal, may not work for some users. Has been successfully tested on windows 10 and 11, on the free version on computers that MDRP works with either Groove or WMP. Paid versions of Tidal may experience issues, and older versions of Tidal will not work because they changed the exe name.
 
 ### If you have a version below 1.7, please refer to the [old readme](https://github.com/jojo2357/Music-Discord-Rich-Presence/blob/1.6.4/README.MD) or update your entire MDRP installation from scratch
 
