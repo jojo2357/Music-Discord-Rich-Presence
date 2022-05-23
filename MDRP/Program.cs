@@ -492,7 +492,7 @@ namespace MDRP
 							}
 						});
 						InvokeActiveClient();
-						SetConsole(_lastTrack.Title , _lastTrack.Artist, _lastTrack.AlbumTitle,
+						SetConsole(_lastTrack.Title, _lastTrack.Artist, _lastTrack.AlbumTitle,
 							currentAlbum);
 					}
 					else if

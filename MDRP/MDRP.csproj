@@ -135,6 +135,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>rem taskkill /im MDRP.exe</PreBuildEvent>
+    <PreBuildEvent>$(ProjectDir)bin\Release\KillHiddenSilent.bat</PreBuildEvent>
   </PropertyGroup>
 </Project>
