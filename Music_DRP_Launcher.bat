@@ -16,8 +16,8 @@
 ::: [5] Link Rich Presence with Windows Media Player (Windows 11)
 ::: [6] Link Rich Presence with System Start
 ::: [7] Unlink Rich Presence with Groove
-::: [8] Unkink Rich Presence with Windows Media Player (Windows 11)
-::: [9] Unkink Rich Presence with System Start
+::: [8] Unlink Rich Presence with Windows Media Player (Windows 11)
+::: [9] Unlink Rich Presence with System Start
 :::
 
 @echo off
@@ -41,9 +41,11 @@ IF %O%==8 GOTO UNLINKDRPWMP
 IF %O%==9 GOTO UNLINKDRPSYSSTART
 GOTO MENU
 :LAUNCHDRPHIDDEN
-"%mypath%\MDRP\bin\Release\MDRP.exe" Shortcuts_Only
-start "" "%mypath%\Shortcuts\Run MDRP Background.lnk"
-exit
+START "Music Discord Rich Presence" /B /MIN "%mypath%\MDRP\bin\Release\RunHidden.vbs"
+EXIT
+REM "%mypath%\MDRP\bin\Release\MDRP.exe" Shortcuts_Only
+REM start "" "%mypath%\Shortcuts\Run MDRP Background.lnk"
+REM exit
 GOTO MENU
 :LAUNCHDRP
 call "%mypath%\MDRP\bin\Release\RunHidden.bat"
