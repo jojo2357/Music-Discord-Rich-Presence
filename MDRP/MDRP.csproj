@@ -102,6 +102,9 @@
     <PackageReference Include="CSCore">
       <Version>1.2.1.2</Version>
     </PackageReference>
+    <PackageReference Include="FuzzySharp">
+      <Version>2.0.2</Version>
+    </PackageReference>
     <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications">
       <Version>7.0.0</Version>
     </PackageReference>
@@ -132,6 +135,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PreBuildEvent>rem taskkill /im MDRP.exe</PreBuildEvent>
+    <PreBuildEvent>$(ProjectDir)bin\Release\KillHiddenSilent.bat</PreBuildEvent>
   </PropertyGroup>
 </Project>

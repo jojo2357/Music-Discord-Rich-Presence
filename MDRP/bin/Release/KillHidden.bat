@@ -1,3 +1,3 @@
 @echo off
 
-taskkill /im MDRP.exe
+curl -X POST --connect-timeout 0.05 -d "{message:\"please die\"}" localhost:2357

@@ -23,7 +23,7 @@ namespace MDRP
 	internal partial class Program
 	{
 		public static LangHelper langHelper = new LangHelper();
-		public const string Version = "1.7.0";
+		public const string Version = "1.7.1";
 		public const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
 		public static readonly string Title = langHelper.get(LocalizableStrings.MDRP_FULL);
 		private const int titleLength = 64;
@@ -40,9 +40,8 @@ namespace MDRP
 				{ "music.ui", new DiscordRpcClient("807774172574253056", autoEvents: false) },
 				{ "microsoft.media.player", new DiscordRpcClient("807774172574253056", autoEvents: false) },
 				{ "musicbee", new DiscordRpcClient("820837854385012766", autoEvents: false) },
-				{ "apple music", new DiscordRpcClient("870047192889577544", autoEvents: false) },
 				{ "spotify", new DiscordRpcClient("802222525110812725", autoEvents: false) },
-				{ "tidalplayer", new DiscordRpcClient("922625678271197215", autoEvents: false) },
+				{ "tidal", new DiscordRpcClient("922625678271197215", autoEvents: false) },
 				{ "wavelink", new DiscordRpcClient("927328178618376212", autoEvents: false) },
 				{ "", new DiscordRpcClient("821398156905283585", autoEvents: false) }
 			};
@@ -74,17 +73,16 @@ namespace MDRP
 		{
 			{ "music.ui", ConsoleColor.Blue },
 			{ "microsoft.media.player", ConsoleColor.Blue },
-			{ "apple music", ConsoleColor.DarkRed },
 			{ "spotify", ConsoleColor.DarkGreen },
 			{ "musicbee", ConsoleColor.Yellow },
-			{ "tidalplayer", ConsoleColor.Gray },
+			{ "tidal", ConsoleColor.Gray },
 			{ "wavelink", ConsoleColor.DarkBlue },
 		};
 
 		private static string _presenceDetails = string.Empty;
 
 		private static readonly string[] ValidPlayers =
-			{ "apple music", "music.ui", "spotify", "musicbee", "microsoft.media.player", "tidalplayer", "wavelink" };
+			{ "music.ui", "spotify", "musicbee", "microsoft.media.player", "tidal", "wavelink" };
 
 		private static readonly string[] RequiresPipeline = { "musicbee" };
 
@@ -93,35 +91,32 @@ namespace MDRP
 		{
 			{ "musicbee", "Music Bee" },
 			{ "spotify", "Spotify Music" },
-			{ "apple music", "Apple Music" },
 			{ "groove", "Groove Music Player" },
 			{ "microsoft.media.player", "Windows Media Player" },
 			{ "music.ui", "Groove Music Player" },
-			{ "tidalplayer", "Tidal Music" },
+			{ "tidal", "Tidal Music" },
 			{ "wavelink", "Wave Link" }
 		};
 
 		private static readonly Dictionary<string, string> BigAssets = new Dictionary<string, string>
 		{
-			{ "musicbee", "musicbee" },
-			{ "music.ui", "groove" },
-			{ "microsoft.media.player", "groove" },
-			{ "spotify", "spotify" },
-			{ "apple music", "applemusic" },
-			{ "tidalplayer", "tidalplayer" },
-			{ "wavelink", "wavelink" },
+			{ "musicbee", "https://cdn.discordapp.com/app-assets/820837854385012766/820838584617009222.png" },
+			{ "music.ui", "https://cdn.discordapp.com/app-assets/801209905020272681/801224923547959376.png" },
+			{ "microsoft.media.player", "https://cdn.discordapp.com/app-assets/801209905020272681/801224923547959376.png" },
+			{ "spotify", "https://cdn.discordapp.com/app-assets/802222525110812725/802222954821582869.png" },
+			{ "tidal", "https://cdn.discordapp.com/app-assets/922625678271197215/978018192393920562.png" },
+			{ "wavelink", "https://cdn.discordapp.com/app-assets/927328178618376212/927329727180574760.png" },
 		};
 
 		//might just combine these later
 		private static readonly Dictionary<string, string> LittleAssets = new Dictionary<string, string>
 		{
-			{ "musicbee", "musicbee_small" },
-			{ "music.ui", "groove_small" },
-			{ "microsoft.media.player", "groove_small" },
-			{ "spotify", "spotify_small" },
-			{ "apple music", "applemusic_small" },
-			{ "tidalplayer", "tidal_small" },
-			{ "wavelink", "wavelink_small" },
+			{ "musicbee", "https://cdn.discordapp.com/app-assets/820837854385012766/820838635703500810.png" },
+			{ "music.ui", "https://cdn.discordapp.com/app-assets/801209905020272681/801224923547959376.png" },
+			{ "microsoft.media.player", "https://cdn.discordapp.com/app-assets/801209905020272681/801224923547959376.png" },
+			{ "spotify", "https://cdn.discordapp.com/app-assets/802222525110812725/802222992683827200.png" },
+			{ "tidal", "https://cdn.discordapp.com/app-assets/922625678271197215/978018192637198406.png" },
+			{ "wavelink", "https://cdn.discordapp.com/app-assets/927328178618376212/927329727218319410.png" },
 		};
 
 		private static readonly Dictionary<string, string> Whatpeoplecallthisplayer = new Dictionary<string, string>
@@ -130,8 +125,7 @@ namespace MDRP
 			{ "music.ui", "Groove Music" },
 			{ "microsoft.media.player", "Windows Media Player" },
 			{ "spotify", "Spotify" },
-			{ "apple music", "Apple Music" },
-			{ "tidalplayer", "Tidal Music" },
+			{ "tidal", "Tidal Music" },
 			{ "wavelink", "Wave Link" }
 		};
 
@@ -142,8 +136,7 @@ namespace MDRP
 				{ "groove", "music.ui" },
 				{ "Microsoft.Media.Player", "microsoft.media.player" },
 				{ "spotify", "spotify" },
-				{ "Apple Music", "apple music" },
-				{ "Tidal Music", "tidalplayer" },
+				{ "Tidal Music", "tidal" },
 				{ "Wave Link", "wavelink" }
 			};
 
@@ -175,8 +168,12 @@ namespace MDRP
 		public static HttpListener listener;
 		public static string url = "http://localhost:2357/";
 
+		public const string defaultPausedURL = "https://cdn.discordapp.com/app-assets/801209905020272681/801527319537516596.png";
+		public static string pausedAsset;
+
 		public static bool useRemoteArt = false, needsExactMatch = true, createCacheFile = true;
 		public static bool remoteControl;
+		public static bool translateFromJapanese = true;
 		public static long resignRemoteControlAt;
 
 		private static readonly Queue<JsonResponse> _PendingMessages = new Queue<JsonResponse>();
@@ -189,6 +186,8 @@ namespace MDRP
 		private static string lineData = "", currentTitle = "";
 		private static bool foundFirst = false, foundSecond = false;
 		private static bool foundImageRemotely = false;
+		private static readonly Regex _smallAssetRex = new Regex("(?<=^small\\s?)\\b[\\w\\\\.]+\\b(?=\\s?asset)", RegexOptions.IgnoreCase);
+		private static readonly Regex _largeAssetReg = new Regex("(?<=^large\\s?)\\b[\\w\\\\.]+\\b(?=\\s?asset)", RegexOptions.IgnoreCase);
 
 		public static async Task HandleIncomingConnections()
 		{
@@ -473,7 +472,18 @@ namespace MDRP
 						return;
 					if (_wasPlaying && !_isPlaying)
 					{
-						activeClient.UpdateSmallAsset("paused", "paused");
+						activeClient.SetPresence(new RichPresence
+						{
+							Details = activeClient.CurrentPresence.Details,
+							State = activeClient.CurrentPresence.State,
+							Assets = new Assets
+							{
+								LargeImageKey = GetLargeImageKey(),
+								LargeImageText = Functions.GetLargeImageText(_currentTrack.AlbumTitle),
+								SmallImageKey = GetSmallImageKey(),
+								SmallImageText = GetSmallImageText()
+							}
+						});
 						InvokeActiveClient();
 						SetConsole(_lastTrack.Title, _lastTrack.Artist, _lastTrack.AlbumTitle,
 							currentAlbum);
@@ -649,6 +659,7 @@ namespace MDRP
 				currentTitle = lastMessage.Title;
 				WrongArtistFlag = HasNameNotQuite(new Album(lastMessage.Album.Name), _playerName);
 
+
 				activeClient.SetPresence(new RichPresence
 				{
 					Details = Functions.CapLength(lineData.Split('\n')[0].Replace("${artist}", (lastMessage.Artist == "" ? langHelper[LocalizableStrings.UNKNOWN_ARTIST] : lastMessage.Artist)).Replace("${title}", lastMessage.Title).Replace("${album}", lastMessage.Album.Name), titleLength),
@@ -715,7 +726,7 @@ namespace MDRP
 				else
 					return defaultPlayer;
 			else
-				return langHelper[LocalizableStrings.PAUSED];
+				return pausedAsset;
 		}
 
 		private static string GetLargeImageKey()
@@ -744,15 +755,13 @@ namespace MDRP
 					foundImageRemotely = true;
 					return res;
 				}
-				else
+
+				if (ScreamAtUser)
 				{
-					if (ScreamAtUser)
+					if (!NotifiedAlbums.Contains(currentAlbum))
 					{
-						if (!NotifiedAlbums.Contains(currentAlbum))
-						{
-							Functions.SendNotification(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_HEADER], string.Format(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_BODY], currentAlbum));
-							NotifiedAlbums.Add(currentAlbum);
-						}
+						Functions.SendNotification(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_HEADER], string.Format(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_BODY], currentAlbum));
+						NotifiedAlbums.Add(currentAlbum);
 					}
 				}
 			}
@@ -1031,48 +1040,71 @@ namespace MDRP
 			{
 				string[] lines = File.ReadAllLines("../../../DiscordPresenceConfig.ini");
 				foreach (string line in lines)
-					if (ValidPlayers.Contains(line.Split('=')[0].Trim().ToLower()))
+				{
+					string[] explodedLine = line.Split('=');
+					string firstPortionRaw = explodedLine.Length > 0 ? explodedLine[0] : "";
+					string firstPortion = firstPortionRaw.Trim().ToLower();
+					string secondPortionRaw = explodedLine.Length > 1 ? explodedLine[1] : "";
+					string secondPortion = secondPortionRaw.Trim().ToLower();
+					if (ValidPlayers.Contains(firstPortion))
 					{
-						EnabledClients[line.Split('=')[0]] = line.Split('=')[1].Trim().ToLower() == "true";
-						if (line.Split('=').Length > 2)
-							DefaultClients[line.Split('=')[0]] =
-								new DiscordRpcClient(line.Split('=')[2], autoEvents: false);
+						EnabledClients[firstPortionRaw] = secondPortion == "true";
+						if (explodedLine.Length > 2)
+							DefaultClients[firstPortionRaw] =
+								new DiscordRpcClient(explodedLine[2], autoEvents: false);
 					}
-					else if (InverseWhatpeoplecallthisplayer.ContainsKey(line.Split('=')[0].Trim().ToLower()) &&
-					         ValidPlayers.Contains(InverseWhatpeoplecallthisplayer[line.Split('=')[0].Trim().ToLower()])
+					else if (InverseWhatpeoplecallthisplayer.ContainsKey(firstPortion) &&
+					         ValidPlayers.Contains(InverseWhatpeoplecallthisplayer[firstPortion])
 					        )
 					{
-						EnabledClients.Add(line.Split('=')[0], line.Split('=')[1].Trim().ToLower() == "true");
-						if (line.Split('=').Length > 2)
-							DefaultClients[InverseWhatpeoplecallthisplayer[line.Split('=')[0]]] =
-								new DiscordRpcClient(line.Split('=')[2], autoEvents: false);
+						EnabledClients.Add(firstPortionRaw, secondPortion == "true");
+						if (explodedLine.Length > 2)
+							DefaultClients[InverseWhatpeoplecallthisplayer[firstPortionRaw]] =
+								new DiscordRpcClient(explodedLine[2], autoEvents: false);
 					}
-					else if (line.Split('=')[0].Trim().ToLower() == "verbose" && line.Split('=').Length > 1)
+					else if (firstPortion == "verbose" && explodedLine.Length > 1)
 					{
-						ScreamAtUser = line.Split('=')[1].Trim().ToLower() == "true";
+						ScreamAtUser = secondPortion == "true";
 					}
-					else if (!foundFirst && line.Split('=')[0].Trim().ToLower() == "first line")
+					else if (!foundFirst && firstPortion == "first line")
 					{
 						foundFirst = true;
-						lineData = String.Join("=", line.Split('=').Skip(1)) + lineData;
+						lineData = String.Join("=", explodedLine.Skip(1)) + lineData;
 					}
-					else if (!foundSecond && line.Split('=')[0].Trim().ToLower() == "second line")
+					else if (!foundSecond && firstPortion == "second line")
 					{
 						foundSecond = true;
-						lineData = lineData + "\n" + String.Join("=", line.Split('=').Skip(1));
+						lineData = lineData + "\n" + String.Join("=", explodedLine.Skip(1));
 					}
-					else if (line.Split('=')[0].Trim().ToLower() == "get remote artwork")
+					else if (firstPortion == "get remote artwork")
 					{
-						useRemoteArt = line.Split('=')[1].Trim().ToLower() == "true";
+						useRemoteArt = secondPortion == "true";
 					}
-					else if (line.Split('=')[0].Trim().ToLower() == "remote needs exact match")
+					else if (firstPortion == "remote needs exact match")
 					{
-						needsExactMatch = line.Split('=')[1].Trim().ToLower() == "true";
+						needsExactMatch = secondPortion == "true";
 					}
-					else if (line.Split('=')[0].Trim().ToLower() == "create cache file")
+					else if (firstPortion == "create cache file")
 					{
-						createCacheFile = line.Split('=')[1].Trim().ToLower() == "true";
+						createCacheFile = secondPortion == "true";
 					}
+					else if (firstPortion == "translate from japanese")
+					{
+						translateFromJapanese = secondPortion == "true";
+					}
+					else if (firstPortion == "paused asset")
+					{
+						pausedAsset = secondPortionRaw.Trim();
+					}
+					else if (BigAssets.ContainsKey(_largeAssetReg.Match(firstPortion).Value))
+					{
+						BigAssets[_largeAssetReg.Match(firstPortion).Value] = secondPortionRaw.Trim();
+					}
+					else if (BigAssets.ContainsKey(_smallAssetRex.Match(firstPortion).Value))
+					{
+						LittleAssets[_smallAssetRex.Match(firstPortion).Value] = secondPortionRaw.Trim();
+					}
+				}
 			}
 			catch (Exception e)
 			{
@@ -1084,6 +1116,9 @@ namespace MDRP
 			{
 				lineData = langHelper.get(LocalizableStrings.TITLE) + ": ${title}\n" + langHelper.get(LocalizableStrings.ARTIST) + ": ${artist}";
 			}
+
+			if (pausedAsset == null)
+				pausedAsset = defaultPausedURL;
 
 			try
 			{
@@ -1232,9 +1267,9 @@ namespace MDRP
 					if (!PlayersClients.ContainsKey(playerCandidate))
 					{
 						PlayersClients[playerCandidate] = new[]
-							{
-								DefaultClients[playerCandidate]
-							};
+						{
+							DefaultClients[playerCandidate]
+						};
 					}
 				}
 				else
