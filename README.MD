@@ -74,7 +74,7 @@ In the ini config file, there is the option to change the default background on 
 
 `large musicbee asset=https://is3-ssl.mzstatic.com/image/thumb/Music125/v4/11/50/a7/1150a7a6-ad88-1985-2869-7ae3d66391d5/12UMGIM10062.rgb.jpg/512x512bb.jpg` 
 
-And to change it for groove, you would change `musicbee` to `music.ui` and for Windows Media Player, this would change to `windows.media.player`
+And to change it for groove, you would change `musicbee` to `music.ui` and for Windows Media Player, this would change to `microsoft.media.player`
 
 To apply this to the small icon, you should change `large` to `small`
 
