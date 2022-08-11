@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Text;
 using System.Threading.Tasks;
 using Windows.Web.Http;
 using Newtonsoft.Json.Linq;
@@ -14,9 +16,15 @@ namespace MDRP
 		public const string cacheFileLocation = "../../../clientdata/cachedImages.dat";
 		public string langAddon = "lang=" + (Program.translateFromJapanese ? "en_us" : "ja_jp");
 
-		private HttpClient myClient = new HttpClient();
-
 		private Dictionary<Album, string> cache = new Dictionary<Album, string>();
+
+		private HttpWebRequest generateRequest(Uri url)
+		{
+			HttpWebRequest outthing = (HttpWebRequest)WebRequest.Create(url);
+			outthing.Timeout = 1500;
+			outthing.Method = "GET";
+			return outthing;
+		}
 
 		public bool HasAlbum(Album album)
 		{
@@ -54,7 +62,6 @@ namespace MDRP
 
 		private async Task<String> ExternalAlbumLookup(Album album, string backupTitle)
 		{
-
 			if (album.Name == "" || album.Name.ToLower() == "unknown album" || album.Artists.Length == 0 || (album.Artists.Length == 1 && album.Artists[0].ToLower() == "unknown artist"))
 				return "";
 
@@ -64,9 +71,16 @@ namespace MDRP
 			}
 
 			Uri queryString = new Uri(default_endpoint + langAddon + "&term=" + album.Name + "&media=music&entity=album");
-			HttpResponseMessage result = await myClient.GetAsync(queryString);
+			WebResponse result = (await generateRequest(queryString).GetResponseAsync());
 
-			JObject jObject = JObject.Parse(result.Content.ToString());
+			string text = "";
+			using (StreamReader reader = new StreamReader(result.GetResponseStream(), Encoding.UTF8))
+			{
+				text = reader.ReadToEnd();
+			}
+			result.Close();
+			
+			JObject jObject = JObject.Parse(text);
 
 			if (jObject["resultCount"] != null && Int16.Parse(jObject["resultCount"].ToString()) > 0)
 			{
@@ -120,9 +134,16 @@ namespace MDRP
 			if (Int16.Parse(jObject["resultCount"].ToString()) == 200)
 			{
 				queryString = new Uri(default_endpoint + langAddon +  "&term=" + album + "&media=music&entity=album");
-				result = await myClient.GetAsync(queryString);
+				result = (await generateRequest(queryString).GetResponseAsync());
 
-				jObject = JObject.Parse(result.Content.ToString());
+				text = "";
+				using (StreamReader reader = new StreamReader(result.GetResponseStream(), Encoding.UTF8))
+				{
+					text = reader.ReadToEnd();
+				}
+				result.Close();
+			
+				jObject = JObject.Parse(text);
 
 				if (jObject["resultCount"] != null && Int16.Parse(jObject["resultCount"].ToString()) > 0)
 				{
@@ -172,9 +193,16 @@ namespace MDRP
 			}
 
 			queryString = new Uri(default_endpoint + langAddon + "&term=" + backupTitle + "&media=music&entity=song");
-			result = await myClient.GetAsync(queryString);
+			result = (await generateRequest(queryString).GetResponseAsync());
 
-			jObject = JObject.Parse(result.Content.ToString());
+			text = "";
+			using (StreamReader reader = new StreamReader(result.GetResponseStream(), Encoding.UTF8))
+			{
+				text = reader.ReadToEnd();
+			}
+			result.Close();
+			
+			jObject = JObject.Parse(text);
 			if (jObject["resultCount"] != null)
 			{
 				if (jObject["resultCount"].ToString() == "1")

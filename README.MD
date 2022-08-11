@@ -80,6 +80,11 @@ To apply this to the small icon, you should change `large` to `small`
 
 **NOTE:** if you would like a per-application paused icon, background icon, etc, you should change the default to be an asset instead of a link. This will look in that application for that asset instead, and by doing this, you can have different image assets by that name in each app to achieve this behavior.
 
+## My Shit's broke pls help
+Well if you are on windows 11 using Windows Media Player, your chances are not looking good.
+
+I would suggest that you set `debug missing player` to `true` and see if you can figure anything out from there.
+
 ### Get Desktop Notifications
 The `verbose` setting enables desktop notifications about the following:
 
@@ -104,13 +109,12 @@ The tooltip on the large image will always have the album name, and the tooltip 
 ### Automatic Album Art Settings
 Automatic Album Art or Remote Artowork as it is sometimes referred to, is the process by which MDRP will look on the internet for the album art that corresponds to your currently playing media. **If MDRP gets the album art wrong, please comment on [this discussion](https://github.com/jojo2357/Music-Discord-Rich-Presence/discussions/59)
 
-| Setting | When It applies | Behavior when true | Behavior when false | Recommendation |
-|---------|-----------------|--------------------|---------------------|----------|
-| `get remote artwork` | The current album is unkeyed for the current Media Player |MDRP will attempt to get the artowork for the currently playing media online and display it on the default application for the current Media Player | MDRP will simply show the default background on the default application | Set this to true if you haven't keyed you albums and would like to have arts in your rich Presence |
+| Setting                   | When It applies | Behavior when true | Behavior when false | Recommendation |
+|---------------------------|-----------------|--------------------|---------------------|----------|
+| `get remote artwork`      | The current album is unkeyed for the current Media Player |MDRP will attempt to get the artowork for the currently playing media online and display it on the default application for the current Media Player | MDRP will simply show the default background on the default application | Set this to true if you haven't keyed you albums and would like to have arts in your rich Presence |
 | `remote needs exact match` | `get remote artwork` is true, The current album is unkeyed, and MDRP could not find an identical match either because there were too many results or the artist name was slightly off | MDRP will search again with more restrictive terms, and choose an exact match, or the only match, or the best non perfect artist match | ditto ^ | Set to false if your arts are frequently incorrect, true if your arts are frequently not found |
-| `create cache file` | `get remote artwork` is true, and MDRP had to search for an artwork | after a successful search, MDRP will key this album to a file in your clientdata folder. This key file will apply to all players, and will use the default app for those players | The cache will not be saved, and lost on restart | Not a lot of reasons to set this to false, MDRP is basically keying all your music for you, and if MDRP gets it wrong, you can correct it yourself |
+| `create cache file`       | `get remote artwork` is true, and MDRP had to search for an artwork | after a successful search, MDRP will key this album to a file in your clientdata folder. This key file will apply to all players, and will use the default app for those players | The cache will not be saved, and lost on restart | Not a lot of reasons to set this to false, MDRP is basically keying all your music for you, and if MDRP gets it wrong, you can correct it yourself |
 | `translate from japanese` | `get remote artwork` is true | Searches to ITunes will be done with the language of the search set to Japanese | Searches assume english, and will only directly latinize searches | Set this to true if you have a lot of Japanese music, especially if the searches don't find it often. Searching in JP will provide subtle corrections like reordering first and last names |
-
 
 ## Languages
 To change the language, move the default `english-us.lang` back to the `languages` folder and then move the `.lang` file you need from the languages folder to the same directory as the readme and launcher.

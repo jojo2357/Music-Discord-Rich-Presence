@@ -23,12 +23,14 @@ namespace MDRP
 	internal partial class Program
 	{
 		public static LangHelper langHelper = new LangHelper();
-		public const string Version = "1.7.1";
+		public const string Version = "1.7.2";
 		public const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
 		public static readonly string Title = langHelper.get(LocalizableStrings.MDRP_FULL);
 		private const int titleLength = 64;
 		private const int artistLength = 64;
 		private const int keyLength = 32;
+
+		public static bool showPlayers = false;
 
 		private static readonly Uri _GithubUrl =
 			new Uri("https://api.github.com/repos/jojo2357/Music-Discord-Rich-Presence/releases/latest");
@@ -39,10 +41,12 @@ namespace MDRP
 			{
 				{ "music.ui", new DiscordRpcClient("807774172574253056", autoEvents: false) },
 				{ "microsoft.media.player", new DiscordRpcClient("807774172574253056", autoEvents: false) },
+				{ "wmplayer", new DiscordRpcClient("807774172574253056", autoEvents: false) },
 				{ "musicbee", new DiscordRpcClient("820837854385012766", autoEvents: false) },
 				{ "spotify", new DiscordRpcClient("802222525110812725", autoEvents: false) },
 				{ "tidal", new DiscordRpcClient("922625678271197215", autoEvents: false) },
 				{ "wavelink", new DiscordRpcClient("927328178618376212", autoEvents: false) },
+				{ "amazon music", new DiscordRpcClient("807774172574253056", autoEvents: false) },
 				{ "", new DiscordRpcClient("821398156905283585", autoEvents: false) }
 			};
 
@@ -73,16 +77,20 @@ namespace MDRP
 		{
 			{ "music.ui", ConsoleColor.Blue },
 			{ "microsoft.media.player", ConsoleColor.Blue },
+			{ "wmplayer", ConsoleColor.Blue },
 			{ "spotify", ConsoleColor.DarkGreen },
 			{ "musicbee", ConsoleColor.Yellow },
 			{ "tidal", ConsoleColor.Gray },
 			{ "wavelink", ConsoleColor.DarkBlue },
+			{ "amazon music", ConsoleColor.Gray },
 		};
 
 		private static string _presenceDetails = string.Empty;
 
 		private static readonly string[] ValidPlayers =
-			{ "music.ui", "spotify", "musicbee", "microsoft.media.player", "tidal", "wavelink" };
+		{
+			"music.ui", "spotify", "musicbee", "microsoft.media.player", "wmplayer", "tidal", "wavelink", "amazon music"
+		};
 
 		private static readonly string[] RequiresPipeline = { "musicbee" };
 
@@ -93,16 +101,22 @@ namespace MDRP
 			{ "spotify", "Spotify Music" },
 			{ "groove", "Groove Music Player" },
 			{ "microsoft.media.player", "Windows Media Player" },
+			{ "wmplayer", "Windows Media Player" },
 			{ "music.ui", "Groove Music Player" },
 			{ "tidal", "Tidal Music" },
-			{ "wavelink", "Wave Link" }
+			{ "wavelink", "Wave Link" },
+			{ "amazon music", "Amazon Music" }
 		};
 
 		private static readonly Dictionary<string, string> BigAssets = new Dictionary<string, string>
 		{
 			{ "musicbee", "https://cdn.discordapp.com/app-assets/820837854385012766/820838584617009222.png" },
 			{ "music.ui", "https://cdn.discordapp.com/app-assets/801209905020272681/801224923547959376.png" },
-			{ "microsoft.media.player", "https://cdn.discordapp.com/app-assets/801209905020272681/801224923547959376.png" },
+			{ "amazon music", "https://cdn.discordapp.com/app-assets/801209905020272681/801224923547959376.png" },
+			{
+				"microsoft.media.player",
+				"https://cdn.discordapp.com/app-assets/801209905020272681/801224923547959376.png"
+			},
 			{ "spotify", "https://cdn.discordapp.com/app-assets/802222525110812725/802222954821582869.png" },
 			{ "tidal", "https://cdn.discordapp.com/app-assets/922625678271197215/978018192393920562.png" },
 			{ "wavelink", "https://cdn.discordapp.com/app-assets/927328178618376212/927329727180574760.png" },
@@ -113,7 +127,11 @@ namespace MDRP
 		{
 			{ "musicbee", "https://cdn.discordapp.com/app-assets/820837854385012766/820838635703500810.png" },
 			{ "music.ui", "https://cdn.discordapp.com/app-assets/801209905020272681/801224923547959376.png" },
-			{ "microsoft.media.player", "https://cdn.discordapp.com/app-assets/801209905020272681/801224923547959376.png" },
+			{ "amazon music", "https://cdn.discordapp.com/app-assets/801209905020272681/801224923547959376.png" },
+			{
+				"microsoft.media.player",
+				"https://cdn.discordapp.com/app-assets/801209905020272681/801224923547959376.png"
+			},
 			{ "spotify", "https://cdn.discordapp.com/app-assets/802222525110812725/802222992683827200.png" },
 			{ "tidal", "https://cdn.discordapp.com/app-assets/922625678271197215/978018192637198406.png" },
 			{ "wavelink", "https://cdn.discordapp.com/app-assets/927328178618376212/927329727218319410.png" },
@@ -124,9 +142,11 @@ namespace MDRP
 			{ "musicbee", "Music Bee" },
 			{ "music.ui", "Groove Music" },
 			{ "microsoft.media.player", "Windows Media Player" },
+			{ "wmplayer", "Windows Media Player" },
 			{ "spotify", "Spotify" },
 			{ "tidal", "Tidal Music" },
-			{ "wavelink", "Wave Link" }
+			{ "wavelink", "Wave Link" },
+			{ "amazon music", "Amazon Music" }
 		};
 
 		private static readonly Dictionary<string, string> InverseWhatpeoplecallthisplayer =
@@ -137,7 +157,8 @@ namespace MDRP
 				{ "Microsoft.Media.Player", "microsoft.media.player" },
 				{ "spotify", "spotify" },
 				{ "Tidal Music", "tidal" },
-				{ "Wave Link", "wavelink" }
+				{ "Wave Link", "wavelink" },
+				{ "Amazon Music", "anazon music" }
 			};
 
 		private static readonly string defaultPlayer = "groove";
@@ -168,7 +189,9 @@ namespace MDRP
 		public static HttpListener listener;
 		public static string url = "http://localhost:2357/";
 
-		public const string defaultPausedURL = "https://cdn.discordapp.com/app-assets/801209905020272681/801527319537516596.png";
+		public const string defaultPausedURL =
+			"https://cdn.discordapp.com/app-assets/801209905020272681/801527319537516596.png";
+
 		public static string pausedAsset;
 
 		public static bool useRemoteArt = false, needsExactMatch = true, createCacheFile = true;
@@ -186,8 +209,12 @@ namespace MDRP
 		private static string lineData = "", currentTitle = "";
 		private static bool foundFirst = false, foundSecond = false;
 		private static bool foundImageRemotely = false;
-		private static readonly Regex _smallAssetRex = new Regex("(?<=^small\\s?)\\b[\\w\\\\.]+\\b(?=\\s?asset)", RegexOptions.IgnoreCase);
-		private static readonly Regex _largeAssetReg = new Regex("(?<=^large\\s?)\\b[\\w\\\\.]+\\b(?=\\s?asset)", RegexOptions.IgnoreCase);
+
+		private static readonly Regex _smallAssetRex =
+			new Regex("(?<=^small\\s?)\\b[\\w\\\\.]+\\b(?=\\s?asset)", RegexOptions.IgnoreCase);
+
+		private static readonly Regex _largeAssetReg =
+			new Regex("(?<=^large\\s?)\\b[\\w\\\\.]+\\b(?=\\s?asset)", RegexOptions.IgnoreCase);
 
 		public static async Task HandleIncomingConnections()
 		{
@@ -248,7 +275,13 @@ namespace MDRP
 							if (WrongArtistFlag)
 								response = "{response:\"keyed incorrectly\"}";
 							else
-								response = "{response:\"no key\"}";
+							{
+								GetLargeImageKey(parsedJason.Album, parsedJason.Title);
+								if (foundImageRemotely)
+									response = "{response:\"found remotely\"}";
+								else
+									response = "{response:\"no key\"}";
+							}
 						}
 						else
 						{
@@ -469,7 +502,12 @@ namespace MDRP
 						_lastTrack = _currentTrack;
 					_currentTrack = Functions.GetPlayingDetails();
 					if (_currentTrack == null)
+					{
+						Console.Error.WriteLine("Failed to find any WMC data");
 						return;
+					}
+
+					//Console.WriteLine("Title: " + _currentTrack.Title + " Album: " + _currentTrack.AlbumTitle);
 					if (_wasPlaying && !_isPlaying)
 					{
 						activeClient.SetPresence(new RichPresence
@@ -511,9 +549,22 @@ namespace MDRP
 									Functions.SendToDebugServer(e);
 								}
 
-						string newDetailsWithTitle = Functions.CapLength(lineData.Split('\n')[0].Replace("${artist}", (_currentTrack.Artist == "" ? langHelper[LocalizableStrings.UNKNOWN_ARTIST] : _currentTrack.Artist)).Replace("${title}", _currentTrack.Title).Replace("${album}", _currentTrack.AlbumTitle), titleLength);
-						string newStateWithArtist = Functions.CapLength(lineData.Split('\n')[1].Replace("${artist}", (_currentTrack.Artist == "" ? langHelper[LocalizableStrings.UNKNOWN_ARTIST] : _currentTrack.Artist)).Replace("${title}", _currentTrack.Title).Replace("${album}", _currentTrack.AlbumTitle), artistLength);
-						if (activeClient.CurrentPresence == null || activeClient.CurrentPresence.Details != newDetailsWithTitle ||
+						string newDetailsWithTitle = Functions.CapLength(
+							lineData.Split('\n')[0]
+								.Replace("${artist}",
+									(_currentTrack.Artist == ""
+										? langHelper[LocalizableStrings.UNKNOWN_ARTIST]
+										: _currentTrack.Artist)).Replace("${title}", _currentTrack.Title)
+								.Replace("${album}", _currentTrack.AlbumTitle), titleLength);
+						string newStateWithArtist = Functions.CapLength(
+							lineData.Split('\n')[1]
+								.Replace("${artist}",
+									(_currentTrack.Artist == ""
+										? langHelper[LocalizableStrings.UNKNOWN_ARTIST]
+										: _currentTrack.Artist)).Replace("${title}", _currentTrack.Title)
+								.Replace("${album}", _currentTrack.AlbumTitle), artistLength);
+						if (activeClient.CurrentPresence == null ||
+						    activeClient.CurrentPresence.Details != newDetailsWithTitle ||
 						    activeClient.CurrentPresence.State != newStateWithArtist || _wasPlaying != _isPlaying)
 						{
 							presenceIsRich = AlbumKeyMapping.ContainsKey(currentAlbum) &&
@@ -530,18 +581,23 @@ namespace MDRP
 								{
 									if (mngr.AlbumLookup(currentAlbum, currentTitle) == "")
 									{
-										Functions.SendNotification(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_HEADER], string.Format(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_BODY], currentAlbum));
+										Functions.SendNotification(
+											langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_HEADER],
+											string.Format(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_BODY],
+												currentAlbum));
 									}
 								}
 								else
 								{
 									if (WrongArtistFlag)
-										Functions.SendNotification(langHelper[LocalizableStrings.NOTIF_KEYED_WRONG_HEADER],
+										Functions.SendNotification(
+											langHelper[LocalizableStrings.NOTIF_KEYED_WRONG_HEADER],
 											currentAlbum.Name +
 											" " + langHelper[LocalizableStrings.NOTIF_KEYED_WRONG_BODY]);
 									else
 										Functions.SendNotification(langHelper[LocalizableStrings.NOTIF_UNKEYED_HEADER],
-											currentAlbum.Name + " " + langHelper[LocalizableStrings.NOTIF_UNKEYED_BODY]);
+											currentAlbum.Name + " " +
+											langHelper[LocalizableStrings.NOTIF_UNKEYED_BODY]);
 								}
 							}
 
@@ -583,6 +639,24 @@ namespace MDRP
 			}
 			else
 			{
+				if (showPlayers)
+				{
+					if (!_isPlaying)
+					{
+						Console.WriteLine(_playerName + " and not playing");
+					}
+
+					if (!(EnabledClients.ContainsKey(_playerName) && EnabledClients[_playerName]))
+					{
+						Console.WriteLine(_playerName + " is not enabled");
+					}
+
+					if (Timer.ElapsedMilliseconds >= timeout_seconds * 1000)
+					{
+						Console.WriteLine("TIMED OUT");
+					}
+				}
+
 				if (!EnabledClients.ContainsKey(_playerName))
 					SetUnknown();
 				else
@@ -649,7 +723,8 @@ namespace MDRP
 				if (_isPlaying)
 					resignRemoteControlAt = long.Parse(lastMessage.TimeStamp) + 1000;
 				else if (remoteControl)
-					resignRemoteControlAt = (long)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds + 60000;
+					resignRemoteControlAt = (long)DateTime.UtcNow.Subtract(new DateTime(1970, 1, 1)).TotalMilliseconds +
+					                        60000;
 				else
 					resignRemoteControlAt = 0;
 
@@ -662,8 +737,20 @@ namespace MDRP
 
 				activeClient.SetPresence(new RichPresence
 				{
-					Details = Functions.CapLength(lineData.Split('\n')[0].Replace("${artist}", (lastMessage.Artist == "" ? langHelper[LocalizableStrings.UNKNOWN_ARTIST] : lastMessage.Artist)).Replace("${title}", lastMessage.Title).Replace("${album}", lastMessage.Album.Name), titleLength),
-					State = Functions.CapLength(lineData.Split('\n')[1].Replace("${artist}", (lastMessage.Artist == "" ? langHelper[LocalizableStrings.UNKNOWN_ARTIST] : lastMessage.Artist)).Replace("${title}", lastMessage.Title).Replace("${album}", lastMessage.Album.Name), artistLength),
+					Details = Functions.CapLength(
+						lineData.Split('\n')[0]
+							.Replace("${artist}",
+								(lastMessage.Artist == ""
+									? langHelper[LocalizableStrings.UNKNOWN_ARTIST]
+									: lastMessage.Artist)).Replace("${title}", lastMessage.Title)
+							.Replace("${album}", lastMessage.Album.Name), titleLength),
+					State = Functions.CapLength(
+						lineData.Split('\n')[1]
+							.Replace("${artist}",
+								(lastMessage.Artist == ""
+									? langHelper[LocalizableStrings.UNKNOWN_ARTIST]
+									: lastMessage.Artist)).Replace("${title}", lastMessage.Title)
+							.Replace("${album}", lastMessage.Album.Name), artistLength),
 
 					Timestamps = _isPlaying
 						? new Timestamps
@@ -690,7 +777,9 @@ namespace MDRP
 					{
 						if (mngr.AlbumLookup(currentAlbum, currentTitle) == "")
 						{
-							Functions.SendNotification(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_HEADER], string.Format(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_BODY], currentAlbum));
+							Functions.SendNotification(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_HEADER],
+								string.Format(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_BODY],
+									currentAlbum));
 						}
 					}
 					else
@@ -731,25 +820,31 @@ namespace MDRP
 
 		private static string GetLargeImageKey()
 		{
+			return GetLargeImageKey(currentAlbum, currentTitle);
+		}
+
+		private static string GetLargeImageKey(Album activeAlbum, string activeTitle)
+		{
 			foundImageRemotely = false;
-			if (AlbumKeyMapping.ContainsKey(currentAlbum) &&
-			    AlbumKeyMapping[currentAlbum].ContainsKey(activeClient.ApplicationID))
+			if (AlbumKeyMapping.ContainsKey(activeAlbum) &&
+			    AlbumKeyMapping[activeAlbum].ContainsKey(activeClient.ApplicationID))
 			{
 				//make sure it is not too long, this will be warned about
-				if (Uri.IsWellFormedUriString(AlbumKeyMapping[currentAlbum][activeClient.ApplicationID], UriKind.Absolute))
+				if (Uri.IsWellFormedUriString(AlbumKeyMapping[activeAlbum][activeClient.ApplicationID],
+					    UriKind.Absolute))
 				{
-					return AlbumKeyMapping[currentAlbum][activeClient.ApplicationID];
+					return AlbumKeyMapping[activeAlbum][activeClient.ApplicationID];
 				}
 
-				if (AlbumKeyMapping[currentAlbum][activeClient.ApplicationID].Length <= keyLength)
+				if (AlbumKeyMapping[activeAlbum][activeClient.ApplicationID].Length <= keyLength)
 				{
-					return AlbumKeyMapping[currentAlbum][activeClient.ApplicationID];
+					return AlbumKeyMapping[activeAlbum][activeClient.ApplicationID];
 				}
 			}
 
 			if (useRemoteArt)
 			{
-				string res = mngr.AlbumLookup(currentAlbum, currentTitle);
+				string res = mngr.AlbumLookup(activeAlbum, activeTitle);
 				if (res != String.Empty)
 				{
 					foundImageRemotely = true;
@@ -758,10 +853,11 @@ namespace MDRP
 
 				if (ScreamAtUser)
 				{
-					if (!NotifiedAlbums.Contains(currentAlbum))
+					if (!NotifiedAlbums.Contains(activeAlbum))
 					{
-						Functions.SendNotification(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_HEADER], string.Format(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_BODY], currentAlbum));
-						NotifiedAlbums.Add(currentAlbum);
+						Functions.SendNotification(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_HEADER],
+							string.Format(langHelper[LocalizableStrings.NOTIF_NOT_FOUND_REMOTELY_BODY], activeAlbum));
+						NotifiedAlbums.Add(activeAlbum);
 					}
 				}
 			}
@@ -779,7 +875,7 @@ namespace MDRP
 		private static void GetClient(Album album, string playerName)
 		{
 			if (AlbumKeyMapping.ContainsKey(album))
-				activeClient = GetBestClient(AlbumKeyMapping[album]);
+				activeClient = GetBestClient(AlbumKeyMapping[album], playerName);
 			else if (DefaultClients.ContainsKey(playerName))
 				activeClient = DefaultClients[playerName];
 			else
@@ -797,9 +893,8 @@ namespace MDRP
 			GetClient(currentAlbum, _playerName);
 		}
 
-		private static DiscordRpcClient GetBestClient(Dictionary<string, string> album)
+		private static DiscordRpcClient GetBestClient(Dictionary<string, string> album, string playerName)
 		{
-			string playerName = _playerName;
 			if (playerName.ToLower() == "microsoft.media.player")
 				playerName = "music.ui";
 			try
@@ -887,7 +982,8 @@ namespace MDRP
 			}
 
 			Console.ForegroundColor = ConsoleColor.White;
-			Console.Write(new string(' ', totalBufLen - langHelper.get(LocalizableStrings.PLAYER).Length + 1) + langHelper.get(LocalizableStrings.PLAYER) + ": ");
+			Console.Write(new string(' ', totalBufLen - langHelper.get(LocalizableStrings.PLAYER).Length + 1) +
+			              langHelper.get(LocalizableStrings.PLAYER) + ": ");
 
 			Console.ForegroundColor =
 				PlayerColors.ContainsKey(_playerName) ? PlayerColors[_playerName] : ConsoleColor.White;
@@ -905,12 +1001,14 @@ namespace MDRP
 			else if (WrongArtistFlag)
 			{
 				Console.ForegroundColor = ConsoleColor.Yellow;
-				Console.WriteLine("\n" + langHelper.get(LocalizableStrings.KEYED_WRONG) + " Got \"" + album.GetArtistString() + "\" but expected \"" + Program.GetNameNotQuite(album, _playerName).GetArtistString() + "\"");
+				Console.WriteLine("\n" + langHelper.get(LocalizableStrings.KEYED_WRONG) + " Got \"" +
+				                  album.GetArtistString() + "\" but expected \"" +
+				                  Program.GetNameNotQuite(album, _playerName).GetArtistString() + "\"");
 				/*foreach (string str in Program.GetNameNotQuite(album, _playerName).Artists)
 				{
-					Console.Write(album.GetArtistString() + ", " + str + "\t");
-					Console.Write(album.GetArtistString().Zip(str, (c1, c2) => c1 == c2).TakeWhile(b => b).Count() + " != " + album.GetArtistString().Zip(str, (c1, c2) => c1 == c2).TakeWhile(b => b).Count());
-					Console.WriteLine(" " + album.GetArtistString().ToCharArray()[album.GetArtistString().Zip(str, (c1, c2) => c1 == c2).TakeWhile(b => b).Count()] + " != " + str.ToCharArray()[album.GetArtistString().Zip(str, (c1, c2) => c1 == c2).TakeWhile(b => b).Count()]);
+				    Console.Write(album.GetArtistString() + ", " + str + "\t");
+				    Console.Write(album.GetArtistString().Zip(str, (c1, c2) => c1 == c2).TakeWhile(b => b).Count() + " != " + album.GetArtistString().Zip(str, (c1, c2) => c1 == c2).TakeWhile(b => b).Count());
+				    Console.WriteLine(" " + album.GetArtistString().ToCharArray()[album.GetArtistString().Zip(str, (c1, c2) => c1 == c2).TakeWhile(b => b).Count()] + " != " + str.ToCharArray()[album.GetArtistString().Zip(str, (c1, c2) => c1 == c2).TakeWhile(b => b).Count()]);
 				}*/
 			}
 			else
@@ -967,16 +1065,16 @@ namespace MDRP
 
 		/*private static void _client_OnPresenceUpdate(object sender, PresenceMessage args)
 		{
-			Console.WriteLine("Update presence: " + args.Name + " | " + args.Presence.State + " | " + args.Type);
-			if (args.Presence != null)
-			{
-				if (_presenceDetails != args.Presence.Details)
-					_presenceDetails = AllClients[args.ApplicationID].CurrentPresence?.Details;
-			}
-			else
-			{
-				_presenceDetails = string.Empty;
-			}
+		    Console.WriteLine("Update presence: " + args.Name + " | " + args.Presence.State + " | " + args.Type);
+		    if (args.Presence != null)
+		    {
+		        if (_presenceDetails != args.Presence.Details)
+		            _presenceDetails = AllClients[args.ApplicationID].CurrentPresence?.Details;
+		    }
+		    else
+		    {
+		        _presenceDetails = string.Empty;
+		    }
 		}*/
 
 		private static void _client_OnError(object sender, ErrorMessage args)
@@ -995,37 +1093,75 @@ namespace MDRP
 				if (EnabledClients.ContainsKey(program) && EnabledClients[program])
 					foreach (Process process in Process.GetProcessesByName(program))
 						candidates.Add(process);
-			if (candidates.Any())
+			if (candidates.Any() || showPlayers)
 			{
-				AudioSessionManager2 sessionManager;
 				using (MMDeviceEnumerator enumerator = new MMDeviceEnumerator())
 				{
-					using (MMDevice device = enumerator.GetDefaultAudioEndpoint(DataFlow.Render, Role.Multimedia))
+					foreach (MMDevice audioOutputDevice in enumerator.EnumAudioEndpoints(DataFlow.Render,
+						         DeviceState.Active))
 					{
-						sessionManager = AudioSessionManager2.FromMMDevice(device);
-					}
-				}
-
-				using (AudioSessionEnumerator sessionEnumerator = sessionManager.GetSessionEnumerator())
-				{
-					foreach (AudioSessionControl session in sessionEnumerator)
-					{
-						Process process = session.QueryInterface<AudioSessionControl2>().Process;
 						try
 						{
-							if (ValidPlayers.Contains(process.ProcessName.ToLower()) &&
-							    EnabledClients.ContainsKey(process.ProcessName.ToLower()) &&
-							    EnabledClients[process.ProcessName.ToLower()] &&
-							    session.QueryInterface<AudioMeterInformation>().GetPeakValue() > 0)
+							using (AudioSessionEnumerator sessionEnumerator = AudioSessionManager2
+								       .FromMMDevice(audioOutputDevice).GetSessionEnumerator())
 							{
-								_lastPlayer = _playerName;
-								_playerName = process.ProcessName.ToLower();
-								return true;
+								foreach (AudioSessionControl session in sessionEnumerator)
+								{
+									Process process = session.QueryInterface<AudioSessionControl2>().Process;
+									bool theresSomething = session.QueryInterface<AudioSessionControl2>()
+										.QueryInterface<AudioMeterInformation>().PeakValue > 0;
+									try
+									{
+										if (ValidPlayers.Contains(process.ProcessName.ToLower()) &&
+										    EnabledClients.ContainsKey(process.ProcessName.ToLower()) &&
+										    EnabledClients[process.ProcessName.ToLower()] &&
+										    session.QueryInterface<AudioMeterInformation>().GetPeakValue() > 0)
+										{
+											if (showPlayers)
+											{
+												Console.ForegroundColor = ConsoleColor.White;
+												Console.Write("Detected and accepting ");
+												Console.ForegroundColor = ConsoleColor.Green;
+												Console.WriteLine(process.ProcessName);
+												Console.ForegroundColor = ConsoleColor.White;
+											}
+
+											_lastPlayer = _playerName;
+											_playerName = process.ProcessName.ToLower();
+											return true;
+										}
+										else if (showPlayers)
+										{
+											var reason = "";
+											if (!ValidPlayers.Contains(process.ProcessName.ToLower()))
+												reason = "INVALID_PLAYER";
+											else if (!(EnabledClients.ContainsKey(process.ProcessName.ToLower()) &&
+											           EnabledClients[process.ProcessName.ToLower()]))
+												reason = "PLAYER_DISABLED";
+											else if (session.QueryInterface<AudioMeterInformation>().GetPeakValue() <=
+											         0)
+												reason = "NO_AUDIO_DETECTED" +
+												         (theresSomething ? " but detected SOMETHING" : "");
+											else
+												reason = "i jsut dont feel like it";
+											Console.ForegroundColor = ConsoleColor.White;
+											Console.Write("Detected and ignoring " + process.ProcessName + " reason: ");
+											Console.ForegroundColor = ConsoleColor.Red;
+											Console.WriteLine(reason);
+											Console.ForegroundColor = ConsoleColor.White;
+										}
+									}
+									catch (Exception e)
+									{
+										Functions.SendToDebugServer(e);
+									}
+								}
 							}
 						}
 						catch (Exception e)
 						{
-							Functions.SendToDebugServer(e);
+							// i am going to ignore this because it likely has to do with the device being 
+							// unsuitable and I dont know how to check
 						}
 					}
 				}
@@ -1104,6 +1240,10 @@ namespace MDRP
 					{
 						LittleAssets[_smallAssetRex.Match(firstPortion).Value] = secondPortionRaw.Trim();
 					}
+					else if (firstPortion == "debug missing player")
+					{
+						showPlayers = secondPortion == "true";
+					}
 				}
 			}
 			catch (Exception e)
@@ -1114,7 +1254,8 @@ namespace MDRP
 
 			if (!foundFirst && !foundSecond)
 			{
-				lineData = langHelper.get(LocalizableStrings.TITLE) + ": ${title}\n" + langHelper.get(LocalizableStrings.ARTIST) + ": ${artist}";
+				lineData = langHelper.get(LocalizableStrings.TITLE) + ": ${title}\n" +
+				           langHelper.get(LocalizableStrings.ARTIST) + ": ${artist}";
 			}
 
 			if (pausedAsset == null)
@@ -1168,7 +1309,8 @@ namespace MDRP
 
 				if (!lines[1].ToLower().Contains("id="))
 				{
-					Console.Error.WriteLine(string.Format(langHelper[LocalizableStrings.NOTIF_SETERR_NO_ID_HEADER], file.Name));
+					Console.Error.WriteLine(string.Format(langHelper[LocalizableStrings.NOTIF_SETERR_NO_ID_HEADER],
+						file.Name));
 					Functions.SendNotification(langHelper[LocalizableStrings.NOTIF_SETERR_NO_ID_HEADER],
 						string.Format(langHelper[LocalizableStrings.NOTIF_SETERR_NO_ID_HEADER], file.Name));
 					Thread.Sleep(5000);
@@ -1259,7 +1401,9 @@ namespace MDRP
 				}
 			}
 
-			foreach (string playerCandidate in lines[0].Split('=')[1] == "*" ? ValidPlayers : lines[0].Split('=')[1].ToLower().Split(','))
+			foreach (string playerCandidate in lines[0].Split('=')[1] == "*"
+				         ? ValidPlayers
+				         : lines[0].Split('=')[1].ToLower().Split(','))
 			{
 				if (useDefaults)
 				{
@@ -1296,9 +1440,9 @@ namespace MDRP
 				{
 					/*if (lines[i].Trim() != "" && !warnedFile)
 					{
-						warnedFile = true;
-						SendNotification(langHelper[LocalizableStrings.NOTIF_SETERR_DEPREC_HEADER],
-							string.Format(langHelper[LocalizableStrings.NOTIF_SETERR_DEPREC_BODY], file.Name));
+					    warnedFile = true;
+					    SendNotification(langHelper[LocalizableStrings.NOTIF_SETERR_DEPREC_HEADER],
+					        string.Format(langHelper[LocalizableStrings.NOTIF_SETERR_DEPREC_BODY], file.Name));
 					}*/
 
 					continue;

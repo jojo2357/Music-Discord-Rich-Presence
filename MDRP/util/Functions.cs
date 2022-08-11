@@ -107,10 +107,37 @@ namespace MDRP
 		{
 			try
 			{
-				GlobalSystemMediaTransportControlsSession gsmtcsm = GlobalSystemMediaTransportControlsSessionManager
-					.RequestAsync().GetAwaiter().GetResult()
-					.GetCurrentSession();
-				return gsmtcsm.TryGetMediaPropertiesAsync().GetAwaiter().GetResult();
+				GlobalSystemMediaTransportControlsSessionMediaProperties bestOption = null;
+				//Functions.SendToDebugServer("Num of: " + GlobalSystemMediaTransportControlsSessionManager.RequestAsync().GetAwaiter().GetResult().GetSessions().Count);
+				foreach (GlobalSystemMediaTransportControlsSession session in GlobalSystemMediaTransportControlsSessionManager.RequestAsync().GetAwaiter().GetResult().GetSessions())
+				{
+					GlobalSystemMediaTransportControlsSessionMediaProperties option = session.TryGetMediaPropertiesAsync().GetAwaiter().GetResult();
+					//Functions.SendToDebugServer("Debating: " + option.Title + ", " + option.Artist + ", " + option.AlbumTitle);
+					if (bestOption == null)
+					{
+						bestOption = option;
+					}
+					else
+					{
+						if (option.Title != null)
+						{
+							if (bestOption.Title == null)
+								bestOption = option;
+							else if (option.AlbumTitle != null)
+							{
+								if (bestOption.AlbumTitle == null)
+									bestOption = option;
+								else if (bestOption.Artist == null && bestOption.AlbumArtist == null)
+								{
+									if (option.Artist != null || option.AlbumArtist != null)
+										bestOption = option;
+								}
+							}
+						}
+					}
+				}
+
+				return bestOption;
 			}
 			catch (Exception)
 			{
@@ -129,6 +156,7 @@ namespace MDRP
 			HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
 			request.Method = "POST";
 			request.ContentType = "text/json";
+			request.Timeout = 250;
 			string urlEncoded = Uri.EscapeUriString(message);
 			byte[] arr = Encoding.UTF8.GetBytes(urlEncoded);
 			try

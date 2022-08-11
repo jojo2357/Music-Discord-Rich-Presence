@@ -1,0 +1,45 @@
+MDRP_FULL==Music Discord Rich Presence
+MDRP_SHORT==MDRP
+DRP_FULL==Discord Rich Presence
+DRP_SHORT==DRP
+ARTIST==Sanatçı
+ALBUM==Albüm
+TITLE==Başlık
+PLAYER==Oynatıcı
+VERSION==Versiyon
+DETAILS==Müzik detayları
+GOOD_ONE==Dinlediğin şarkı fena değilmiş , DRP'yi kontrol et ;)
+KEYED_WRONG== Albümü yanlış sanatçıya tanımladın :/
+UNKEYED==Albüm tanımlanmamış :(
+UNKNOWN_ARTIST==Bilinmeyen sanatçı
+CONSOLE_NAME==Music Discord Rich Presence
+NO_VALID_MEDIA==Bir şeyin içinde ses tespit edildi ama desteklemediğinden veya devre dışı bırakıldığından göstermiyor
+REQUIRE_PIPELINE==Ses {0} içinde tespit edildi fakat hiçbir veri alınamadı. Oynatıcıyı güncellemeniz gerekebilir, eklenti yükleyin, veya parçayı durdurup oynatın. Daha fazla bilgi için {1}
+AND==ve
+FAILED_TO_GET_INFO==Parça bilgisi alınamadı
+UNKNOWN_ALBUM==Bilinmeyen Albüm
+ERROR_OCCURRED==Bir hata oluştu. Eğer hata ciddiyse yada hata hakkında daha fazla bilgi almak istiyorsanız lütfen hata ayıklamadaki sonucu kullanın. Eğer hata MDRP kullanımına engel oluyorsa, lütfen github'da sorunu bildirin.
+REQUEST_DEBUG_TOOL==Bir hata oluştu. Sorunun anlaşlması için lütfen hata ayıklama aracını kullanın, hata ayıklamadan çıkan sonuçla sorunu bildirin.
+SPECIAL_INTEGRATION==özel entregrasyon kullanılyor!
+NOTHING_PLAYING==Hiçbir şey çalmıyor (Büyük ihtimalle parça durduruldu)
+NEW_UPDATE==YENİ GÜNCELLEME {0} (Yeni güncellemeyi indirmek için lütfen GitHub'a gidin)
+NO_SETTINGS==DiscordPresenceConfig.ini bulunamadı! Bu dosya bazı özellikleri açıp kapamaya yarar.
+NOTIF_KEYED_WRONG_HEADER==Albüm yanlış tanımlanmış
+NOTIF_KEYED_WRONG_BODY==Farklı bir sanatçı için tanımlanmış (Büyük harflere dikkat edin). Bu bildirimleri kapatmak için, DiscordPresenceConfig.ini'deki verbose'u false olarak değiştirin
+NOTIF_UNKEYED_HEADER==Albüm tanımlanmamış
+NOTIF_UNKEYED_BODY==Tanımlanmamış. Bu bildirimleri kapatmak için, DiscordPresenceConfig.ini'deki verbose'u false olarak değiştirin
+NOTIF_KEY_TOO_LONG_HEADER==Discord'un içindeki albüm anahtarı çok uzun
+NOTIF_KEY_TOO_LONG_BODY=={0} ({1}) olan anahtarın maksimum karakter sayısı {2}'den daha uzun
+NOTIF_SETERR_NO_ID_HEADER==MDRP ayarlar sorunu
+NOTIF_SETERR_NO_ID_BODY=={0} dosyasında hata çıktı, ikinci dizede id bulunamadı
+NOTIF_SETERR_DEPREC_HEADER==Kullanılmayan anahtar bildirimi
+NOTIF_SETERR_DEPREC_BODY=={0} Artık kullanılmayan bir anahtar formatıdır. Albümler Name(isim)==key(anahtar)==Artist(Sanatçı) biçiminde olmalıdır
+NOTIF_UPDATE_HEADER==Güncelleme mevcut
+NOTIF_UPDATE_BODY=={0} Github'da paylaşıldı. En son versiyonu almak için lütfen Github'a gidin
+USING==Çalıyor
+PAUSED==Durduruldu
+KEY_TOO_LONG==Anahtar bu albüm için çok uzun. Anahtar {0} karakter yada az olması lazım.
+FOUND_REMOTELY==Görüntü internetden bulundu
+NOT_FOUND_REMOTELY==Görüntü internetden bulunamadı
+NOTIF_NOT_FOUND_REMOTELY_HEADER==Albüm kapağı internetden bulunamadı
+NOTIF_NOT_FOUND_REMOTELY_BODY=={0} Itunes API'de bulunamadı, lütfen manuel olarak tuşlayın
