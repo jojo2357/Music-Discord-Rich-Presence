@@ -1,0 +1,45 @@
+MDRP_FULL==Music Discord Rich Presence
+MDRP_SHORT==MDRP
+DRP_FULL==Discord Rich Presence
+DRP_SHORT==DRP
+ARTIST==Artista
+ALBUM==Album
+TITLE==Titolo
+PLAYER==Lettore Musicale
+VERSION==Versione
+DETAILS==Dettagli Musicali
+GOOD_ONE==Questa è buona, dai un'occhiata al tuo DRP ;)
+KEYED_WRONG==L'album incluso è per l'artista sbagliato :/
+UNKEYED==Album non salvato :(
+UNKNOWN_ARTIST==Artista sconosciuto
+CONSOLE_NAME==Music Discord Rich Presence
+NO_VALID_MEDIA==Rilevato volume in qualcosa ma non visualizzato perché non supportato oppure è disabilitato attualmente.
+REQUIRE_PIPELINE==Rilevato il volume in {0} , ma non sono stati ricevuti dati da esso. Potrebbe essere necessario aggiornare il lettore, installare un plug-in o semplicemente mettere in pausa e riprendere la musica. Vedi di più su
+AND==e
+FAILED_TO_GET_INFO==Impossibile ottenere informazioni sulla traccia
+UNKNOWN_ALBUM==Album ignoto
+ERROR_OCCURRED==È stato riscontrato un errore. Se il problema è grave o desideri saperne di più, esegui lo strumento di Debug. Se ciò ostacola gravemente la tua esperienza MDRP, apri un problema su GitHub.
+REQUEST_DEBUG_TOOL==È stato riscontrato un errore. Eseguire lo strumento di Debug per ottenere una lettura migliore e quindi aprire un problema su github con quella stampa.
+SPECIAL_INTEGRATION==utilizzando un'integrazione speciale!
+NOTHING_PLAYING==Nulla in riproduzione al momento (Probabilmente in pausa)
+NEW_UPDATE==NUOVO AGGIORNAMENTO {0} Disponibile (effettua il download da github)
+NO_SETTINGS==file DiscordPresenceConfig.ini mancante! Esso è il file di configurazione che permette di abilitare o disabilitare determinate funzionalità.
+NOTIF_KEYED_WRONG_HEADER==L'album salvato è errato
+NOTIF_KEYED_WRONG_BODY==è salvato per un artista diverso (spunta in maiuscolo). Per disabilitare queste notifiche, imposta "verbose" su FALSE in DiscordPresenceConfig.ini
+NOTIF_UNKEYED_HEADER==Album non salvato
+NOTIF_UNKEYED_BODY==non è stato salvato. Per disabilitare queste notifiche, imposta "verbose" su FALSE in DiscordPresenceConfig.ini
+NOTIF_KEY_TOO_LONG_HEADER==nome dell'album su discord è troppo lungo
+NOTIF_KEY_TOO_LONG_BODY==La chiave per {0} ({1}) è più lunga del massimo di {2} caratteri
+NOTIF_SETERR_NO_ID_HEADER==Problema con le impostazioni MDRP
+NOTIF_SETERR_NO_ID_BODY==Errore nel file {0} nessun ID trovato nella seconda riga
+NOTIF_SETERR_DEPREC_HEADER==Avviso di deprecazione
+NOTIF_SETERR_DEPREC_BODY=={0} utilizza un formato di codifica obsoleto. Gli album dovrebbero essere nella forma Nome==chiave==Artista
+NOTIF_UPDATE_HEADER==Aggiornamento Disponibile!
+NOTIF_UPDATE_BODY=={0} è disponibile, ottieni l'ultima versione su github.
+USING==Utilizzando
+PAUSED==in pausa
+KEY_TOO_LONG==La chiave per questo album è troppo lunga. Deve contenere {0} caratteri o meno
+FOUND_REMOTELY==Image trovata sul web!
+NOT_FOUND_REMOTELY==Impossibile trovare l'immagine sul web
+NOTIF_NOT_FOUND_REMOTELY_HEADER==Copertina dell'album non trovata sul web
+NOTIF_NOT_FOUND_REMOTELY_BODY==Impossibile trovare {0} nell'API di iTunes, digitarlo manualmente.
