@@ -1,0 +1,45 @@
+MDRP_FULL==Music Discord Rich Presence
+MDRP_SHORT==MDRP
+DRP_FULL==Discord Rich Presence
+DRP_SHORT==DRP
+ARTIST==Artist
+ALBUM==Album
+TITLE==Title
+PLAYER==Player
+VERSION==Version
+DETAILS==Détails de la musique
+GOOD_ONE==Celle-ci est bonne, vérifie ton statut Discord ;)
+KEYED_WRONG==Album nommé pour le mauvais artiste :/
+UNKEYED==Album non nommé :(
+UNKNOWN_ARTIST==Artiste inconnu
+CONSOLE_NAME==Music Discord Rich Presence
+NO_VALID_MEDIA==Volume détécté quelque part, mais il ne s'affiche pas car ça n'est pas encore supporté ou que c'est désactivé
+REQUIRE_PIPELINE==Volume détécté dans {0}, mais aucune donnée n'a été récupérée. Tu dois peut-être mettre à jour le lecteur, installer un plugin ou mettre la musique en pause et la relancer. En savoir plus :
+AND==et
+FAILED_TO_GET_INFO==Échec de la récupération des infos de la piste
+UNKNOWN_ALBUM==Album inconnu
+ERROR_OCCURRED==Erreur. Si le souci persiste ou que tu veux en savoir plus, exécute l'outil de debug et utilise les prints qui s'y trouvent. Si cela impacte fortement ton expérience, ouvre une requête sur le GitHub de MDRP
+REQUEST_DEBUG_TOOL==Erreur. Utilise l'outil de debug pour avoir une meilleure idée de ce qui se passe, et ouvre une requête github avec le print en question.
+SPECIAL_INTEGRATION==Utilisation d'une intégration spéciale !
+NOTHING_PLAYING==Pas de musique (probablement en pause)
+NEW_UPDATE==Nouvelle MAJ {0} (Télécharge là sur GitHub)
+NO_SETTINGS==DiscordPresenceConfig.ini n'a pas été trouvé ! C'est le fichier de configuration pour activer ou désactiver des fonctionnalités.
+NOTIF_KEYED_WRONG_HEADER==Album mal nommé
+NOTIF_KEYED_WRONG_BODY==nommé pour un autre artiste (attention aux majuscules). Pour désactiver ces notifications, passe "verbose" en false dans DiscordPresenceConfig.ini
+NOTIF_UNKEYED_HEADER==Album non nommé
+NOTIF_UNKEYED_BODY==n'est pas nommé. Pour désactiver ces notifications, passe "verbose" en false dans DiscordPresenceConfig.ini
+NOTIF_KEY_TOO_LONG_HEADER==Nom d'album trop long pour Discord.
+NOTIF_KEY_TOO_LONG_BODY==Le nom {0} ({1}) est plus long que {2} (Nombre maximum de caractères)
+NOTIF_SETERR_NO_ID_HEADER==Erreur de paramétrade MDRP
+NOTIF_SETERR_NO_ID_BODY==Erreur dans le fichier {0} pas d'ID trouvé sur la deuxième ligne.
+NOTIF_SETERR_DEPREC_HEADER==Notice d'obsolescence
+NOTIF_SETERR_DEPREC_BODY=={0} utilise un format de nom obsolète. Forme souhaitée : Titre==Nom==Artiste
+NOTIF_UPDATE_HEADER==Mise à jour disponible.
+NOTIF_UPDATE_BODY=={0} est publié sur GitHub. Rends-toi-y pour la dernière version.
+USING==Utilisation
+PAUSED==en pause
+KEY_TOO_LONG==Le nom de l'album est trop long. Il doit faire maximum {0} caractères.
+FOUND_REMOTELY==Image trouvée en ligne !
+NOT_FOUND_REMOTELY==L'image n'a pas pu être trouvée en ligne.
+NOTIF_NOT_FOUND_REMOTELY_HEADER==Cover de l'album non trouvée en ligne.
+NOTIF_NOT_FOUND_REMOTELY_BODY=={0} n'a pas pu être trouvé dans l'API d'Itunes. Veuillez le nommer manuellement.

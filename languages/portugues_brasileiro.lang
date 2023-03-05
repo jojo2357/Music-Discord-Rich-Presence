@@ -1,0 +1,45 @@
+MDRP_FULL==Music Discord Rich Presence
+MDRP_SHORT==MDRP
+DRP_FULL==Discord Rich Presence
+DRP_SHORT==DRP
+ARTIST==Artista
+ALBUM==Álbum
+TITLE==Título
+PLAYER==Leitor de Música
+VERSION==Versão
+DETAILS==Detalhes
+GOOD_ONE==Sucesso, verifique seu DRP ;)
+KEYED_WRONG==Álbum registrado para o artista errado :/
+UNKEYED==O álbum não foi registrado :(
+UNKNOWN_ARTIST==Artista desconhecido
+CONSOLE_NAME==Music Discord Rich Presence
+NO_VALID_MEDIA==Volume detectado, mas não está sendo exibido pois não é compativel ou está desativado no momento
+REQUIRE_PIPELINE==Volume detectado em {0} mas nenhum dado recebido. Pode ser necessário atualizar o seu leitor de música, instalar algum plugin, ou simplesmente pausar e dar play novamente na música. Leia mais em
+AND==e
+FAILED_TO_GET_INFO==Erro ao buscar informação sobre a faixa
+UNKNOWN_ALBUM==Álbum desconhecido
+ERROR_OCCURRED==Ocorreu um erro. Se você quiser saber mais ou se o problema for grave, execute a ferramenta de depuração. Se o erro o impedir de usar o MDRP, abra um "Issue" em nosso GitHub com a saída da ferramenta de depuração
+REQUEST_DEBUG_TOOL==Ocorreu um erro. Execute a ferramenta de depuração para obter mais informações. Se necessário, abra um "Issue" em nosso Github com a saída da ferramenta de depuração.
+SPECIAL_INTEGRATION==Usando uma integração especial!
+NOTHING_PLAYING==Nada reproduzindo (provavelmente está pausado)
+NEW_UPDATE==NOVA ATUALIZAÇÃO! {0} (Veja em nosso GitHub para baixa-lo)
+NO_SETTINGS==DiscordPresenceConfig.ini não encontrado! Este é o arquivo de configurações para habilitar e desabilitar certas funções.
+NOTIF_KEYED_WRONG_HEADER==Álbum não registrado
+NOTIF_KEYED_WRONG_BODY==Está registrado para um artista errado (verifique as letras maiúsculas). Para desabilitar a notificação, defina em verbose como "False" em DiscordPresenceConfig.ini
+NOTIF_UNKEYED_HEADER==Álbum não registrado
+NOTIF_UNKEYED_BODY==Não está registrado. Para desabilitar estas notificação, define em verbose como "False" em DiscordPresenceConfig.ini
+NOTIF_KEY_TOO_LONG_HEADER==Chave de álbum muito longa no discord
+NOTIF_KEY_TOO_LONG_BODY==A chave para {0} ({1}) é mais longa que {2} caracteres máximos
+NOTIF_SETERR_NO_ID_HEADER==Problemas de configurações MDRP
+NOTIF_SETERR_NO_ID_BODY==Erro no arquivo {0} ID não encontrado na segunda linha.
+NOTIF_SETERR_DEPREC_HEADER==Aviso de incompatibilidade
+NOTIF_SETERR_DEPREC_BODY=={0} usa um formato de chave incompatível. Os álbuns devem ter a estrutura Nome==Chave==Artista
+NOTIF_UPDATE_HEADER==Atualização disponível
+NOTIF_UPDATE_BODY=={0} Está publicado no GitHub. Visite para encontrar a versão mais recente
+USING==Usando
+PAUSED==Pausado
+KEY_TOO_LONG==A chave para este álbum é muito longa. Deve ter {0} caracteres ou menos
+FOUND_REMOTELY==Imagem encontrada remotamente!
+NOT_FOUND_REMOTELY==A imagem não pode ser encontrada remotamente
+NOTIF_NOT_FOUND_REMOTELY_HEADER==Arte do álbum não encontrada remotamente
+NOTIF_NOT_FOUND_REMOTELY_BODY=={0} Não foi encontrada na API do iTunes, digite-o manualmente.
