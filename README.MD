@@ -122,10 +122,16 @@ To change the language, move the default `english-us.lang` back to the `language
 Feel free to contribute a new language, it is recommended to join [my discord](https://discord.gg/qVbY2ygeGy) so we can make sure we get the translations right.
   
 ### Supported Langs
+All translations are courtesy of the community. If you would like to contribute a new language, please edit one of the lang files and change the stuff after the `==`. Any things like `{0}` are where MDRP will replace an album, number, etc, so leave those in there. To submit, you can open a pull request or send me the file on discord.
+
 - English
 - Spanish
 - German
 - Dutch
+- French
+- Portugues (Brazil)
+- Italian
+- Turkish
   
 Icon is thanks to [Ghoelian](https://github.com/Ghoelian) so thanks for that!
 
