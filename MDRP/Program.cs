@@ -8,6 +8,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Net;
 using Windows.Media.Control;
 using Windows.Web.Http;
 using CSCore.CoreAudioAPI;
@@ -850,8 +851,8 @@ namespace MDRP
 		private static string PrepareEscapedFormatString(JsonResponse lastMessage, string instring)
 		{
 			return instring.Replace("${artist}",
-					Uri.EscapeUriString(GetArtist(lastMessage))).Replace("${title}", Uri.EscapeUriString(lastMessage.Title))
-				.Replace("${album}", Uri.EscapeUriString(lastMessage.Album.Name));
+					WebUtility.UrlEncode(Uri.EscapeUriString(GetArtist(lastMessage)))).Replace("${title}", WebUtility.UrlEncode(Uri.EscapeUriString(lastMessage.Title)))
+				.Replace("${album}", WebUtility.UrlEncode(Uri.EscapeUriString(lastMessage.Album.Name)));
 		}
 
 		private static string GetSmallImageText()
