@@ -23,7 +23,7 @@ namespace MDRP
 	internal partial class Program
 	{
 		public static LangHelper langHelper = new LangHelper();
-		public const string Version = "1.7.2";
+		public const string Version = "1.7.3";
 		public const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
 		public static readonly string Title = langHelper.get(LocalizableStrings.MDRP_FULL);
 		private const int titleLength = 64;
@@ -215,6 +215,31 @@ namespace MDRP
 
 		private static readonly Regex _largeAssetReg =
 			new Regex("(?<=^large\\s?)\\b[\\w\\\\.]+\\b(?=\\s?asset)", RegexOptions.IgnoreCase);
+
+		private static String GetArtist(JsonResponse lastMessage)
+		{
+			if (lastMessage != null)
+			{
+				if (lastMessage.Artist != "" || lastMessage.AlbumArtist != "")
+				{
+					if (lastMessage.Artist != "")
+					{
+						return lastMessage.Artist;
+					}
+					return lastMessage.AlbumArtist;
+				}
+			}
+			else if (_currentTrack.Artist != "" || _currentTrack.AlbumArtist != "")
+			{
+				if (_currentTrack.Artist != "")
+				{
+					return _currentTrack.Artist;
+				}
+
+				return _currentTrack.AlbumArtist;
+			}
+			return langHelper[LocalizableStrings.UNKNOWN_ARTIST];
+		}
 
 		public static async Task HandleIncomingConnections()
 		{
@@ -523,7 +548,7 @@ namespace MDRP
 							}
 						});
 						InvokeActiveClient();
-						SetConsole(_lastTrack.Title, _lastTrack.Artist, _lastTrack.AlbumTitle,
+						SetConsole(_lastTrack.Title, GetArtist(null), _lastTrack.AlbumTitle,
 							currentAlbum);
 					}
 					else if
@@ -552,16 +577,12 @@ namespace MDRP
 						string newDetailsWithTitle = Functions.CapLength(
 							lineData.Split('\n')[0]
 								.Replace("${artist}",
-									(_currentTrack.Artist == ""
-										? langHelper[LocalizableStrings.UNKNOWN_ARTIST]
-										: _currentTrack.Artist)).Replace("${title}", _currentTrack.Title)
+									(GetArtist(null))).Replace("${title}", _currentTrack.Title)
 								.Replace("${album}", _currentTrack.AlbumTitle), titleLength);
 						string newStateWithArtist = Functions.CapLength(
 							lineData.Split('\n')[1]
 								.Replace("${artist}",
-									(_currentTrack.Artist == ""
-										? langHelper[LocalizableStrings.UNKNOWN_ARTIST]
-										: _currentTrack.Artist)).Replace("${title}", _currentTrack.Title)
+									(GetArtist(null))).Replace("${title}", _currentTrack.Title)
 								.Replace("${album}", _currentTrack.AlbumTitle), artistLength);
 						if (activeClient.CurrentPresence == null ||
 						    activeClient.CurrentPresence.Details != newDetailsWithTitle ||
@@ -613,7 +634,7 @@ namespace MDRP
 									SmallImageText = GetSmallImageText()
 								}
 							});
-							SetConsole(_currentTrack.Title, _currentTrack.Artist, _currentTrack.AlbumTitle,
+							SetConsole(_currentTrack.Title, GetArtist(null), _currentTrack.AlbumTitle,
 								currentAlbum);
 							InvokeActiveClient();
 						}
@@ -740,16 +761,12 @@ namespace MDRP
 					Details = Functions.CapLength(
 						lineData.Split('\n')[0]
 							.Replace("${artist}",
-								(lastMessage.Artist == ""
-									? langHelper[LocalizableStrings.UNKNOWN_ARTIST]
-									: lastMessage.Artist)).Replace("${title}", lastMessage.Title)
+								(GetArtist(lastMessage))).Replace("${title}", lastMessage.Title)
 							.Replace("${album}", lastMessage.Album.Name), titleLength),
 					State = Functions.CapLength(
 						lineData.Split('\n')[1]
 							.Replace("${artist}",
-								(lastMessage.Artist == ""
-									? langHelper[LocalizableStrings.UNKNOWN_ARTIST]
-									: lastMessage.Artist)).Replace("${title}", lastMessage.Title)
+								(GetArtist(lastMessage))).Replace("${title}", lastMessage.Title)
 							.Replace("${album}", lastMessage.Album.Name), artistLength),
 
 					Timestamps = _isPlaying
@@ -793,7 +810,7 @@ namespace MDRP
 					}
 				}
 
-				SetConsole(lastMessage.Title, lastMessage.Artist, lastMessage.Album.Name,
+				SetConsole(lastMessage.Title, GetArtist(lastMessage), lastMessage.Album.Name,
 					lastMessage.Album);
 				if (!_isPlaying) Timer.Restart();
 			}
