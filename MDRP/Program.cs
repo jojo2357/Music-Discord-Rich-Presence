@@ -8,13 +8,11 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Net;
 using Windows.Media.Control;
 using Windows.Web.Http;
 using CSCore.CoreAudioAPI;
 using DiscordRPC;
 using DiscordRPC.Message;
-using Microsoft.Toolkit.Uwp.Notifications;
 using Newtonsoft.Json.Linq;
 using File = System.IO.File;
 
@@ -48,6 +46,7 @@ namespace MDRP
 				{ "tidalplayer", new DiscordRpcClient("922625678271197215", autoEvents: false) },
 				{ "wavelink", new DiscordRpcClient("927328178618376212", autoEvents: false) },
 				{ "amazon music", new DiscordRpcClient("807774172574253056", autoEvents: false) },
+				{ "mediamonkeyengine", new DiscordRpcClient("1096929771511873587", autoEvents: false) },
 				{ "foobar2000", new DiscordRpcClient("1009193842211299428", autoEvents: false) },
 				{ "", new DiscordRpcClient("821398156905283585", autoEvents: false) }
 			};
@@ -87,13 +86,14 @@ namespace MDRP
 			{ "wavelink", ConsoleColor.DarkBlue },
 			{ "amazon music", ConsoleColor.Gray },
 			{ "foobar2000", ConsoleColor.DarkCyan},
+			{"mediamonkeyengine", ConsoleColor.Yellow}
 		};
 
 		private static string _presenceDetails = string.Empty;
 
 		private static readonly string[] ValidPlayers =
 		{
-			"music.ui", "spotify", "musicbee", "microsoft.media.player", "wmplayer", "tidal", "tidalplayer", "wavelink", "amazon music", "foobar2000"
+			"music.ui", "spotify", "musicbee", "microsoft.media.player", "wmplayer", "tidal", "tidalplayer", "wavelink", "amazon music", "foobar2000", "mediamonkeyengine"
 		};
 
 		private static readonly string[] RequiresPipeline = { "musicbee" };
@@ -112,6 +112,7 @@ namespace MDRP
 			{ "wavelink", "Wave Link" },
 			{ "amazon music", "Amazon Music" },
 			{ "foobar2000", "FooBar2000"},
+			{ "mediamonkeyengine", "MediaMonkey5"}
 		};
 
 		private static readonly Dictionary<string, string> BigAssets = new Dictionary<string, string>
@@ -128,6 +129,7 @@ namespace MDRP
 			{ "tidalplayer", "https://cdn.discordapp.com/app-assets/922625678271197215/978018192393920562.png" },
 			{ "wavelink", "https://cdn.discordapp.com/app-assets/927328178618376212/927329727180574760.png" },
 			{ "foobar2000", "https://cdn.discordapp.com/app-assets/1009193842211299428/1009196080853950464.png" },
+			{"mediamonkeyengine", "https://cdn.discordapp.com/app-assets/1096929771511873587/1096930933325713519.png"}
 		};
 
 		//might just combine these later
@@ -145,6 +147,7 @@ namespace MDRP
 			{ "tidalplayer", "https://cdn.discordapp.com/app-assets/922625678271197215/978018192637198406.png" },
 			{ "wavelink", "https://cdn.discordapp.com/app-assets/927328178618376212/927329727218319410.png" },
 			{ "foobar2000", "https://cdn.discordapp.com/app-assets/1009193842211299428/1009196080950423563.png" },
+			{"mediamonkeyengine", "https://cdn.discordapp.com/app-assets/1096929771511873587/1096930933325713519.png"}
 		};
 
 		private static readonly Dictionary<string, string> Whatpeoplecallthisplayer = new Dictionary<string, string>
@@ -159,6 +162,7 @@ namespace MDRP
 			{ "wavelink", "Wave Link" },
 			{ "amazon music", "Amazon Music" },
 			{ "foobar2000", "FooBar2000"},
+			{"mediamonkeyengine", "MediaMonkey5"}
 		};
 
 		private static readonly Dictionary<string, string> InverseWhatpeoplecallthisplayer =
@@ -172,6 +176,7 @@ namespace MDRP
 				{ "Wave Link", "wavelink" },
 				{ "Amazon Music", "anazon music" },
 				{ "FooBar2000", "foobar2000"},
+				{"MediaMonkey5", "mediamonkeyengine"}
 			};
 
 		private static readonly string defaultPlayer = "groove";
@@ -637,7 +642,7 @@ namespace MDRP
 								}
 							}
 
-							activeClient.SetPresence(new RichPresence
+							RichPresence richPresence = new RichPresence
 							{
 								Details = newDetailsWithTitle,
 								State = newStateWithArtist,
@@ -648,7 +653,19 @@ namespace MDRP
 									SmallImageKey = GetSmallImageKey(),
 									SmallImageText = GetSmallImageText()
 								}
-							});
+							};
+				
+							if (foundButtonText || foundButtonURL)
+							{
+								richPresence.Buttons = new []{new Button
+								{
+									Label = PrepareFormatStringCappedLocal(GetArtist(null), _currentTrack.AlbumTitle, _currentTrack.Title, buttonText, 32),
+									Url = PrepareEscapedFormatStringLocal(GetArtist(null), _currentTrack.AlbumTitle, _currentTrack.Title, buttonURL)
+								}};
+							}
+				
+							activeClient.SetPresence(richPresence);
+
 							SetConsole(_currentTrack.Title, GetArtist(null), _currentTrack.AlbumTitle,
 								currentAlbum);
 							InvokeActiveClient();
@@ -835,10 +852,24 @@ namespace MDRP
 			}
 		}
 
+		private static string PrepareFormatStringCappedLocal(string artist, string album, string title, string instring,
+			int capLength)
+		{
+			return Functions.CapLength(
+				PrepareFormatStringLocal(artist, album, title, instring), capLength);
+		}
+
 		private static string PrepareFormatStringCapped(JsonResponse lastMessage, string instring, int capLength)
 		{
 			return Functions.CapLength(
 				PrepareFormatString(lastMessage, instring), capLength);
+		}
+
+		private static string PrepareFormatStringLocal(string artist, string album, string title, string instring)
+		{
+			return instring.Replace("${artist}",
+					(artist)).Replace("${title}", title)
+				.Replace("${album}", album);
 		}
 
 		private static string PrepareFormatString(JsonResponse lastMessage, string instring)
@@ -846,6 +877,13 @@ namespace MDRP
 			return instring.Replace("${artist}",
 					(GetArtist(lastMessage))).Replace("${title}", lastMessage.Title)
 				.Replace("${album}", lastMessage.Album.Name);
+		}
+		
+		private static string PrepareEscapedFormatStringLocal(string artist, string album, string title, string instring)
+		{
+			return instring.Replace("${artist}",
+					WebUtility.UrlEncode(Uri.EscapeUriString(artist))).Replace("${title}", WebUtility.UrlEncode(Uri.EscapeUriString(title)))
+				.Replace("${album}", WebUtility.UrlEncode(Uri.EscapeUriString(album)));
 		}
 
 		private static string PrepareEscapedFormatString(JsonResponse lastMessage, string instring)
