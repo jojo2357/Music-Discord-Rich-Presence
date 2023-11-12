@@ -10,6 +10,7 @@ namespace MDRP
 			public JsonResponse(JObject jObject)
 			{
 				Artist = GetJasonField(jObject, "artist");
+				AlbumArtist = GetJasonField(jObject, "album_artist");
 				if (jObject["album"] != null && jObject["album"].ToString() != string.Empty)
 					Album = new Album(jObject["album"].ToString(), jObject["artist"].ToString());
 				else
@@ -30,6 +31,7 @@ namespace MDRP
 			}
 
 			public string Artist { get; }
+			public string AlbumArtist { get; }
 			public Album Album { get; }
 			public string Title { get; }
 			public string TimeStamp { get; }
@@ -57,7 +59,8 @@ namespace MDRP
 				else
 				{
 					if (!ValidPlayers.Contains(Player))
-						return "invalid player name. expected one of \"" + string.Join("\", \"", ValidPlayers) + "\" got " + Player + " instead";
+						return "invalid player name. expected one of \"" + string.Join("\", \"", ValidPlayers) +
+						       "\" got " + Player + " instead";
 					else if (!EnabledClients[Player])
 						return "user has disabled this player";
 					else
@@ -67,7 +70,7 @@ namespace MDRP
 
 			public override string ToString()
 			{
-				return Action + " " + Title + " by " + Artist + " on " + Album.Name + " ending " + TimeStamp +
+				return Action + " " + Title + " by " + Artist + " (or " + AlbumArtist + ") on " + Album.Name + " ending " + TimeStamp +
 				       " from " + Player;
 			}
 

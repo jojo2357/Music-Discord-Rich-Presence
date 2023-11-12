@@ -76,7 +76,7 @@ namespace MDRP
 			string text = "";
 			using (StreamReader reader = new StreamReader(result.GetResponseStream(), Encoding.UTF8))
 			{
-				text = reader.ReadToEnd();
+				text = await reader.ReadToEndAsync();
 			}
 			result.Close();
 			

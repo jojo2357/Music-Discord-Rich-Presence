@@ -13,8 +13,6 @@ using Windows.Web.Http;
 using CSCore.CoreAudioAPI;
 using DiscordRPC;
 using DiscordRPC.Message;
-using IWshRuntimeLibrary;
-using Microsoft.Toolkit.Uwp.Notifications;
 using Newtonsoft.Json.Linq;
 using File = System.IO.File;
 
@@ -23,7 +21,7 @@ namespace MDRP
 	internal partial class Program
 	{
 		public static LangHelper langHelper = new LangHelper();
-		public const string Version = "1.7.2";
+		public const string Version = "1.7.3";
 		public const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
 		public static readonly string Title = langHelper.get(LocalizableStrings.MDRP_FULL);
 		private const int titleLength = 64;
@@ -45,8 +43,11 @@ namespace MDRP
 				{ "musicbee", new DiscordRpcClient("820837854385012766", autoEvents: false) },
 				{ "spotify", new DiscordRpcClient("802222525110812725", autoEvents: false) },
 				{ "tidal", new DiscordRpcClient("922625678271197215", autoEvents: false) },
+				{ "tidalplayer", new DiscordRpcClient("922625678271197215", autoEvents: false) },
 				{ "wavelink", new DiscordRpcClient("927328178618376212", autoEvents: false) },
 				{ "amazon music", new DiscordRpcClient("807774172574253056", autoEvents: false) },
+				{ "mediamonkeyengine", new DiscordRpcClient("1096929771511873587", autoEvents: false) },
+				{ "foobar2000", new DiscordRpcClient("1009193842211299428", autoEvents: false) },
 				{ "", new DiscordRpcClient("821398156905283585", autoEvents: false) }
 			};
 
@@ -81,15 +82,18 @@ namespace MDRP
 			{ "spotify", ConsoleColor.DarkGreen },
 			{ "musicbee", ConsoleColor.Yellow },
 			{ "tidal", ConsoleColor.Gray },
+			{ "tidalplayer", ConsoleColor.Gray },
 			{ "wavelink", ConsoleColor.DarkBlue },
 			{ "amazon music", ConsoleColor.Gray },
+			{ "foobar2000", ConsoleColor.DarkCyan},
+			{"mediamonkeyengine", ConsoleColor.Yellow}
 		};
 
 		private static string _presenceDetails = string.Empty;
 
 		private static readonly string[] ValidPlayers =
 		{
-			"music.ui", "spotify", "musicbee", "microsoft.media.player", "wmplayer", "tidal", "wavelink", "amazon music"
+			"music.ui", "spotify", "musicbee", "microsoft.media.player", "wmplayer", "tidal", "tidalplayer", "wavelink", "amazon music", "foobar2000", "mediamonkeyengine"
 		};
 
 		private static readonly string[] RequiresPipeline = { "musicbee" };
@@ -104,8 +108,11 @@ namespace MDRP
 			{ "wmplayer", "Windows Media Player" },
 			{ "music.ui", "Groove Music Player" },
 			{ "tidal", "Tidal Music" },
+			{ "tidalplayer", "Tidal Music" },
 			{ "wavelink", "Wave Link" },
-			{ "amazon music", "Amazon Music" }
+			{ "amazon music", "Amazon Music" },
+			{ "foobar2000", "FooBar2000"},
+			{ "mediamonkeyengine", "MediaMonkey5"}
 		};
 
 		private static readonly Dictionary<string, string> BigAssets = new Dictionary<string, string>
@@ -119,7 +126,10 @@ namespace MDRP
 			},
 			{ "spotify", "https://cdn.discordapp.com/app-assets/802222525110812725/802222954821582869.png" },
 			{ "tidal", "https://cdn.discordapp.com/app-assets/922625678271197215/978018192393920562.png" },
+			{ "tidalplayer", "https://cdn.discordapp.com/app-assets/922625678271197215/978018192393920562.png" },
 			{ "wavelink", "https://cdn.discordapp.com/app-assets/927328178618376212/927329727180574760.png" },
+			{ "foobar2000", "https://cdn.discordapp.com/app-assets/1009193842211299428/1009196080853950464.png" },
+			{"mediamonkeyengine", "https://cdn.discordapp.com/app-assets/1096929771511873587/1096930933325713519.png"}
 		};
 
 		//might just combine these later
@@ -134,7 +144,10 @@ namespace MDRP
 			},
 			{ "spotify", "https://cdn.discordapp.com/app-assets/802222525110812725/802222992683827200.png" },
 			{ "tidal", "https://cdn.discordapp.com/app-assets/922625678271197215/978018192637198406.png" },
+			{ "tidalplayer", "https://cdn.discordapp.com/app-assets/922625678271197215/978018192637198406.png" },
 			{ "wavelink", "https://cdn.discordapp.com/app-assets/927328178618376212/927329727218319410.png" },
+			{ "foobar2000", "https://cdn.discordapp.com/app-assets/1009193842211299428/1009196080950423563.png" },
+			{"mediamonkeyengine", "https://cdn.discordapp.com/app-assets/1096929771511873587/1096930933325713519.png"}
 		};
 
 		private static readonly Dictionary<string, string> Whatpeoplecallthisplayer = new Dictionary<string, string>
@@ -145,8 +158,11 @@ namespace MDRP
 			{ "wmplayer", "Windows Media Player" },
 			{ "spotify", "Spotify" },
 			{ "tidal", "Tidal Music" },
+			{ "tidalplayer", "Tidal Music" },
 			{ "wavelink", "Wave Link" },
-			{ "amazon music", "Amazon Music" }
+			{ "amazon music", "Amazon Music" },
+			{ "foobar2000", "FooBar2000"},
+			{"mediamonkeyengine", "MediaMonkey5"}
 		};
 
 		private static readonly Dictionary<string, string> InverseWhatpeoplecallthisplayer =
@@ -158,7 +174,9 @@ namespace MDRP
 				{ "spotify", "spotify" },
 				{ "Tidal Music", "tidal" },
 				{ "Wave Link", "wavelink" },
-				{ "Amazon Music", "anazon music" }
+				{ "Amazon Music", "anazon music" },
+				{ "FooBar2000", "foobar2000"},
+				{"MediaMonkey5", "mediamonkeyengine"}
 			};
 
 		private static readonly string defaultPlayer = "groove";
@@ -208,6 +226,8 @@ namespace MDRP
 
 		private static string lineData = "", currentTitle = "";
 		private static bool foundFirst = false, foundSecond = false;
+		private static string buttonText = "Click Me!", buttonURL = "https://archive.org/donate/";
+		private static bool foundButtonText = false, foundButtonURL = false;
 		private static bool foundImageRemotely = false;
 
 		private static readonly Regex _smallAssetRex =
@@ -215,6 +235,31 @@ namespace MDRP
 
 		private static readonly Regex _largeAssetReg =
 			new Regex("(?<=^large\\s?)\\b[\\w\\\\.]+\\b(?=\\s?asset)", RegexOptions.IgnoreCase);
+
+		private static String GetArtist(JsonResponse lastMessage)
+		{
+			if (lastMessage != null)
+			{
+				if (lastMessage.Artist != "" || lastMessage.AlbumArtist != "")
+				{
+					if (lastMessage.Artist != "")
+					{
+						return lastMessage.Artist;
+					}
+					return lastMessage.AlbumArtist;
+				}
+			}
+			else if (_currentTrack.Artist != "" || _currentTrack.AlbumArtist != "")
+			{
+				if (_currentTrack.Artist != "")
+				{
+					return _currentTrack.Artist;
+				}
+
+				return _currentTrack.AlbumArtist;
+			}
+			return langHelper[LocalizableStrings.UNKNOWN_ARTIST];
+		}
 
 		public static async Task HandleIncomingConnections()
 		{
@@ -523,7 +568,7 @@ namespace MDRP
 							}
 						});
 						InvokeActiveClient();
-						SetConsole(_lastTrack.Title, _lastTrack.Artist, _lastTrack.AlbumTitle,
+						SetConsole(_lastTrack.Title, GetArtist(null), _lastTrack.AlbumTitle,
 							currentAlbum);
 					}
 					else if
@@ -552,16 +597,12 @@ namespace MDRP
 						string newDetailsWithTitle = Functions.CapLength(
 							lineData.Split('\n')[0]
 								.Replace("${artist}",
-									(_currentTrack.Artist == ""
-										? langHelper[LocalizableStrings.UNKNOWN_ARTIST]
-										: _currentTrack.Artist)).Replace("${title}", _currentTrack.Title)
+									(GetArtist(null))).Replace("${title}", _currentTrack.Title)
 								.Replace("${album}", _currentTrack.AlbumTitle), titleLength);
 						string newStateWithArtist = Functions.CapLength(
 							lineData.Split('\n')[1]
 								.Replace("${artist}",
-									(_currentTrack.Artist == ""
-										? langHelper[LocalizableStrings.UNKNOWN_ARTIST]
-										: _currentTrack.Artist)).Replace("${title}", _currentTrack.Title)
+									(GetArtist(null))).Replace("${title}", _currentTrack.Title)
 								.Replace("${album}", _currentTrack.AlbumTitle), artistLength);
 						if (activeClient.CurrentPresence == null ||
 						    activeClient.CurrentPresence.Details != newDetailsWithTitle ||
@@ -601,7 +642,7 @@ namespace MDRP
 								}
 							}
 
-							activeClient.SetPresence(new RichPresence
+							RichPresence richPresence = new RichPresence
 							{
 								Details = newDetailsWithTitle,
 								State = newStateWithArtist,
@@ -612,8 +653,20 @@ namespace MDRP
 									SmallImageKey = GetSmallImageKey(),
 									SmallImageText = GetSmallImageText()
 								}
-							});
-							SetConsole(_currentTrack.Title, _currentTrack.Artist, _currentTrack.AlbumTitle,
+							};
+				
+							if (foundButtonText || foundButtonURL)
+							{
+								richPresence.Buttons = new []{new Button
+								{
+									Label = PrepareFormatStringCappedLocal(GetArtist(null), _currentTrack.AlbumTitle, _currentTrack.Title, buttonText, 32),
+									Url = PrepareEscapedFormatStringLocal(GetArtist(null), _currentTrack.AlbumTitle, _currentTrack.Title, buttonURL)
+								}};
+							}
+				
+							activeClient.SetPresence(richPresence);
+
+							SetConsole(_currentTrack.Title, GetArtist(null), _currentTrack.AlbumTitle,
 								currentAlbum);
 							InvokeActiveClient();
 						}
@@ -734,23 +787,10 @@ namespace MDRP
 				currentTitle = lastMessage.Title;
 				WrongArtistFlag = HasNameNotQuite(new Album(lastMessage.Album.Name), _playerName);
 
-
-				activeClient.SetPresence(new RichPresence
+				RichPresence richPresence = new RichPresence
 				{
-					Details = Functions.CapLength(
-						lineData.Split('\n')[0]
-							.Replace("${artist}",
-								(lastMessage.Artist == ""
-									? langHelper[LocalizableStrings.UNKNOWN_ARTIST]
-									: lastMessage.Artist)).Replace("${title}", lastMessage.Title)
-							.Replace("${album}", lastMessage.Album.Name), titleLength),
-					State = Functions.CapLength(
-						lineData.Split('\n')[1]
-							.Replace("${artist}",
-								(lastMessage.Artist == ""
-									? langHelper[LocalizableStrings.UNKNOWN_ARTIST]
-									: lastMessage.Artist)).Replace("${title}", lastMessage.Title)
-							.Replace("${album}", lastMessage.Album.Name), artistLength),
+					Details = PrepareFormatStringCapped(lastMessage, lineData.Split('\n')[0], titleLength),
+					State = PrepareFormatStringCapped(lastMessage, lineData.Split('\n')[1], titleLength),
 
 					Timestamps = _isPlaying
 						? new Timestamps
@@ -765,8 +805,21 @@ namespace MDRP
 						LargeImageText = Functions.GetLargeImageText(lastMessage.Album.Name),
 						SmallImageKey = GetSmallImageKey(),
 						SmallImageText = GetSmallImageText()
-					}
-				});
+					},
+				};
+				
+				if (foundButtonText || foundButtonURL)
+				{
+					richPresence.Buttons = new []{new Button
+					{
+						Label = PrepareFormatStringCapped(lastMessage, buttonText, 32),
+						Url = PrepareEscapedFormatString(lastMessage, buttonURL)
+					}};
+				}
+				
+				activeClient.SetPresence(richPresence);
+				
+
 				InvokeActiveClient();
 
 				if (ScreamAtUser && !presenceIsRich && !NotifiedAlbums.Contains(currentAlbum) &&
@@ -793,10 +846,51 @@ namespace MDRP
 					}
 				}
 
-				SetConsole(lastMessage.Title, lastMessage.Artist, lastMessage.Album.Name,
+				SetConsole(lastMessage.Title, GetArtist(lastMessage), lastMessage.Album.Name,
 					lastMessage.Album);
 				if (!_isPlaying) Timer.Restart();
 			}
+		}
+
+		private static string PrepareFormatStringCappedLocal(string artist, string album, string title, string instring,
+			int capLength)
+		{
+			return Functions.CapLength(
+				PrepareFormatStringLocal(artist, album, title, instring), capLength);
+		}
+
+		private static string PrepareFormatStringCapped(JsonResponse lastMessage, string instring, int capLength)
+		{
+			return Functions.CapLength(
+				PrepareFormatString(lastMessage, instring), capLength);
+		}
+
+		private static string PrepareFormatStringLocal(string artist, string album, string title, string instring)
+		{
+			return instring.Replace("${artist}",
+					(artist)).Replace("${title}", title)
+				.Replace("${album}", album);
+		}
+
+		private static string PrepareFormatString(JsonResponse lastMessage, string instring)
+		{
+			return instring.Replace("${artist}",
+					(GetArtist(lastMessage))).Replace("${title}", lastMessage.Title)
+				.Replace("${album}", lastMessage.Album.Name);
+		}
+		
+		private static string PrepareEscapedFormatStringLocal(string artist, string album, string title, string instring)
+		{
+			return instring.Replace("${artist}",
+					WebUtility.UrlEncode(Uri.EscapeUriString(artist))).Replace("${title}", WebUtility.UrlEncode(Uri.EscapeUriString(title)))
+				.Replace("${album}", WebUtility.UrlEncode(Uri.EscapeUriString(album)));
+		}
+
+		private static string PrepareEscapedFormatString(JsonResponse lastMessage, string instring)
+		{
+			return instring.Replace("${artist}",
+					WebUtility.UrlEncode(Uri.EscapeUriString(GetArtist(lastMessage)))).Replace("${title}", WebUtility.UrlEncode(Uri.EscapeUriString(lastMessage.Title)))
+				.Replace("${album}", WebUtility.UrlEncode(Uri.EscapeUriString(lastMessage.Album.Name)));
 		}
 
 		private static string GetSmallImageText()
@@ -862,7 +956,7 @@ namespace MDRP
 				}
 			}
 
-			return BigAssets[_playerName];
+			return BigAssets.ContainsKey(_playerName) ? BigAssets[_playerName] : BigAssets[defaultPlayer];
 		}
 
 		private static void UnsetAllPresences()
@@ -1205,12 +1299,22 @@ namespace MDRP
 					else if (!foundFirst && firstPortion == "first line")
 					{
 						foundFirst = true;
-						lineData = String.Join("=", explodedLine.Skip(1)) + lineData;
+						lineData = String.Join("=", explodedLine.Skip(1).ToArray()) + lineData;
 					}
 					else if (!foundSecond && firstPortion == "second line")
 					{
 						foundSecond = true;
-						lineData = lineData + "\n" + String.Join("=", explodedLine.Skip(1));
+						lineData = lineData + "\n" + String.Join("=", explodedLine.Skip(1).ToArray());
+					}
+					else if (!foundButtonText && firstPortion == "button text")
+					{
+						foundButtonText = true;
+						buttonText = String.Join("=", explodedLine.Skip(1).ToArray());
+					}
+					else if (!foundButtonURL && firstPortion == "button url")
+					{
+						foundButtonURL = true;
+						buttonURL = String.Join("=", explodedLine.Skip(1).ToArray());
 					}
 					else if (firstPortion == "get remote artwork")
 					{
