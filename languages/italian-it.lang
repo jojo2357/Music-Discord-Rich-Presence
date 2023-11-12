@@ -14,7 +14,7 @@ UNKEYED==Album non salvato :(
 UNKNOWN_ARTIST==Artista sconosciuto
 CONSOLE_NAME==Music Discord Rich Presence
 NO_VALID_MEDIA==Rilevato volume in qualcosa ma non visualizzato perché non supportato oppure è disabilitato attualmente.
-REQUIRE_PIPELINE==Rilevato il volume in {0} , ma non sono stati ricevuti dati da esso. Potrebbe essere necessario aggiornare il lettore, installare un plug-in o semplicemente mettere in pausa e riprendere la musica. Vedi di più su
+REQUIRE_PIPELINE==Rilevato il volume in {0}, ma non sono stati ricevuti dati da esso. Potrebbe essere necessario aggiornare il lettore, installare un plug-in o semplicemente mettere in pausa e riprendere la musica. Vedi di più su
 AND==e
 FAILED_TO_GET_INFO==Impossibile ottenere informazioni sulla traccia
 UNKNOWN_ALBUM==Album ignoto
