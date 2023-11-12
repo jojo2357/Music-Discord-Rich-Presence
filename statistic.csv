@@ -1,26 +1,26 @@
 File,Lines (% total),Code Lines,% Code,Comment Lines,% Comment,Blank Lines,% Blank
 MDRPDebugTool.js,11 (100.0%),9,81.8%,0,0.0%,2,18.2%
-Program.cs,1529 (99.3%),1316,86.1%,58,3.8%,155,10.1%
-AssemblyInfo.cs,36 (2.3%),15,41.7%,17,47.2%,4,11.1%
-FindGroove.bat,62 (3.8%),38,61.3%,1,1.6%,23,37.1%
-FindSpotify.bat,54 (3.2%),33,61.1%,1,1.9%,20,37.0%
-FindWMP.bat,54 (3.1%),33,61.1%,1,1.9%,20,37.0%
+Program.cs,1633 (99.3%),1406,86.1%,58,3.6%,169,10.3%
+AssemblyInfo.cs,36 (2.1%),15,41.7%,17,47.2%,4,11.1%
+FindGroove.bat,62 (3.6%),38,61.3%,1,1.6%,23,37.1%
+FindSpotify.bat,54 (3.0%),33,61.1%,1,1.9%,20,37.0%
+FindWMP.bat,54 (2.9%),33,61.1%,1,1.9%,20,37.0%
 KillHidden.bat,3 (0.2%),2,66.7%,0,0.0%,1,33.3%
 KillHiddenSilent.bat,5 (0.3%),3,60.0%,0,0.0%,2,40.0%
-LinkSystemStartAndMDRP.bat,17 (1.0%),11,64.7%,0,0.0%,6,35.3%
-LinkWithGroove.bat,53 (2.9%),34,64.2%,2,3.8%,17,32.1%
-LinkWithSpotify.bat,51 (2.7%),33,64.7%,2,3.9%,16,31.4%
-LinkWithWMP.bat,51 (2.6%),33,64.7%,2,3.9%,16,31.4%
+LinkSystemStartAndMDRP.bat,17 (0.9%),11,64.7%,0,0.0%,6,35.3%
+LinkWithGroove.bat,53 (2.7%),34,64.2%,2,3.8%,17,32.1%
+LinkWithSpotify.bat,51 (2.6%),33,64.7%,2,3.9%,16,31.4%
+LinkWithWMP.bat,51 (2.5%),33,64.7%,2,3.9%,16,31.4%
 RunHidden.bat,10 (0.5%),6,60.0%,0,0.0%,4,40.0%
 UnlinkFromGroove.bat,22 (1.1%),15,68.2%,0,0.0%,7,31.8%
 UnlinkFromSpotify.bat,22 (1.1%),15,68.2%,0,0.0%,7,31.8%
 UnlinkFromSystemStart.bat,21 (1.0%),14,66.7%,0,0.0%,7,33.3%
-UnlinkFromWMP.bat,22 (1.1%),15,68.2%,0,0.0%,7,31.8%
+UnlinkFromWMP.bat,22 (1.0%),15,68.2%,0,0.0%,7,31.8%
 delete_sensitive_files.bat,1 (0.0%),1,100.0%,0,0.0%,0,0.0%
-Album.cs,82 (3.9%),63,76.8%,8,9.8%,11,13.4%
-ExternalArtManager.cs,245 (10.4%),220,89.8%,0,0.0%,25,10.2%
-Functions.cs,250 (9.6%),213,85.2%,9,3.6%,28,11.2%
-JsonResponse.cs,100 (3.7%),90,90.0%,1,1.0%,9,9.0%
-LangHelper.cs,155 (5.4%),147,94.8%,0,0.0%,8,5.2%
-Music_DRP_Launcher.bat,73 (2.5%),51,69.9%,21,28.8%,1,1.4%
-Total,2929,2410,0.8,123,0.0,396,0.1
+Album.cs,82 (3.7%),63,76.8%,8,9.8%,11,13.4%
+ExternalArtManager.cs,245 (10.0%),220,89.8%,0,0.0%,25,10.2%
+Functions.cs,250 (9.2%),213,85.2%,9,3.6%,28,11.2%
+JsonResponse.cs,103 (3.7%),93,90.3%,1,1.0%,9,8.7%
+LangHelper.cs,155 (5.2%),147,94.8%,0,0.0%,8,5.2%
+Music_DRP_Launcher.bat,73 (2.4%),51,69.9%,21,28.8%,1,1.4%
+Total,3036,2503,0.8,123,0.0,410,0.1
