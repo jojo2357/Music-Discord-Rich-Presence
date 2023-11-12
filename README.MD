@@ -9,11 +9,16 @@ This program has been designed to work with many music players in the windows en
 - Spotify
 - Music Bee ([Special Plugin](https://github.com/jojo2357/MDRP-MusicBee-Bridge) Required, but has bonus features)
 - Wavelink
+- Media Monkey
+- foobar2000
 - Tidal Player\*
+- Amazon Music\*\*
 
 There may be more to come, time will tell.
 
 \* Note for Tidal, may not work for some users. Has been successfully tested on windows 10 and 11, on the free version on computers that MDRP works with either Groove or WMP. Paid versions of Tidal may experience issues, and older versions of Tidal will not work because they changed the exe name.
+
+\*\* Very unreliable due to Amazon Music not reporting its media to WMC properly, so there is nothing that MDRP can to
 
 ### If you have a version below 1.7, please refer to the [old readme](https://github.com/jojo2357/Music-Discord-Rich-Presence/blob/1.6.4/README.MD) or update your entire MDRP installation from scratch
 
@@ -30,7 +35,7 @@ There may be more to come, time will tell.
 1. Unzip the zip file
 2. Navigate to the unzipped contents
 3. Run `Music_DRP_Launcher.bat`. Your antivirus may flag it as potentially dangerous, so optionally run a scan first, or live on the edge and select "Run Anyway" (you may need to google how to do so)
-4. Select the option you would like, and play some tunes. It is recommended that you do *not* run hidden on win 11 or until you are confortable using MDRP
+4. Select the option you would like, and play some tunes. It is recommended that you do *not* run hidden on win 11 or until you are comfortable using MDRP
 5. Profit
 
 # Extended Setup
@@ -70,7 +75,7 @@ To change any MDRP settings, they will all be located in your `DiscordPresenceCo
 Data in this file is in `key=value` pairs so any line that does not have a `=` will be ignored.
 
 ### Changing default background
-In the ini config file, there is the option to change the default background on a per-player setting. The schema is `large <player> asset=url/application asset`. For example, to change the default beckground of MusicBee to the album cover of "My Head is an Animal", you would put: 
+In the ini config file, there is the option to change the default background on a per-player setting. The schema is `large <player> asset=url/application asset`. For example, to change the default background of MusicBee to the album cover of "My Head is an Animal", you would put: 
 
 `large musicbee asset=https://is3-ssl.mzstatic.com/image/thumb/Music125/v4/11/50/a7/1150a7a6-ad88-1985-2869-7ae3d66391d5/12UMGIM10062.rgb.jpg/512x512bb.jpg` 
 
@@ -94,7 +99,7 @@ The `verbose` setting enables desktop notifications about the following:
 - Depreciated settings/key style
 
 ### Changing Rich Presence Format
-If you would like, you can change how your Rich Presence is shown in Discord. You are limited to two lines (by discord, not MDRP) and these can be changed in the ini. The two examples will render the song King And Lionheard by Of Monsters And Men on the ablum My Head is An Animal as
+If you would like, you can change how your Rich Presence is shown in Discord. You are limited to two lines (by discord, not MDRP) and these can be changed in the ini. The two examples will render the song King And Lionheart by Of Monsters And Men on the album My Head is An Animal as
 
 Spotify-style:
 line 1: `King And Lionheart by Of Monsters And Men`
@@ -107,11 +112,11 @@ line 2: `Artist: Of Monsters and Men`
 The tooltip on the large image will always have the album name, and the tooltip on the small icon will have one of `Listening to <Music Player>` or `paused` (when appropriate).
 
 ### Automatic Album Art Settings
-Automatic Album Art or Remote Artowork as it is sometimes referred to, is the process by which MDRP will look on the internet for the album art that corresponds to your currently playing media. **If MDRP gets the album art wrong, please comment on [this discussion](https://github.com/jojo2357/Music-Discord-Rich-Presence/discussions/59)
+Automatic Album Art or Remote Artwork as it is sometimes referred to, is the process by which MDRP will look on the internet for the album art that corresponds to your currently playing media. **If MDRP gets the album art wrong, please comment on [this discussion](https://github.com/jojo2357/Music-Discord-Rich-Presence/discussions/59)
 
 | Setting                   | When It applies | Behavior when true | Behavior when false | Recommendation |
 |---------------------------|-----------------|--------------------|---------------------|----------|
-| `get remote artwork`      | The current album is unkeyed for the current Media Player |MDRP will attempt to get the artowork for the currently playing media online and display it on the default application for the current Media Player | MDRP will simply show the default background on the default application | Set this to true if you haven't keyed you albums and would like to have arts in your rich Presence |
+| `get remote artwork`      | The current album is unkeyed for the current Media Player |MDRP will attempt to get the artwork for the currently playing media online and display it on the default application for the current Media Player | MDRP will simply show the default background on the default application | Set this to true if you haven't keyed you albums and would like to have arts in your rich Presence |
 | `remote needs exact match` | `get remote artwork` is true, The current album is unkeyed, and MDRP could not find an identical match either because there were too many results or the artist name was slightly off | MDRP will search again with more restrictive terms, and choose an exact match, or the only match, or the best non perfect artist match | ditto ^ | Set to false if your arts are frequently incorrect, true if your arts are frequently not found |
 | `create cache file`       | `get remote artwork` is true, and MDRP had to search for an artwork | after a successful search, MDRP will key this album to a file in your clientdata folder. This key file will apply to all players, and will use the default app for those players | The cache will not be saved, and lost on restart | Not a lot of reasons to set this to false, MDRP is basically keying all your music for you, and if MDRP gets it wrong, you can correct it yourself |
 | `translate from japanese` | `get remote artwork` is true | Searches to ITunes will be done with the language of the search set to Japanese | Searches assume english, and will only directly latinize searches | Set this to true if you have a lot of Japanese music, especially if the searches don't find it often. Searching in JP will provide subtle corrections like reordering first and last names |
@@ -135,5 +140,5 @@ All translations are courtesy of the community. If you would like to contribute 
   
 Icon is thanks to [Ghoelian](https://github.com/Ghoelian) so thanks for that!
 
-### Licence
+### License
 Since I have added more features that allow the user to do more and more, I must add that while licensed under an MIT license, I am not responsible for any damages caused by the use or abuse of the tools that I have provided. Use for good, not evil.
