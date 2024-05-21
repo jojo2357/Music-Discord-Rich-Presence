@@ -76,11 +76,15 @@ To change any MDRP settings, they will all be located in your `DiscordPresenceCo
 Data in this file is in `key=value` pairs so any line that does not have a `=` will be ignored.
 
 ## Adding a custom player
-Assuming the player outputs properly to WMC, it can be added as a new player. Open `SupportedPlayers.dat`, and following the schema below, fill out the information.
+***Assuming the player outputs properly to WMC***, it can be added as a new player. Open `SupportedPlayers.dat` and following the schema below, fill out the information.
 
 `executable name==display name==enabled==discord application id==console color==asset link`
 
 Discord application id can be created by navigating to the [Discord developer dashboard](https://discord.com/developers/applications) and creating an application. The asset link should be a link to the player's icon, this is what you'll see as both the small icon and the large one if no album art is keyed. The console color should be a valid C# ConsoleColor.
+
+To complete the process, open `DiscordPresenceConfig.ini` and follow the format `executable name=enabled=discord application id` in a similar style to the above.
+
+If this doesn't work, either the formatting is not correct or the application does not output to WMC and will not work with MDRP.
 ### Changing default background
 In the ini config file, there is the option to change the default background on a per-player setting. The schema is `large <player> asset=url/application asset`. For example, to change the default background of MusicBee to the album cover of "My Head is an Animal", you would put: 
 
