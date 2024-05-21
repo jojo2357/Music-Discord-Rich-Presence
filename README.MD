@@ -29,6 +29,7 @@ There may be more to come, time will tell.
 - Includes batch scripts to run MDRP when your music player is started, and will close MDRP when your player closes
 - Can toggle on or off certain music players
 - Can change the default name of the application in Discord, so you could have `Playing Music` instead of `Playing Groove Music`
+- Ability to add your own music player support, assuming the player outputs to WMC properly
 
 ## Setup
 0. Download the [latest release](https://github.com/jojo2357/Music-Discord-Rich-Presence/releases/latest)
@@ -68,12 +69,18 @@ You can set in the settings file `get remote artwork` and `create cache file`. T
 Right now you can only use the old library, so don't use this for now.
 
 ### The Spotify Way
-If you would like to key all of your Spotify playlists, go to the [MDRP website](https://mdrp.tech/fetchalbumart) (under construction, please be patient) and click `Regenerate Token`, then select either `Include Artists` (recommended) or `Exclude Artists` and then download the dat (may take up to 5 minutes if you have a ton of songs) and place it in your clientdata folder.
+If you would like to key all of your Spotify playlists, go to the [MDRP website](https://smaltin.dev/fetchalbumart) (under construction, please be patient) and click `Regenerate Token`, then select either `Include Artists` (recommended) or `Exclude Artists` and then download the dat (may take up to 5 minutes if you have a ton of songs) and place it in your clientdata folder.
 
 ## Changing MDRP Settings
 To change any MDRP settings, they will all be located in your `DiscordPresenceConfig.ini` file.\
 Data in this file is in `key=value` pairs so any line that does not have a `=` will be ignored.
 
+## Adding a custom player
+Assuming the player outputs properly to WMC, it can be added as a new player. Open `SupportedPlayers.dat`, and following the schema below, fill out the information.
+
+`executable name==display name==enabled==discord application id==console color==asset link`
+
+Discord application id can be created by navigating to the [Discord developer dashboard](https://discord.com/developers/applications) and creating an application. The asset link should be a link to the player's icon, this is what you'll see as both the small icon and the large one if no album art is keyed. The console color should be a valid C# ConsoleColor.
 ### Changing default background
 In the ini config file, there is the option to change the default background on a per-player setting. The schema is `large <player> asset=url/application asset`. For example, to change the default background of MusicBee to the album cover of "My Head is an Animal", you would put: 
 
