@@ -80,7 +80,9 @@ Data in this file is in `key=value` pairs so any line that does not have a `=` w
 
 `executable name==display name==enabled==discord application id==console color==asset link`
 
-Discord application id can be created by navigating to the [Discord developer dashboard](https://discord.com/developers/applications) and creating an application. The asset link should be a link to the player's icon, this is what you'll see as both the small icon and the large one if no album art is keyed. The console color should be a valid C# ConsoleColor.
+Discord application id can be created by navigating to the [Discord developer dashboard](https://discord.com/developers/applications) and creating an application. The asset link should be a link to the player's icon, this is what you'll see as both the small icon and the large one if no album art is keyed.
+
+The console color should be a valid [ConsoleColor](https://learn.microsoft.com/en-us/dotnet/api/system.consolecolor?view=net-8.0#fields), as seen in the image ![ConsoleColors](assets/consolecolors.png)
 
 To complete the process, open `DiscordPresenceConfig.ini` and follow the format `executable name=enabled=discord application id` in a similar style to the above.
 
