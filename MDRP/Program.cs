@@ -1178,34 +1178,53 @@ namespace MDRP
 					iterator++;
 					if (!line.StartsWith("#") && !string.IsNullOrWhiteSpace(line))
 					{
-						try
-						{
-							string[] explodedLine = Regex.Split(line, @"==");
-							if (bool.Parse(explodedLine[2]))
-							{
-								//Format: executable name==display name==enabled==discord application id==console color==asset link
-								string execName = explodedLine[0];
-								string displayName = explodedLine[1];
-								string appid = explodedLine[3];
-								ConsoleColor color =
-									(ConsoleColor)Enum.Parse(typeof(ConsoleColor), explodedLine[4], true);
-								string assetLink = explodedLine[5];
-
-								DefaultClients.Add(execName, new DiscordRpcClient(appid, autoEvents: false));
-								PlayerColors.Add(execName, color);
-								Aliases.Add(execName, displayName);
-								BigAssets.Add(execName, assetLink);
-								LittleAssets.Add(execName, assetLink);
-								Whatpeoplecallthisplayer.Add(execName, displayName);
-								if (!InverseWhatpeoplecallthisplayer.ContainsKey(displayName))
-									InverseWhatpeoplecallthisplayer.Add(displayName, execName);
-								ValidPlayers.Add(execName);
-							}
-						}
-						catch (Exception e)
-						{
-							Functions.SendToDebugServer(e);
+						string[] explodedLine = Regex.Split(line, @"==");
+						if (explodedLine.Length != 6)
+						{ 
 							Functions.SendToDebugServer("Invalid formatting on line " + iterator + ". Please follow the format 'executable name==display name==enabled==discord application id==console color==asset link'");
+						}
+						else
+						{
+							try
+							{
+								if (bool.Parse(explodedLine[2]))
+								{
+									//Format: executable name==display name==enabled==discord application id==console color==asset link
+									string execName = explodedLine[0];
+									string displayName = explodedLine[1];
+									string appid = explodedLine[3];
+									ConsoleColor color;
+									if (Enum.IsDefined(typeof(ConsoleColor), explodedLine[4]))
+									{
+										color =
+											(ConsoleColor)Enum.Parse(typeof(ConsoleColor), explodedLine[4], true);
+									}
+									else
+									{
+										Functions.SendToDebugServer("The color '" + explodedLine[4] + "' is not a valid ConsoleColor in C#. Defaulting to ConsoleColor.Gray");
+										color = ConsoleColor.Gray;
+									}
+
+									string assetLink = explodedLine[5];
+
+									DefaultClients.Add(execName, new DiscordRpcClient(appid, autoEvents: false));
+									PlayerColors.Add(execName, color);
+									Aliases.Add(execName, displayName);
+									BigAssets.Add(execName, assetLink);
+									LittleAssets.Add(execName, assetLink);
+									Whatpeoplecallthisplayer.Add(execName, displayName);
+									if (!InverseWhatpeoplecallthisplayer.ContainsKey(displayName))
+										InverseWhatpeoplecallthisplayer.Add(displayName, execName);
+									ValidPlayers.Add(execName);
+								}
+							}
+
+							catch (Exception e)
+							{
+								Functions.SendToDebugServer(e);
+								Functions.SendToDebugServer("Invalid formatting on line " + iterator +
+								                            ". Please follow the format 'executable name==display name==enabled==discord application id==console color==asset link'");
+							}
 						}
 					}
 				}
