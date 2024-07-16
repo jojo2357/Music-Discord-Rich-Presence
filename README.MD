@@ -18,7 +18,7 @@ There may be more to come, time will tell.
 
 \* Note for Tidal, may not work for some users. Has been successfully tested on windows 10 and 11, on the free version on computers that MDRP works with either Groove or WMP. Paid versions of Tidal may experience issues, and older versions of Tidal will not work because they changed the exe name.
 
-\*\* Very unreliable due to Amazon Music not reporting its media to WMC properly, so there is nothing that MDRP can to
+\*\* Very unreliable due to Amazon Music not reporting its media to Windows Media Controls (referred to as WMC) properly, so there is nothing that MDRP can do
 
 ### If you have a version below 1.7, please refer to the [old readme](https://github.com/jojo2357/Music-Discord-Rich-Presence/blob/1.6.4/README.MD) or update your entire MDRP installation from scratch
 
@@ -75,8 +75,8 @@ If you would like to key all of your Spotify playlists, go to the [MDRP website]
 To change any MDRP settings, they will all be located in your `DiscordPresenceConfig.ini` file.\
 Data in this file is in `key=value` pairs so any line that does not have a `=` will be ignored.
 
-## Adding a custom player
-***Assuming the player outputs properly to WMC***, it can be added as a new player. Open `SupportedPlayers.dat` and following the schema below, fill out the information.
+### Adding a custom player
+*Assuming the player outputs properly to WMC*, it can be added as a new player. Open `SupportedPlayers.dat` and following the schema below, fill out the information.
 
 `executable name==display name==enabled==discord application id==console color==asset link`
 
@@ -89,6 +89,14 @@ The console color should be a valid [ConsoleColor](https://learn.microsoft.com/e
 To complete the process, open `DiscordPresenceConfig.ini` and follow the format `executable name=enabled=discord application id` in a similar style to the above.
 
 If this doesn't work, either the formatting is not correct or the application does not output to WMC and will not work with MDRP.
+
+#### How do I know if my media player inputs to WMC properly?
+This depends on what version of Windows you are running.
+
+On Windows 11, you can press the volume icon on your taskbar and if the song information is displayed in the media section it should work properly.
+
+On Windows 10, you can use the media keys to change the volume, the information should be displayed in the volume control. If this is the case, it should work properly.
+
 ### Changing default background
 In the ini config file, there is the option to change the default background on a per-player setting. The schema is `large <player> asset=url/application asset`. For example, to change the default background of MusicBee to the album cover of "My Head is an Animal", you would put: 
 
