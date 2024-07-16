@@ -5,8 +5,8 @@
 |[LangHelper.cs](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/smaltin-supported-players/MDRP%2Futil%2FLangHelper.cs)|155 (6.3%)|147|94.8%|0|0.0%|8|5.2%|
 |[JsonResponse.cs](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/smaltin-supported-players/MDRP%2Futil%2FJsonResponse.cs)|103 (4.2%)|93|90.3%|1|1.0%|9|8.7%|
 |[Album.cs](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/smaltin-supported-players/MDRP%2Futil%2FAlbum.cs)|82 (3.3%)|63|76.8%|8|9.8%|11|13.4%|
-|[ExternalArtManager.cs](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/smaltin-supported-players/MDRP%2Futil%2FExternalAPI%2FExternalArtManager.cs)|245 (10.0%)|220|89.8%|0|0.0%|25|10.2%|
-|[Functions.cs](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/smaltin-supported-players/MDRP%2Futil%2FFunctions.cs)|250 (10.2%)|213|85.2%|9|3.6%|28|11.2%|
-|[Program.cs](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/smaltin-supported-players/MDRP%2FProgram.cs)|1582 (64.5%)|1354|85.6%|58|3.7%|170|10.7%|
-|Average |350.4|300.7|X|13.3|X|36.4|X|
-|Total (7)|2453|2105|85.8%|93| 3.8%|255|10.4%|
+|[ExternalArtManager.cs](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/smaltin-supported-players/MDRP%2Futil%2FExternalAPI%2FExternalArtManager.cs)|245 (9.9%)|220|89.8%|0|0.0%|25|10.2%|
+|[Functions.cs](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/smaltin-supported-players/MDRP%2Futil%2FFunctions.cs)|250 (10.1%)|213|85.2%|9|3.6%|28|11.2%|
+|[Program.cs](https://github.com/jojo2357/Music-Discord-Rich-Presence/tree/smaltin-supported-players/MDRP%2FProgram.cs)|1601 (64.8%)|1371|85.6%|58|3.6%|172|10.7%|
+|Average |353.1|303.1|X|13.3|X|36.7|X|
+|Total (7)|2472|2122|85.8%|93| 3.8%|257|10.4%|
