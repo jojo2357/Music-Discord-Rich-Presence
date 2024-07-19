@@ -58,10 +58,7 @@ namespace MDRP
 
 		//ID, process name
 		//process name, enabled y/n
-		private static readonly Dictionary<string, bool> EnabledClients = new Dictionary<string, bool>
-		{
-			{ "music.ui", true }
-		};
+		private static readonly Dictionary<string, bool> EnabledClients = new Dictionary<string, bool>();
 
 		private static Dictionary<string, ConsoleColor> PlayerColors = new Dictionary<string, ConsoleColor>();
 
@@ -1191,31 +1188,40 @@ namespace MDRP
 								{
 									//Format: executable name==display name==enabled==discord application id==console color==asset link
 									string execName = explodedLine[0];
-									string displayName = explodedLine[1];
-									string appid = explodedLine[3];
-									ConsoleColor color;
-									if (Enum.IsDefined(typeof(ConsoleColor), explodedLine[4]))
+									if (!EnabledClients.ContainsKey(execName))
 									{
-										color =
-											(ConsoleColor)Enum.Parse(typeof(ConsoleColor), explodedLine[4], true);
+										string displayName = explodedLine[1];
+										string appid = explodedLine[3];
+										ConsoleColor color;
+										if (Enum.IsDefined(typeof(ConsoleColor), explodedLine[4]))
+										{
+											color =
+												(ConsoleColor)Enum.Parse(typeof(ConsoleColor), explodedLine[4], true);
+										}
+										else
+										{
+											Functions.SendToDebugServer("The color '" + explodedLine[4] +
+											                            "' is not a valid ConsoleColor in C#. Defaulting to ConsoleColor.Gray");
+											color = ConsoleColor.Gray;
+										}
+
+										string assetLink = explodedLine[5];
+
+										EnabledClients.Add(execName, explodedLine[2].ToLower() == "true");
+										DefaultClients.Add(execName, new DiscordRpcClient(appid, autoEvents: false));
+										PlayerColors.Add(execName, color);
+										Aliases.Add(execName, displayName);
+										BigAssets.Add(execName, assetLink);
+										LittleAssets.Add(execName, assetLink);
+										Whatpeoplecallthisplayer.Add(execName, displayName);
+										if (!InverseWhatpeoplecallthisplayer.ContainsKey(displayName))
+											InverseWhatpeoplecallthisplayer.Add(displayName, execName);
+										ValidPlayers.Add(execName);
 									}
 									else
 									{
-										Functions.SendToDebugServer("The color '" + explodedLine[4] + "' is not a valid ConsoleColor in C#. Defaulting to ConsoleColor.Gray");
-										color = ConsoleColor.Gray;
+										Functions.SendToDebugServer("Duplicated executable on line " + iterator + ", skipping");
 									}
-
-									string assetLink = explodedLine[5];
-
-									DefaultClients.Add(execName, new DiscordRpcClient(appid, autoEvents: false));
-									PlayerColors.Add(execName, color);
-									Aliases.Add(execName, displayName);
-									BigAssets.Add(execName, assetLink);
-									LittleAssets.Add(execName, assetLink);
-									Whatpeoplecallthisplayer.Add(execName, displayName);
-									if (!InverseWhatpeoplecallthisplayer.ContainsKey(displayName))
-										InverseWhatpeoplecallthisplayer.Add(displayName, execName);
-									ValidPlayers.Add(execName);
 								}
 							}
 
@@ -1244,6 +1250,7 @@ namespace MDRP
 					string firstPortion = firstPortionRaw.Trim().ToLower();
 					string secondPortionRaw = explodedLine.Length > 1 ? explodedLine[1] : "";
 					string secondPortion = secondPortionRaw.Trim().ToLower();
+					/*
 					if (ValidPlayers.Contains(firstPortion))
 					{
 						EnabledClients[firstPortionRaw] = secondPortion == "true";
@@ -1260,7 +1267,7 @@ namespace MDRP
 							DefaultClients[InverseWhatpeoplecallthisplayer[firstPortionRaw]] =
 								new DiscordRpcClient(explodedLine[2], autoEvents: false);
 					}
-					else if (firstPortion == "verbose" && explodedLine.Length > 1)
+					else */if (firstPortion == "verbose" && explodedLine.Length > 1)
 					{
 						ScreamAtUser = secondPortion == "true";
 					}
