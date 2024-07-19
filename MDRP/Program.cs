@@ -21,7 +21,7 @@ namespace MDRP
 	internal partial class Program
 	{
 		public static LangHelper langHelper = new LangHelper();
-		public const string Version = "1.7.3";
+		public const string Version = "1.8.0";
 		public const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
 		public static readonly string Title = langHelper.get(LocalizableStrings.MDRP_FULL);
 		private const int titleLength = 64;
@@ -34,20 +34,9 @@ namespace MDRP
 			new Uri("https://api.github.com/repos/jojo2357/Music-Discord-Rich-Presence/releases/latest");
 
 		//Player Name, client
-		private static readonly Dictionary<string, DiscordRpcClient> DefaultClients =
+		private static Dictionary<string, DiscordRpcClient> DefaultClients =
 			new Dictionary<string, DiscordRpcClient>
 			{
-				{ "music.ui", new DiscordRpcClient("807774172574253056", autoEvents: false) },
-				{ "microsoft.media.player", new DiscordRpcClient("807774172574253056", autoEvents: false) },
-				{ "wmplayer", new DiscordRpcClient("807774172574253056", autoEvents: false) },
-				{ "musicbee", new DiscordRpcClient("820837854385012766", autoEvents: false) },
-				{ "spotify", new DiscordRpcClient("802222525110812725", autoEvents: false) },
-				{ "tidal", new DiscordRpcClient("922625678271197215", autoEvents: false) },
-				{ "tidalplayer", new DiscordRpcClient("922625678271197215", autoEvents: false) },
-				{ "wavelink", new DiscordRpcClient("927328178618376212", autoEvents: false) },
-				{ "amazon music", new DiscordRpcClient("807774172574253056", autoEvents: false) },
-				{ "mediamonkeyengine", new DiscordRpcClient("1096929771511873587", autoEvents: false) },
-				{ "foobar2000", new DiscordRpcClient("1009193842211299428", autoEvents: false) },
 				{ "", new DiscordRpcClient("821398156905283585", autoEvents: false) }
 			};
 
@@ -69,115 +58,26 @@ namespace MDRP
 
 		//ID, process name
 		//process name, enabled y/n
-		private static readonly Dictionary<string, bool> EnabledClients = new Dictionary<string, bool>
-		{
-			{ "music.ui", true }
-		};
+		private static readonly Dictionary<string, bool> EnabledClients = new Dictionary<string, bool>();
 
-		private static readonly Dictionary<string, ConsoleColor> PlayerColors = new Dictionary<string, ConsoleColor>
-		{
-			{ "music.ui", ConsoleColor.Blue },
-			{ "microsoft.media.player", ConsoleColor.Blue },
-			{ "wmplayer", ConsoleColor.Blue },
-			{ "spotify", ConsoleColor.DarkGreen },
-			{ "musicbee", ConsoleColor.Yellow },
-			{ "tidal", ConsoleColor.Gray },
-			{ "tidalplayer", ConsoleColor.Gray },
-			{ "wavelink", ConsoleColor.DarkBlue },
-			{ "amazon music", ConsoleColor.Gray },
-			{ "foobar2000", ConsoleColor.DarkCyan},
-			{"mediamonkeyengine", ConsoleColor.Yellow}
-		};
+		private static Dictionary<string, ConsoleColor> PlayerColors = new Dictionary<string, ConsoleColor>();
 
 		private static string _presenceDetails = string.Empty;
 
-		private static readonly string[] ValidPlayers =
-		{
-			"music.ui", "spotify", "musicbee", "microsoft.media.player", "wmplayer", "tidal", "tidalplayer", "wavelink", "amazon music", "foobar2000", "mediamonkeyengine"
-		};
+		private static List<string> ValidPlayers = new List<string>();
 
 		private static readonly string[] RequiresPipeline = { "musicbee" };
 
 		//For use in settings
-		private static readonly Dictionary<string, string> Aliases = new Dictionary<string, string>
-		{
-			{ "musicbee", "Music Bee" },
-			{ "spotify", "Spotify Music" },
-			{ "groove", "Groove Music Player" },
-			{ "microsoft.media.player", "Windows Media Player" },
-			{ "wmplayer", "Windows Media Player" },
-			{ "music.ui", "Groove Music Player" },
-			{ "tidal", "Tidal Music" },
-			{ "tidalplayer", "Tidal Music" },
-			{ "wavelink", "Wave Link" },
-			{ "amazon music", "Amazon Music" },
-			{ "foobar2000", "FooBar2000"},
-			{ "mediamonkeyengine", "MediaMonkey5"}
-		};
+		private static Dictionary<string, string> Aliases = new Dictionary<string, string> ();
 
-		private static readonly Dictionary<string, string> BigAssets = new Dictionary<string, string>
-		{
-			{ "musicbee", "https://cdn.discordapp.com/app-assets/820837854385012766/820838584617009222.png" },
-			{ "music.ui", "https://cdn.discordapp.com/app-assets/801209905020272681/801224923547959376.png" },
-			{ "amazon music", "https://cdn.discordapp.com/app-assets/801209905020272681/801224923547959376.png" },
-			{
-				"microsoft.media.player",
-				"https://cdn.discordapp.com/app-assets/801209905020272681/801224923547959376.png"
-			},
-			{ "spotify", "https://cdn.discordapp.com/app-assets/802222525110812725/802222954821582869.png" },
-			{ "tidal", "https://cdn.discordapp.com/app-assets/922625678271197215/978018192393920562.png" },
-			{ "tidalplayer", "https://cdn.discordapp.com/app-assets/922625678271197215/978018192393920562.png" },
-			{ "wavelink", "https://cdn.discordapp.com/app-assets/927328178618376212/927329727180574760.png" },
-			{ "foobar2000", "https://cdn.discordapp.com/app-assets/1009193842211299428/1009196080853950464.png" },
-			{"mediamonkeyengine", "https://cdn.discordapp.com/app-assets/1096929771511873587/1096930933325713519.png"}
-		};
+		private static Dictionary<string, string> BigAssets = new Dictionary<string, string>();
 
-		//might just combine these later
-		private static readonly Dictionary<string, string> LittleAssets = new Dictionary<string, string>
-		{
-			{ "musicbee", "https://cdn.discordapp.com/app-assets/820837854385012766/820838635703500810.png" },
-			{ "music.ui", "https://cdn.discordapp.com/app-assets/801209905020272681/801224923547959376.png" },
-			{ "amazon music", "https://cdn.discordapp.com/app-assets/801209905020272681/801224923547959376.png" },
-			{
-				"microsoft.media.player",
-				"https://cdn.discordapp.com/app-assets/801209905020272681/801224923547959376.png"
-			},
-			{ "spotify", "https://cdn.discordapp.com/app-assets/802222525110812725/802222992683827200.png" },
-			{ "tidal", "https://cdn.discordapp.com/app-assets/922625678271197215/978018192637198406.png" },
-			{ "tidalplayer", "https://cdn.discordapp.com/app-assets/922625678271197215/978018192637198406.png" },
-			{ "wavelink", "https://cdn.discordapp.com/app-assets/927328178618376212/927329727218319410.png" },
-			{ "foobar2000", "https://cdn.discordapp.com/app-assets/1009193842211299428/1009196080950423563.png" },
-			{"mediamonkeyengine", "https://cdn.discordapp.com/app-assets/1096929771511873587/1096930933325713519.png"}
-		};
+		private static Dictionary<string, string> LittleAssets = new Dictionary<string, string>();
 
-		private static readonly Dictionary<string, string> Whatpeoplecallthisplayer = new Dictionary<string, string>
-		{
-			{ "musicbee", "Music Bee" },
-			{ "music.ui", "Groove Music" },
-			{ "microsoft.media.player", "Windows Media Player" },
-			{ "wmplayer", "Windows Media Player" },
-			{ "spotify", "Spotify" },
-			{ "tidal", "Tidal Music" },
-			{ "tidalplayer", "Tidal Music" },
-			{ "wavelink", "Wave Link" },
-			{ "amazon music", "Amazon Music" },
-			{ "foobar2000", "FooBar2000"},
-			{"mediamonkeyengine", "MediaMonkey5"}
-		};
+		private static Dictionary<string, string> Whatpeoplecallthisplayer = new Dictionary<string, string>();
 
-		private static readonly Dictionary<string, string> InverseWhatpeoplecallthisplayer =
-			new Dictionary<string, string>
-			{
-				{ "musicbee", "musicbee" },
-				{ "groove", "music.ui" },
-				{ "Microsoft.Media.Player", "microsoft.media.player" },
-				{ "spotify", "spotify" },
-				{ "Tidal Music", "tidal" },
-				{ "Wave Link", "wavelink" },
-				{ "Amazon Music", "anazon music" },
-				{ "FooBar2000", "foobar2000"},
-				{"MediaMonkey5", "mediamonkeyengine"}
-			};
+		private static Dictionary<string, string> InverseWhatpeoplecallthisplayer = new Dictionary<string, string>();
 
 		private static readonly string defaultPlayer = "groove";
 		private static readonly int timeout_seconds = 60;
@@ -1268,6 +1168,80 @@ namespace MDRP
 		{
 			try
 			{
+				string[] lines = File.ReadAllLines("../../../SupportedPlayers.dat");
+				int iterator = 0;
+				foreach (string line in lines)
+				{
+					iterator++;
+					if (!line.StartsWith("#") && !string.IsNullOrWhiteSpace(line))
+					{
+						string[] explodedLine = Regex.Split(line, @"==");
+						if (explodedLine.Length != 6)
+						{ 
+							Functions.SendToDebugServer("Invalid formatting on line " + iterator + ". Please follow the format 'executable name==display name==enabled==discord application id==console color==asset link'");
+						}
+						else
+						{
+							try
+							{
+								if (bool.Parse(explodedLine[2]))
+								{
+									//Format: executable name==display name==enabled==discord application id==console color==asset link
+									string execName = explodedLine[0];
+									if (!EnabledClients.ContainsKey(execName))
+									{
+										string displayName = explodedLine[1];
+										string appid = explodedLine[3];
+										ConsoleColor color;
+										if (Enum.IsDefined(typeof(ConsoleColor), explodedLine[4]))
+										{
+											color =
+												(ConsoleColor)Enum.Parse(typeof(ConsoleColor), explodedLine[4], true);
+										}
+										else
+										{
+											Functions.SendToDebugServer("The color '" + explodedLine[4] +
+											                            "' is not a valid ConsoleColor in C#. Defaulting to ConsoleColor.Gray");
+											color = ConsoleColor.Gray;
+										}
+
+										string assetLink = explodedLine[5];
+
+										EnabledClients.Add(execName, explodedLine[2].ToLower() == "true");
+										DefaultClients.Add(execName, new DiscordRpcClient(appid, autoEvents: false));
+										PlayerColors.Add(execName, color);
+										Aliases.Add(execName, displayName);
+										BigAssets.Add(execName, assetLink);
+										LittleAssets.Add(execName, assetLink);
+										Whatpeoplecallthisplayer.Add(execName, displayName);
+										if (!InverseWhatpeoplecallthisplayer.ContainsKey(displayName))
+											InverseWhatpeoplecallthisplayer.Add(displayName, execName);
+										ValidPlayers.Add(execName);
+									}
+									else
+									{
+										Functions.SendToDebugServer("Duplicated executable on line " + iterator + ", skipping");
+									}
+								}
+							}
+
+							catch (Exception e)
+							{
+								Functions.SendToDebugServer(e);
+								Functions.SendToDebugServer("Invalid formatting on line " + iterator +
+								                            ". Please follow the format 'executable name==display name==enabled==discord application id==console color==asset link'");
+							}
+						}
+					}
+				}
+			}
+			catch (Exception e)
+			{
+				Functions.SendToDebugServer("SupportedPlayers.dat could not be found");
+				Functions.SendToDebugServer(e);
+			}
+			try
+			{
 				string[] lines = File.ReadAllLines("../../../DiscordPresenceConfig.ini");
 				foreach (string line in lines)
 				{
@@ -1276,6 +1250,7 @@ namespace MDRP
 					string firstPortion = firstPortionRaw.Trim().ToLower();
 					string secondPortionRaw = explodedLine.Length > 1 ? explodedLine[1] : "";
 					string secondPortion = secondPortionRaw.Trim().ToLower();
+					/*
 					if (ValidPlayers.Contains(firstPortion))
 					{
 						EnabledClients[firstPortionRaw] = secondPortion == "true";
@@ -1292,7 +1267,7 @@ namespace MDRP
 							DefaultClients[InverseWhatpeoplecallthisplayer[firstPortionRaw]] =
 								new DiscordRpcClient(explodedLine[2], autoEvents: false);
 					}
-					else if (firstPortion == "verbose" && explodedLine.Length > 1)
+					else */if (firstPortion == "verbose" && explodedLine.Length > 1)
 					{
 						ScreamAtUser = secondPortion == "true";
 					}
@@ -1506,7 +1481,7 @@ namespace MDRP
 			}
 
 			foreach (string playerCandidate in lines[0].Split('=')[1] == "*"
-				         ? ValidPlayers
+				         ? ValidPlayers.ToArray()
 				         : lines[0].Split('=')[1].ToLower().Split(','))
 			{
 				if (useDefaults)

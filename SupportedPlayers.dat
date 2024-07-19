@@ -1,0 +1,15 @@
+﻿#Format: executable name==display name==enabled==discord application id==console color==asset link
+musicbee==Music Bee==true==820837854385012766==Yellow==https://cdn.discordapp.com/app-assets/820837854385012766/820838584617009222.png
+groove==Groove Music==true==807774172574253056==Blue==https://cdn.discordapp.com/app-assets/801209905020272681/801224923547959376.png
+music.ui==Groove Music==true==807774172574253056==Blue==https://cdn.discordapp.com/app-assets/801209905020272681/801224923547959376.png
+microsoft.media.player==Windows Media Player==true==807774172574253056==Blue==https://cdn.discordapp.com/app-assets/801209905020272681/801224923547959376.png
+wmplayer==Windows Media Player==true==807774172574253056==Blue==https://cdn.discordapp.com/app-assets/801209905020272681/801224923547959376.png
+spotify==Spotify==true==802222525110812725==DarkGreen==https://cdn.discordapp.com/app-assets/802222525110812725/802222954821582869.png
+tidal==Tidal Music==true==922625678271197215==Gray==https://cdn.discordapp.com/app-assets/922625678271197215/978018192393920562.png
+tidalplayer==Tidal Music==true==922625678271197215==Gray==https://cdn.discordapp.com/app-assets/922625678271197215/978018192393920562.png
+wavelink==Wave Link==true==927328178618376212==DarkBlue==https://cdn.discordapp.com/app-assets/927328178618376212/927329727180574760.png
+amazon music==Amazon Music==true==807774172574253056==Gray==https://cdn.discordapp.com/app-assets/801209905020272681/801224923547959376.png
+foobar2000==FooBar2000==true==1009193842211299428==DarkCyan==https://cdn.discordapp.com/app-assets/1009193842211299428/1009196080853950464.png
+mediamonkeyengine==MediaMonkey5==true==1096929771511873587==Yellow==https://cdn.discordapp.com/app-assets/1096929771511873587/1096930933325713519.png
+msedge==Soundcloud==false==1223074808540037310==Red==https://cdn.discordapp.com/app-assets/1223074808540037310/1223076877313376346.png
+amplibraryagent==Apple Music==true==868974911178285056==Red==https://cdn.discordapp.com/app-assets/868974911178285056/868975029411545128.png
