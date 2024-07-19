@@ -21,7 +21,7 @@ namespace MDRP
 	internal partial class Program
 	{
 		public static LangHelper langHelper = new LangHelper();
-		public const string Version = "1.7.3";
+		public const string Version = "1.8.0";
 		public const string Github = "https://github.com/jojo2357/Music-Discord-Rich-Presence";
 		public static readonly string Title = langHelper.get(LocalizableStrings.MDRP_FULL);
 		private const int titleLength = 64;
