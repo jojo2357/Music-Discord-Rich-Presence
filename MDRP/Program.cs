@@ -557,7 +557,8 @@ namespace MDRP
 					{
 						activeClient.SetPresence(new RichPresence
 						{
-							Details = activeClient.CurrentPresence.Details,
+                            Type = ActivityType.Listening,
+                            Details = activeClient.CurrentPresence.Details,
 							State = activeClient.CurrentPresence.State,
 							Assets = new Assets
 							{
@@ -644,6 +645,7 @@ namespace MDRP
 
 							RichPresence richPresence = new RichPresence
 							{
+								Type = ActivityType.Listening,
 								Details = newDetailsWithTitle,
 								State = newStateWithArtist,
 								Assets = new Assets
@@ -685,6 +687,7 @@ namespace MDRP
 					if (activeClient != null)
 						activeClient.SetPresence(new RichPresence
 						{
+							Type = ActivityType.Listening,
 							Details = langHelper[LocalizableStrings.FAILED_TO_GET_INFO]
 						});
 					Console.Write(langHelper[LocalizableStrings.FAILED_TO_GET_INFO] + " \r");
@@ -789,7 +792,8 @@ namespace MDRP
 
 				RichPresence richPresence = new RichPresence
 				{
-					Details = PrepareFormatStringCapped(lastMessage, lineData.Split('\n')[0], titleLength),
+                    Type = ActivityType.Listening,
+                    Details = PrepareFormatStringCapped(lastMessage, lineData.Split('\n')[0], titleLength),
 					State = PrepareFormatStringCapped(lastMessage, lineData.Split('\n')[1], titleLength),
 
 					Timestamps = _isPlaying

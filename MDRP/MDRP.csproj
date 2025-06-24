@@ -8,7 +8,7 @@
     <OutputType>Exe</OutputType>
     <RootNamespace>MDRP</RootNamespace>
     <AssemblyName>MDRP</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
@@ -97,10 +97,14 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="discordapp.ico" />
+    <Content Include="DiscordRPC.dll" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="CSCore">
       <Version>1.2.1.2</Version>
+    </PackageReference>
+    <PackageReference Include="DiscordRichPresence">
+      <Version>1.3.0.28</Version>
     </PackageReference>
     <PackageReference Include="FuzzySharp">
       <Version>2.0.2</Version>
@@ -116,9 +120,6 @@
     <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <ItemGroup>
-    <Reference Include="DiscordRPC, Version=1.0.203.0, Culture=neutral, PublicKeyToken=null">
-      <HintPath>libs\DiscordRPC.dll</HintPath>
-    </Reference>
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
   </ItemGroup>
